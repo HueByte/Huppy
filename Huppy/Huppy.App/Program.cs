@@ -34,6 +34,13 @@ var bot = new Creator(_serviceProvider);
 
 await bot.ConfigureCommandsAsync();
 
+await bot.ConfigureClientEventsAsync();
+
 await bot.CreateBot();
 
 await Task.Delay(-1);
+
+// IServiceProvider
+// DiscordShardedClient
+// CommandService
+// CommandHandlerservice

@@ -3,6 +3,8 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Huppy.Core.Entities;
+using Newtonsoft.Json;
+using Serilog;
 
 namespace Huppy.Core.Services.CommandService
 {
@@ -19,14 +21,22 @@ namespace Huppy.Core.Services.CommandService
             _serviceProvider = serviceProvider;
             _appSettings = appSettings;
 
-            _client.MessageReceived += HandleCommandAsync;
+            _client.SlashCommandExecuted += HandleCommandAsync;
         }
 
         public async Task InitializeAsync() => await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _serviceProvider);
 
-        public async Task HandleCommandAsync(SocketMessage message)
+        public async Task HandleCommandAsync(SocketSlashCommand command)
         {
+            await command.DeferAsync();
+            _ = Task.Run(() => Log.Information(JsonConvert.SerializeObject(command.Data)));
+            await command.ModifyOriginalResponseAsync(async (msg) =>
+            {
+                msg.Content = "pong";
+            });
+            // await command.ModifyOriginalResponseAsync($"Executed {command.Data.Name}");
 
+            // var context = new ShardedCommandContext(_client, command);
         }
     }
 }

@@ -57,6 +57,5 @@ namespace Huppy.App.Configuration
         }
 
         public IServiceProvider Build() => _services.BuildServiceProvider();
-
     }
 }

@@ -1,7 +1,12 @@
+using Discord;
+using Discord.Net;
 using Discord.WebSocket;
+using Huppy.Core.Common.SlashCommands;
 using Huppy.Core.Entities;
 using Huppy.Core.Services.CommandService;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
+using Serilog;
 
 namespace Huppy.App
 {
@@ -15,10 +20,11 @@ namespace Huppy.App
         {
             _serviceProvider = serviceProvider;
             _client = _serviceProvider.GetRequiredService<DiscordShardedClient>();
+            _appSettings = _serviceProvider.GetRequiredService<AppSettings>();
         }
 
         public async Task ConfigureCommandsAsync() =>
-            await _serviceProvider.GetRequiredService<CommandHandlerService>().InitializeAsync();
+            await _serviceProvider.GetRequiredService<ICommandHandlerService>().InitializeAsync();
 
         public async Task CreateBot()
         {
@@ -30,7 +36,28 @@ namespace Huppy.App
 
         public async Task ConfigureClientEventsAsync()
         {
-            // _client.ShardReady 
+            _client.ShardReady += CreateSlashCommands;
+        }
+
+        private async Task CreateSlashCommands(DiscordSocketClient socketClient)
+        {
+            var guild = socketClient.GetGuild(0000000000000);
+
+            var guildCommand = new SlashCommandBuilder();
+
+            guildCommand.WithName(Ping.Name);
+            guildCommand.WithDescription(Ping.Description);
+
+            try
+            {
+                await guild.CreateApplicationCommandAsync(guildCommand.Build());
+            }
+            catch (ApplicationCommandException exp)
+            {
+                var json = JsonConvert.SerializeObject(exp.Errors, Formatting.Indented);
+
+                Log.Fatal(json);
+            }
         }
     }
 }
