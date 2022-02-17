@@ -1,6 +1,6 @@
 using System.Reflection;
 using Discord;
-using Discord.Commands;
+using Discord.Interactions;
 using Discord.WebSocket;
 using Huppy.Core.Entities;
 using Huppy.Core.Services.CommandService;
@@ -36,16 +36,10 @@ namespace Huppy.App.Configuration
                 MessageCacheSize = 1000
             });
 
-            CommandService commandService = new(new CommandServiceConfig
-            {
-                DefaultRunMode = RunMode.Async,
-                LogLevel = LogSeverity.Info,
-                CaseSensitiveCommands = false,
-                ThrowOnError = false
-            });
+            InteractionService interactionService = new(client);
 
             _services.AddSingleton(client)
-                     .AddSingleton(commandService)
+                     .AddSingleton(interactionService)
                      .AddSingleton<ICommandHandlerService, CommandHandlerService>();
 
             return this;
