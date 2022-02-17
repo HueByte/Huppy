@@ -10,6 +10,7 @@ namespace Huppy.Core.Entities
     public class AppSettings
     {
         public string? BotToken { get; set; }
+        public string HomeGuild { get; set; }
         public string? ConnectionString { get; set; }
         public Logger Logger { get; set; }
 
@@ -35,6 +36,7 @@ namespace Huppy.Core.Entities
             var config = new AppSettings()
             {
                 BotToken = "",
+                HomeGuild = "",
                 ConnectionString = "",
                 Logger = new Logger()
                 {
