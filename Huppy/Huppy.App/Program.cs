@@ -1,34 +1,29 @@
-﻿using Huppy.App;
+﻿using System.Text.Json;
+using Huppy.App;
 using Huppy.App.Configuration;
 using Huppy.Core.Entities;
 using Huppy.Core.Lib;
+using Newtonsoft.Json;
 using Serilog;
 using Serilog.Events;
 
 Logo.Print();
 
+// Get config
 var appSettings = AppSettings.IsCreated
     ? AppSettings.Load()
     : AppSettings.Create();
 
-LogEventLevel logLevel = SerilogConfigurator.GetLogEventLevel(appSettings);
-RollingInterval logInterval = SerilogConfigurator.GetRollingInterval(appSettings);
+// Configure Logger
+Log.Logger = SerilogConfigurator.ConfigureLogger(appSettings);
 
-if (!Directory.Exists(Path.Combine(AppContext.BaseDirectory, @"logs")))
-    Directory.CreateDirectory(Path.Combine(AppContext.BaseDirectory, @"logs"));
-
-Log.Logger = new LoggerConfiguration().MinimumLevel
-                .Override("Microsoft", logLevel)
-                .WriteTo.Async(e => e.Console())
-                .WriteTo.Async(e => e.File(Path.Combine(AppContext.BaseDirectory, "logs/log.txt"), rollingInterval: logInterval))
-                .CreateLogger();
-
-
+// Configure Service provider
 IServiceProvider _serviceProvider = new ModuleConfigurator().AddAppSettings(appSettings)
+                                                            .AddLogger(Log.Logger)
                                                             .AddDiscord()
                                                             .Build();
 
-
+// Start bot
 var bot = new Creator(_serviceProvider);
 
 await bot.CreateCommands();

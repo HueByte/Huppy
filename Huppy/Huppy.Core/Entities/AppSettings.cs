@@ -10,9 +10,9 @@ namespace Huppy.Core.Entities
     public class AppSettings
     {
         public string? BotToken { get; set; }
-        public string HomeGuild { get; set; }
+        public string? HomeGuilds { get; set; }
         public string? ConnectionString { get; set; }
-        public Logger Logger { get; set; }
+        public Logger? Logger { get; set; }
 
         [JsonIgnore]
         private static string FILE_NAME = AppContext.BaseDirectory + "appsettings.json";
@@ -36,7 +36,7 @@ namespace Huppy.Core.Entities
             var config = new AppSettings()
             {
                 BotToken = "",
-                HomeGuild = "",
+                HomeGuilds = "",
                 ConnectionString = "",
                 Logger = new Logger()
                 {
@@ -58,7 +58,7 @@ namespace Huppy.Core.Entities
 
     public class Logger
     {
-        public string LogLevel { get; set; }
-        public string TimeInterval { get; set; }
+        public string? LogLevel { get; set; }
+        public string? TimeInterval { get; set; }
     }
 }

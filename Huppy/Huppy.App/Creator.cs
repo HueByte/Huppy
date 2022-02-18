@@ -3,10 +3,11 @@ using Discord;
 using Discord.Interactions;
 using Discord.Net;
 using Discord.WebSocket;
-using Huppy.Core.Common.SlashCommands;
 using Huppy.Core.Entities;
 using Huppy.Core.Services.CommandService;
+using Huppy.Core.Services.LoggerService;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Serilog;
 
@@ -19,6 +20,8 @@ namespace Huppy.App
         private readonly AppSettings _appSettings;
         private readonly InteractionService _interactionService;
         private readonly ICommandHandlerService _commandHandler;
+        private readonly LoggingService _loggingService;
+        private readonly ILogger<Creator> _logger;
 
         public Creator(IServiceProvider serviceProvider)
         {
@@ -27,6 +30,8 @@ namespace Huppy.App
             _appSettings = _serviceProvider.GetRequiredService<AppSettings>();
             _interactionService = _serviceProvider.GetRequiredService<InteractionService>();
             _commandHandler = _serviceProvider.GetRequiredService<ICommandHandlerService>();
+            _loggingService = _serviceProvider.GetRequiredService<LoggingService>();
+            _logger = _serviceProvider.GetRequiredService<ILogger<Creator>>();
         }
 
         public async Task CreateCommands() =>
@@ -34,6 +39,8 @@ namespace Huppy.App
 
         public async Task CreateBot()
         {
+            _logger.LogInformation("Starting the bot");
+
             await _client.LoginAsync(TokenType.Bot, _appSettings.BotToken);
 
             await _client.StartAsync();
@@ -43,23 +50,39 @@ namespace Huppy.App
 
         public async Task CreateEvents()
         {
+            _logger.LogInformation("Creating events");
+
             // sharded client events
             _client.ShardReady += CreateSlashCommands;
             _client.InteractionCreated += _commandHandler.HandleCommandAsync;
+            _client.Log += _loggingService.OnLogAsync;
+            _client.ShardReady += _loggingService.OnReadyAsync;
 
             // interaction service events
             _interactionService.SlashCommandExecuted += _commandHandler.SlashCommandExecuted;
+            _interactionService.Log += _loggingService.OnLogAsync;
         }
 
         private async Task CreateSlashCommands(DiscordSocketClient socketClient)
         {
+            _logger.LogInformation("Creating slash commands");
+
             try
             {
-                await _interactionService.RegisterCommandsToGuildAsync(Convert.ToUInt64(_appSettings.HomeGuild));
+                string[] guilds = _appSettings.HomeGuilds!.Split(';').ToArray();
+                ulong[] homeGuilds = Array.ConvertAll(guilds, UInt64.Parse);
+
+
+                foreach (var guild in homeGuilds)
+                {
+                    _logger.LogInformation($"Registering commands to [ {guild} ]");
+                    await _interactionService.RegisterCommandsToGuildAsync(guild);
+                    await Task.Delay(2000);
+                }
             }
             catch (Exception exp)
             {
-                Log.Error(exp.Message);
+                Log.Error($"{exp.Message}\n{exp.StackTrace}");
             }
         }
     }

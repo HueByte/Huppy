@@ -4,7 +4,9 @@ using Discord.Interactions;
 using Discord.WebSocket;
 using Huppy.Core.Entities;
 using Huppy.Core.Services.CommandService;
+using Huppy.Core.Services.LoggerService;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog;
 
 namespace Huppy.App.Configuration
 {
@@ -24,6 +26,14 @@ namespace Huppy.App.Configuration
                 : AppSettings.Create();
 
             _services.AddSingleton(settings);
+
+            return this;
+        }
+
+        public ModuleConfigurator AddLogger(ILogger logger)
+        {
+            _services.AddLogging(conf => conf.AddSerilog());
+            _services.AddSingleton<LoggingService>();
 
             return this;
         }

@@ -3,6 +3,7 @@ using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Huppy.Core.Entities;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Serilog;
 
@@ -14,39 +15,52 @@ namespace Huppy.Core.Services.CommandService
         private readonly InteractionService _interactionService;
         private readonly IServiceProvider _serviceProvider;
         private readonly AppSettings _appSettings;
-        public CommandHandlerService(DiscordShardedClient client, InteractionService interactionService, IServiceProvider serviceProvider, AppSettings appSettings)
+        private readonly Microsoft.Extensions.Logging.ILogger _logger;
+        public CommandHandlerService(DiscordShardedClient client, InteractionService interactionService, IServiceProvider serviceProvider, AppSettings appSettings, ILogger<CommandHandlerService> logger)
         {
             _client = client;
             _interactionService = interactionService;
             _serviceProvider = serviceProvider;
             _appSettings = appSettings;
+            _logger = logger;
         }
 
         public async Task InitializeAsync() =>
             await _interactionService.AddModulesAsync(Assembly.GetEntryAssembly(), _serviceProvider);
 
-        public async Task SlashCommandExecuted(SlashCommandInfo arg1, Discord.IInteractionContext arg2, IResult arg3)
+        public async Task SlashCommandExecuted(SlashCommandInfo commandInfo, Discord.IInteractionContext context, IResult result)
         {
-            if (!arg3.IsSuccess)
+            if (result.IsSuccess)
             {
-                switch (arg3.Error)
+                _logger.LogInformation($"Command [{commandInfo.Name}] executed for [{context.User.Username}] on [{context.Guild.Name}]");
+                return;
+            }
+            else
+            {
+                switch (result.Error)
                 {
                     case InteractionCommandError.UnmetPrecondition:
-                        await arg2.Interaction.RespondAsync($"Unmet Precondition: {arg3.ErrorReason}");
+                        await context.Interaction.ModifyOriginalResponseAsync((msg) => msg.Content = $"Unmet Precondition: {result.ErrorReason}");
                         break;
+
                     case InteractionCommandError.UnknownCommand:
-                        await arg2.Interaction.RespondAsync("Unknown command");
+                        await context.Interaction.ModifyOriginalResponseAsync((msg) => msg.Content = "Unknown command");
                         break;
+
                     case InteractionCommandError.BadArgs:
-                        await arg2.Interaction.RespondAsync("Invalid number or arguments");
+                        await context.Interaction.ModifyOriginalResponseAsync((msg) => msg.Content = "Invalid number or arguments");
                         break;
+
                     case InteractionCommandError.Exception:
-                        await arg2.Interaction.RespondAsync($"Command exception:{arg3.ErrorReason}");
+                        await context.Interaction.ModifyOriginalResponseAsync((msg) => msg.Content = $"Command exception:{result.ErrorReason}");
                         break;
+
                     case InteractionCommandError.Unsuccessful:
-                        await arg2.Interaction.RespondAsync("Command could not be executed");
+                        await context.Interaction.ModifyOriginalResponseAsync((msg) => msg.Content = "Command could not be executed");
                         break;
+
                     default:
+                        await context.Interaction.ModifyOriginalResponseAsync((msg) => msg.Content = "Something went wrong");
                         break;
                 }
             }
@@ -56,15 +70,16 @@ namespace Huppy.Core.Services.CommandService
         {
             try
             {
-                // await command.DeferAsync();
+                await command.DeferAsync();
 
                 var ctx = new ShardedInteractionContext(_client, command);
+
                 await _interactionService.ExecuteCommandAsync(ctx, _serviceProvider);
             }
             catch (Exception ex)
             {
                 Log.Error(ex.Message);
-                await command.RespondAsync("Something went wrong");
+                await command.ModifyOriginalResponseAsync((msg) => msg.Content = "Something went wrong");
             }
         }
     }
