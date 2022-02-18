@@ -32,7 +32,7 @@ namespace Huppy.App.Configuration
 
         public ModuleConfigurator AddLogger(ILogger logger)
         {
-            _services.AddLogging(conf => conf.AddSerilog());
+            _services.AddLogging(conf => conf.AddSerilog(logger));
             _services.AddSingleton<LoggingService>();
 
             return this;

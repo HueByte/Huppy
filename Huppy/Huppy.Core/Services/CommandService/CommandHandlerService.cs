@@ -32,11 +32,12 @@ namespace Huppy.Core.Services.CommandService
         {
             if (result.IsSuccess)
             {
-                _logger.LogInformation($"Command [{commandInfo.Name}] executed for [{context.User.Username}] on [{context.Guild.Name}]");
+                _logger.LogInformation("Command [{CommandName}] executed for [{Username}] on [{GuildName}]", commandInfo.Name, context.User.Username, context.Guild.Name);
                 return;
             }
             else
             {
+                _logger.LogError("Command [{CommandName} resulted in error: [{Error}]]", commandInfo.Name, result.ErrorReason);
                 switch (result.Error)
                 {
                     case InteractionCommandError.UnmetPrecondition:

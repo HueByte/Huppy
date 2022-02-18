@@ -75,7 +75,7 @@ namespace Huppy.App
 
                 foreach (var guild in homeGuilds)
                 {
-                    _logger.LogInformation($"Registering commands to [ {guild} ]");
+                    _logger.LogInformation("Registering commands to [ {guild} ]", guild);
                     await _interactionService.RegisterCommandsToGuildAsync(guild);
                     await Task.Delay(2000);
                 }

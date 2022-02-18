@@ -20,8 +20,8 @@ namespace Huppy.Core.Services.LoggerService
 
         public Task OnReadyAsync(DiscordSocketClient socketClient)
         {
-            _logger.LogInformation($"Connected as [ {_client.CurrentUser.Username} ]");
-            _logger.LogInformation($"I'm active on [ {_client.Guilds.Count} ] servers");
+            _logger.LogInformation("Connected as [ {Username} ]", _client.CurrentUser.Username);
+            _logger.LogInformation("Used by [ {Count} ] servers", _client.Guilds.Count);
 
             return Task.CompletedTask;
         }
