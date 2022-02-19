@@ -12,7 +12,7 @@ namespace Huppy.App.Commands
             _logger = logger;
         }
 
-        [SlashCommand("GetStats", "Get statistics of the bot")]
+        [SlashCommand("stats", "Get statistics of the bot")]
         [RequireOwner]
         public async Task GetStatsAsync()
         {
