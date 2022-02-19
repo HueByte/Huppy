@@ -35,6 +35,8 @@ namespace Huppy.App.Commands
         [RequireUserPermission(GuildPermission.ManageRoles)]
         public async Task SendEmbed(string title, string content, string? thumbnail = null)
         {
+            content = content.Replace("\\n", "\n");
+
             EmbedBuilder embed = new EmbedBuilder().WithTitle(title)
                 .WithCurrentTimestamp()
                 .WithThumbnailUrl(thumbnail ?? "https://i.kym-cdn.com/entries/icons/facebook/000/017/618/pepefroggie.jpg")

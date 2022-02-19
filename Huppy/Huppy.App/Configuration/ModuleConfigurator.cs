@@ -4,7 +4,7 @@ using Discord.Interactions;
 using Discord.WebSocket;
 using Huppy.Core.Entities;
 using Huppy.Core.IRepositories;
-using Huppy.Core.Services.AiLimiterService;
+using Huppy.Core.Services.AiStabilizerService;
 using Huppy.Core.Services.CommandService;
 using Huppy.Core.Services.GPTService;
 using Huppy.Core.Services.LoggerService;
@@ -73,7 +73,7 @@ namespace Huppy.App.Configuration
         {
             _services.AddScoped<IGPTService, GPTService>();
             _services.AddScoped<IAiUsageRepository, AiUsageRepository>();
-            _services.AddSingleton<IAiStabilizer, AiStabilizer>();
+            _services.AddSingleton<IAiStabilizerService, AiStabilizerService>();
 
             return this;
         }

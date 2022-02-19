@@ -1,6 +1,6 @@
 using Discord;
 using Discord.Interactions;
-using Huppy.Core.Services.AiLimiterService;
+using Huppy.Core.Services.AiStabilizerService;
 using Huppy.Core.Services.CommandService;
 using Huppy.Core.Services.GPTService;
 using Microsoft.Extensions.Logging;
@@ -13,9 +13,9 @@ namespace Huppy.App.Commands
         private readonly InteractionService _commands;
         private readonly ILogger _logger;
         private readonly IGPTService _aiService;
-        private readonly IAiStabilizer _stabilizerService;
+        private readonly IAiStabilizerService _stabilizerService;
 
-        public AiCommands(ICommandHandlerService commandHandler, InteractionService commands, ILogger<GeneralCommands> logger, IGPTService aiService, IAiStabilizer stabilizerService)
+        public AiCommands(ICommandHandlerService commandHandler, InteractionService commands, ILogger<GeneralCommands> logger, IGPTService aiService, IAiStabilizerService stabilizerService)
         {
             _commandHandler = commandHandler;
             _commands = commands;
