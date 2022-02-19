@@ -25,7 +25,7 @@ namespace Huppy.App.Commands
             var topStats = stats.OrderByDescending(x => x.Value).Take(5);
 
             StringBuilder sb = new();
-            sb.AppendLine("Top Huppy friends\n");
+            sb.AppendLine("✨ Top Huppy friends ✨\n");
             foreach (var item in topStats)
             {
                 sb.AppendLine($"<@!{item.Key}> : `{item.Value}`\n");

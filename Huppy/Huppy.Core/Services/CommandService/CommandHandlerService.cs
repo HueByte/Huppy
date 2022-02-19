@@ -37,7 +37,7 @@ namespace Huppy.Core.Services.CommandService
             }
             else
             {
-                _logger.LogError("Command [{CommandName} resulted in error: [{Error}]]", commandInfo.Name, result.ErrorReason);
+                _logger.LogError("Command [{CommandName}] resulted in error: [{Error}]", commandInfo.Name, result.ErrorReason);
                 switch (result.Error)
                 {
                     case InteractionCommandError.UnmetPrecondition:
