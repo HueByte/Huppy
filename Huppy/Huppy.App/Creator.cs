@@ -6,6 +6,8 @@ using Discord.WebSocket;
 using Huppy.Core.Entities;
 using Huppy.Core.Services.CommandService;
 using Huppy.Core.Services.LoggerService;
+using Huppy.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -22,6 +24,7 @@ namespace Huppy.App
         private readonly ICommandHandlerService _commandHandler;
         private readonly LoggingService _loggingService;
         private readonly ILogger<Creator> _logger;
+        private readonly HuppyDbContext _dbContext;
 
         public Creator(IServiceProvider serviceProvider)
         {
@@ -32,6 +35,12 @@ namespace Huppy.App
             _commandHandler = _serviceProvider.GetRequiredService<ICommandHandlerService>();
             _loggingService = _serviceProvider.GetRequiredService<LoggingService>();
             _logger = _serviceProvider.GetRequiredService<ILogger<Creator>>();
+            _dbContext = _serviceProvider.GetRequiredService<HuppyDbContext>();
+        }
+
+        public async Task CreateDatabase()
+        {
+            await _dbContext.Database.MigrateAsync();
         }
 
         public async Task CreateCommands() =>

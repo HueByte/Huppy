@@ -3,6 +3,7 @@ using Huppy.App;
 using Huppy.App.Configuration;
 using Huppy.Core.Entities;
 using Huppy.Core.Lib;
+using Huppy.Infrastructure;
 using Newtonsoft.Json;
 using Serilog;
 using Serilog.Events;
@@ -22,11 +23,14 @@ IServiceProvider _serviceProvider = new ModuleConfigurator().AddAppSettings(appS
                                                             .AddLogger(Log.Logger)
                                                             .AddDiscord()
                                                             .AddServices()
+                                                            .AddDatabase()
                                                             .AddHttpClient()
                                                             .Build();
 
 // Start bot
 var bot = new Creator(_serviceProvider);
+
+await bot.CreateDatabase();
 
 await bot.CreateCommands();
 

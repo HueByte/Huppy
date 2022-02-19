@@ -3,9 +3,13 @@ using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Huppy.Core.Entities;
+using Huppy.Core.IRepositories;
+using Huppy.Core.Services.AiLimiterService;
 using Huppy.Core.Services.CommandService;
 using Huppy.Core.Services.GPTService;
 using Huppy.Core.Services.LoggerService;
+using Huppy.Infrastructure;
+using Huppy.Infrastructure.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 
@@ -58,9 +62,18 @@ namespace Huppy.App.Configuration
             return this;
         }
 
+        public ModuleConfigurator AddDatabase()
+        {
+            _services.AddDbContext(_appSettings.ConnectionString!);
+
+            return this;
+        }
+
         public ModuleConfigurator AddServices()
         {
             _services.AddScoped<IGPTService, GPTService>();
+            _services.AddScoped<IAiUsageRepository, AiUsageRepository>();
+            _services.AddSingleton<IAiStabilizer, AiStabilizer>();
 
             return this;
         }

@@ -22,6 +22,10 @@ namespace Huppy.Core.Entities
         public static bool IsCreated
             => File.Exists(FILE_NAME);
 
+        [JsonIgnore]
+        public static string SavePath
+            => Path.Combine(AppContext.BaseDirectory, @"Save/save.sqlite");
+
         public static AppSettings Load()
         {
             var readBytes = File.ReadAllBytes(FILE_NAME);
@@ -34,11 +38,14 @@ namespace Huppy.Core.Entities
             if (IsCreated)
                 return Load();
 
+            if (!Directory.Exists(Path.Combine(AppContext.BaseDirectory, "save")))
+                Directory.CreateDirectory(Path.Combine(AppContext.BaseDirectory, "save"));
+
             var config = new AppSettings()
             {
                 BotToken = "",
                 HomeGuilds = "",
-                ConnectionString = "",
+                ConnectionString = $"Data Source={SavePath}",
                 Logger = new()
                 {
                     LogLevel = "information",
