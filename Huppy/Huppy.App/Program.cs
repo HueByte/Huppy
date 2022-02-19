@@ -21,6 +21,8 @@ Log.Logger = SerilogConfigurator.ConfigureLogger(appSettings);
 IServiceProvider _serviceProvider = new ModuleConfigurator().AddAppSettings(appSettings)
                                                             .AddLogger(Log.Logger)
                                                             .AddDiscord()
+                                                            .AddServices()
+                                                            .AddHttpClient()
                                                             .Build();
 
 // Start bot

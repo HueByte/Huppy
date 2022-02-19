@@ -81,6 +81,7 @@ namespace Huppy.Core.Services.CommandService
             {
                 Log.Error(ex.Message);
                 await command.ModifyOriginalResponseAsync((msg) => msg.Content = "Something went wrong");
+                throw;
             }
         }
     }

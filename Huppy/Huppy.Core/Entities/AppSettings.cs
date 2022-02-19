@@ -13,6 +13,7 @@ namespace Huppy.Core.Entities
         public string? HomeGuilds { get; set; }
         public string? ConnectionString { get; set; }
         public Logger? Logger { get; set; }
+        public GPT GPT { get; set; }
 
         [JsonIgnore]
         private static string FILE_NAME = AppContext.BaseDirectory + "appsettings.json";
@@ -38,10 +39,16 @@ namespace Huppy.Core.Entities
                 BotToken = "",
                 HomeGuilds = "",
                 ConnectionString = "",
-                Logger = new Logger()
+                Logger = new()
                 {
                     LogLevel = "information",
                     TimeInterval = "hour"
+                },
+                GPT = new()
+                {
+                    BaseUrl = "",
+                    ApiKey = "",
+                    Orgranization = ""
                 }
             };
 
@@ -60,5 +67,12 @@ namespace Huppy.Core.Entities
     {
         public string? LogLevel { get; set; }
         public string? TimeInterval { get; set; }
+    }
+
+    public class GPT
+    {
+        public string? BaseUrl { get; set; }
+        public string? ApiKey { get; set; }
+        public string? Orgranization { get; set; }
     }
 }

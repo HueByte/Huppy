@@ -4,6 +4,7 @@ using Discord.Interactions;
 using Discord.WebSocket;
 using Huppy.Core.Entities;
 using Huppy.Core.Services.CommandService;
+using Huppy.Core.Services.GPTService;
 using Huppy.Core.Services.LoggerService;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
@@ -13,6 +14,7 @@ namespace Huppy.App.Configuration
     public class ModuleConfigurator
     {
         private readonly IServiceCollection _services;
+        private AppSettings _appSettings;
 
         public ModuleConfigurator(IServiceCollection? services = null)
         {
@@ -26,6 +28,7 @@ namespace Huppy.App.Configuration
                 : AppSettings.Create();
 
             _services.AddSingleton(settings);
+            _appSettings = settings;
 
             return this;
         }
@@ -57,6 +60,22 @@ namespace Huppy.App.Configuration
 
         public ModuleConfigurator AddServices()
         {
+            _services.AddScoped<IGPTService, GPTService>();
+
+            return this;
+        }
+
+        public ModuleConfigurator AddHttpClient()
+        {
+            _services.AddHttpClient("GPT", httpclient =>
+            {
+                httpclient.BaseAddress = new Uri(_appSettings.GPT!.BaseUrl!);
+
+                httpclient.DefaultRequestHeaders.Add("Authorization", $"Bearer {_appSettings.GPT.ApiKey}");
+                httpclient.DefaultRequestHeaders.Add("OpenAI-Organization", _appSettings.GPT.Orgranization);
+
+            });
+
             return this;
         }
 
