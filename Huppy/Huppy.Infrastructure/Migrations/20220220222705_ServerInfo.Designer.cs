@@ -3,6 +3,7 @@ using System;
 using Huppy.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Huppy.Infrastructure.Migrations
 {
     [DbContext(typeof(HuppyDbContext))]
-    partial class HuppyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220220222705_ServerInfo")]
+    partial class ServerInfo
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "6.0.2");
@@ -40,29 +42,6 @@ namespace Huppy.Infrastructure.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("CommandLogs");
-                });
-
-            modelBuilder.Entity("Huppy.Core.Models.Server", b =>
-                {
-                    b.Property<ulong>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("GreetMessage")
-                        .HasColumnType("TEXT");
-
-                    b.Property<ulong>("OutputRoom")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("ServerName")
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("UseGreet")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("ID");
-
-                    b.ToTable("Servers");
                 });
 
             modelBuilder.Entity("Huppy.Core.Models.User", b =>
