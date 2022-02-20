@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Linq;
 using Huppy.Core.Entities;
 using Huppy.Core.IRepositories;
 using Huppy.Core.Models;
@@ -11,7 +12,6 @@ namespace Huppy.Core.Services.AiStabilizerService
         private readonly ILogger _logger;
         private readonly IAiUsageRepository _usageRepository;
         private ConcurrentDictionary<ulong, AiUser> _userAiUsage = new();
-        private double EstimatedCost = 0;
 
         public AiStabilizerService(ILogger<AiStabilizerService> logger, IAiUsageRepository usageRepository)
         {
@@ -37,7 +37,6 @@ namespace Huppy.Core.Services.AiStabilizerService
 
             await _usageRepository.AddAsync(model);
             await AddToCache(UserId, Username);
-            EstimatedCost += Response.Length / 4 * 0.00006;
         }
 
         public async Task<Dictionary<ulong, AiUser>> GetStatistics()

@@ -1,6 +1,7 @@
 using System.Text;
 using Discord;
 using Discord.Interactions;
+using Huppy.Core.Common.Constants;
 using Huppy.Core.IRepositories;
 using Huppy.Core.Services.AiStabilizerService;
 using Microsoft.Extensions.Logging;
@@ -36,7 +37,7 @@ namespace Huppy.App.Commands
 
             var embed = new EmbedBuilder().WithCurrentTimestamp()
                                           .WithTitle("Statistics for AI service usage")
-                                          .WithThumbnailUrl("https://i.pinimg.com/564x/69/2a/5b/692a5b4fcf71936d25ffdc01a62ca3a2.jpg")
+                                          .WithThumbnailUrl(Icons.Huppy1)
                                           .WithColor(Color.Magenta)
                                           .WithDescription(sb.ToString());
 

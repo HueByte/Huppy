@@ -1,5 +1,6 @@
 using Discord;
 using Discord.Interactions;
+using Huppy.Core.Common.Constants;
 using Huppy.Core.Services.AiStabilizerService;
 using Huppy.Core.Services.CommandService;
 using Huppy.Core.Services.GPTService;
@@ -34,7 +35,7 @@ namespace Huppy.App.Commands
                                           .WithTitle(message)
                                           .WithColor(Color.Teal)
                                           .WithAuthor(Context.User)
-                                          .WithThumbnailUrl("https://i.pinimg.com/564x/69/2a/5b/692a5b4fcf71936d25ffdc01a62ca3a2.jpg");
+                                          .WithThumbnailUrl(Icons.Huppy1);
 
             await ModifyOriginalResponseAsync((msg) => msg.Embed = embed.Build());
             await _stabilizerService.LogUsageAsync(message, Context.User.Username, Context.User.Id, result.Trim());
