@@ -39,12 +39,24 @@ namespace Huppy.Core.Services.AiStabilizerService
             await AddToCache(UserId, Username);
         }
 
-        public async Task<Dictionary<ulong, AiUser>> GetAiStatistics() =>
-            _userAiUsage.ToDictionary(p => p.Key, p => p.Value);
-
-        private async Task AddToCache(ulong UserId, string Username)
+        public Task<AiUser> GetUserUsage(ulong UserId)
         {
-            if (_userAiUsage.TryGetValue(UserId, out AiUser currentValue))
+            _userAiUsage.TryGetValue(UserId, out var user);
+            return Task.FromResult(user!);
+        }
+
+        public Task<int> GetCurrentMessageCount()
+        {
+            var count = _userAiUsage.Sum(e => e.Value.Count);
+            return Task.FromResult(count);
+        }
+
+        public Task<Dictionary<ulong, AiUser>> GetAiStatistics() =>
+            Task.FromResult(_userAiUsage.ToDictionary(p => p.Key, p => p.Value));
+
+        private Task AddToCache(ulong UserId, string Username)
+        {
+            if (_userAiUsage.TryGetValue(UserId, out var currentValue))
             {
                 _userAiUsage[UserId].Count = currentValue.Count + 1;
             }
@@ -52,6 +64,8 @@ namespace Huppy.Core.Services.AiStabilizerService
             {
                 _userAiUsage.TryAdd(UserId, new AiUser { Username = Username, Count = 1 });
             }
+
+            return Task.CompletedTask;
         }
     }
 }

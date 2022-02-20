@@ -1,7 +1,3 @@
-using System;
-using System.Diagnostics.Contracts;
-using System.IO;
-using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -55,7 +51,8 @@ namespace Huppy.Core.Entities
                 {
                     BaseUrl = "",
                     ApiKey = "",
-                    Orgranization = ""
+                    Orgranization = "",
+                    FreeMessageQuota = 0
                 }
             };
 
@@ -81,5 +78,6 @@ namespace Huppy.Core.Entities
         public string? BaseUrl { get; set; }
         public string? ApiKey { get; set; }
         public string? Orgranization { get; set; }
+        public int FreeMessageQuota { get; set; }
     }
 }
