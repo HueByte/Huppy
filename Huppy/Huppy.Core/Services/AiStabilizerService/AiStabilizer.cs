@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Linq;
+using System.Security.Cryptography;
 using Huppy.Core.Entities;
 using Huppy.Core.IRepositories;
 using Huppy.Core.Models;
@@ -10,47 +11,57 @@ namespace Huppy.Core.Services.AiStabilizerService
     public class AiStabilizerService : IAiStabilizerService
     {
         private readonly ILogger _logger;
-        private readonly IAiUsageRepository _usageRepository;
-        private ConcurrentDictionary<ulong, AiUser> _userAiUsage = new();
+        private readonly ICommandLogRepository _commandRepository;
+        private ConcurrentDictionary<ulong, AiUser> _userAiUsage = new(); // ai usage cache
 
-        public AiStabilizerService(ILogger<AiStabilizerService> logger, IAiUsageRepository usageRepository)
+        public AiStabilizerService(ILogger<AiStabilizerService> logger, ICommandLogRepository commandLogRepository)
         {
             _logger = logger;
-            _usageRepository = usageRepository;
+            _commandRepository = commandLogRepository;
 
             Initialize().GetAwaiter().GetResult();
         }
 
+        // fetch ai usage from database and set as cache
         private async Task Initialize() =>
-            _userAiUsage = new(await _usageRepository.GetUsage());
+            _userAiUsage = new(await _commandRepository.GetAiUsage());
 
-        public async Task LogUsageAsync(string Prompt, string Username, ulong UserId, string Response)
+        /// <summary>
+        /// Adds Ai usage to cache
+        /// </summary>
+        /// <param name="Username"></param>
+        /// <param name="UserId"></param>
+        /// <returns></returns>
+        public async Task LogUsageAsync(string Username, ulong UserId)
         {
-            AiUsage model = new()
-            {
-                Prompt = Prompt,
-                UserId = UserId,
-                Username = Username,
-                Response = Response,
-                Date = DateTime.UtcNow
-            };
-
-            await _usageRepository.AddAsync(model);
             await AddToCache(UserId, Username);
         }
 
+        /// <summary>
+        /// Gets specific user AI usage 
+        /// </summary>
+        /// <param name="UserId"></param>
+        /// <returns></returns>
         public Task<AiUser> GetUserUsage(ulong UserId)
         {
             _userAiUsage.TryGetValue(UserId, out var user);
             return Task.FromResult(user!);
         }
 
+        /// <summary>
+        /// Gets current Ai message count from cache
+        /// </summary>
+        /// <returns></returns>
         public Task<int> GetCurrentMessageCount()
         {
             var count = _userAiUsage.Sum(e => e.Value.Count);
             return Task.FromResult(count);
         }
 
+        /// <summary>
+        /// Gets current Ai usage cache
+        /// </summary>
+        /// <returns></returns>
         public Task<Dictionary<ulong, AiUser>> GetAiStatistics() =>
             Task.FromResult(_userAiUsage.ToDictionary(p => p.Key, p => p.Value));
 

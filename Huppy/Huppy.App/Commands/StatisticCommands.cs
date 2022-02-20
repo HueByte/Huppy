@@ -12,13 +12,11 @@ namespace Huppy.App.Commands
     {
         private readonly ILogger _logger;
         private readonly IAiStabilizerService _stabilizerService;
-        private readonly IAiUsageRepository _usageRepository;
 
-        public StatisticCommands(ILogger<StatisticCommands> logger, IAiStabilizerService stabilizerService, IAiUsageRepository usageRepository)
+        public StatisticCommands(ILogger<StatisticCommands> logger, IAiStabilizerService stabilizerService)
         {
             _logger = logger;
             _stabilizerService = stabilizerService;
-            _usageRepository = usageRepository;
         }
 
         [SlashCommand("aistats", "Get statistics of the bot")]

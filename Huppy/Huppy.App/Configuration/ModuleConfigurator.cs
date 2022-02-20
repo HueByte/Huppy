@@ -72,8 +72,10 @@ namespace Huppy.App.Configuration
         public ModuleConfigurator AddServices()
         {
             _services.AddScoped<IGPTService, GPTService>();
-            _services.AddScoped<IAiUsageRepository, AiUsageRepository>();
             _services.AddSingleton<IAiStabilizerService, AiStabilizerService>();
+
+            _services.AddScoped<IUserRepository, UserRepository>();
+            _services.AddScoped<ICommandLogRepository, CommandLogRepository>();
 
             return this;
         }

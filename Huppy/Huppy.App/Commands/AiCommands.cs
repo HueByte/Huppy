@@ -49,7 +49,7 @@ namespace Huppy.App.Commands
                                           .WithThumbnailUrl(Icons.Huppy1);
 
             await ModifyOriginalResponseAsync((msg) => msg.Embed = embed.Build());
-            await _stabilizerService.LogUsageAsync(message, Context.User.Username, Context.User.Id, result.Trim());
+            await _stabilizerService.LogUsageAsync(Context.User.Username, Context.User.Id);
         }
     }
 }

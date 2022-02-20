@@ -12,6 +12,7 @@ namespace Huppy.Infrastructure
 
         protected override void OnModelCreating(ModelBuilder builder) { }
 
-        public DbSet<AiUsage>? AiUsages { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<CommandLog> CommandLogs { get; set; }
     }
 }
