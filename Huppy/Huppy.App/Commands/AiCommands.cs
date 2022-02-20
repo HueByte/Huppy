@@ -6,27 +6,19 @@ using Huppy.Core.Entities;
 using Huppy.Core.Services.AiStabilizerService;
 using Huppy.Core.Services.CommandService;
 using Huppy.Core.Services.GPTService;
+using Huppy.Core.Services.HuppyCacheService;
 using Microsoft.Extensions.Logging;
 
 namespace Huppy.App.Commands
 {
     public class AiCommands : InteractionModuleBase<ShardedInteractionContext>
     {
-        private readonly ICommandHandlerService _commandHandler;
-        private readonly InteractionService _commands;
-        private readonly ILogger _logger;
         private readonly IGPTService _aiService;
-        private readonly IAiStabilizerService _stabilizerService;
-        private readonly AppSettings _appSettings;
-
-        public AiCommands(ICommandHandlerService commandHandler, InteractionService commands, ILogger<GeneralCommands> logger, IGPTService aiService, IAiStabilizerService stabilizerService, AppSettings appSettings)
+        private readonly CacheService _cacheService;
+        public AiCommands(IGPTService aiService, CacheService cacheService)
         {
-            _commandHandler = commandHandler;
-            _commands = commands;
-            _logger = logger;
             _aiService = aiService;
-            _stabilizerService = stabilizerService;
-            _appSettings = appSettings;
+            _cacheService = cacheService;
         }
 
         [SlashCommand("ai", "Talk with Huppy!")]
@@ -49,7 +41,7 @@ namespace Huppy.App.Commands
                                           .WithThumbnailUrl(Icons.Huppy1);
 
             await ModifyOriginalResponseAsync((msg) => msg.Embed = embed.Build());
-            await _stabilizerService.LogUsageAsync(Context.User.Username, Context.User.Id);
+            await _cacheService.LogUsageAsync(Context.User.Username, Context.User.Id);
         }
     }
 }

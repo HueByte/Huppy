@@ -12,12 +12,10 @@ namespace Huppy.Core.Services.GPTService
 {
     public class GPTService : IGPTService
     {
-        private readonly AppSettings _appSettings;
         private readonly IHttpClientFactory _clientFactory;
         private readonly ILogger _logger;
-        public GPTService(AppSettings appSettings, IHttpClientFactory clientFactory, ILogger<GPTService> logger)
+        public GPTService(IHttpClientFactory clientFactory, ILogger<GPTService> logger)
         {
-            _appSettings = appSettings;
             _clientFactory = clientFactory;
             _logger = logger;
         }

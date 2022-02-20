@@ -6,22 +6,21 @@ using Huppy.Core.Entities;
 using Huppy.Core.IRepositories;
 using Huppy.Core.Services.CommandService;
 using Huppy.Core.Services.GPTService;
+using Huppy.Core.Services.HuppyCacheService;
 using Microsoft.Extensions.Logging;
 
 namespace Huppy.App.Commands
 {
     public class GeneralCommands : InteractionModuleBase<ShardedInteractionContext>
     {
-        private readonly ICommandHandlerService _commandHandler;
-        private readonly InteractionService _commands;
         private readonly ILogger _logger;
         private readonly ICommandLogRepository _commandRepository;
-        public GeneralCommands(ICommandHandlerService commandHandler, InteractionService commands, ILogger<GeneralCommands> logger, ICommandLogRepository commandLogRepository)
+        private readonly CacheService _cacheService;
+        public GeneralCommands(ILogger<GeneralCommands> logger, ICommandLogRepository commandLogRepository, CacheService cacheService)
         {
-            _commandHandler = commandHandler;
-            _commands = commands;
             _logger = logger;
             _commandRepository = commandLogRepository;
+            _cacheService = cacheService;
         }
 
         [SlashCommand("ping", "return pong")]
@@ -57,15 +56,17 @@ namespace Huppy.App.Commands
         {
             StringBuilder sb = new();
 
-            sb.AppendLine("I am a bot who is always looking to help others. I'm willing to lend a hand, and I try to be friendly and welcoming. I am looking to make new friends, and I love spending time with those that I am close to.");
+            sb.AppendLine("> I am a bot who is always looking to help others. I'm willing to lend a hand, and I try to be friendly and welcoming. I am looking to make new friends, and I love spending time with those that I am close to.");
+            sb.AppendLine("> I use powerful AI engine to be myself and have a little conversation with you!\n");
+            sb.AppendLine("> Also currently I'm mentally stuck at 2019");
 
-            var embed = new EmbedBuilder().WithTitle("Hello I'm Huppy!")
+            var embed = new EmbedBuilder().WithTitle("✨ Hello I'm Huppy! ✨")
                                           .WithColor(Color.Teal)
                                           .WithDescription(sb.ToString())
                                           .WithThumbnailUrl(Icons.Huppy1)
                                           .WithCurrentTimestamp();
 
-            embed.AddField("Users", _commandHandler.GetUserNames().Count, true);
+            embed.AddField("Users", _cacheService.GetUserNames().Count, true);
             embed.AddField("Commands Used", await _commandRepository.GetCount(), true);
 
             await ModifyOriginalResponseAsync((msg) => msg.Embed = embed.Build());

@@ -10,12 +10,10 @@ namespace Huppy.Core.Services.LoggerService
     {
         private readonly ILogger _logger;
         private readonly DiscordShardedClient _client;
-        private readonly InteractionService _interactionService;
-        public LoggingService(ILogger<LoggingService> logger, DiscordShardedClient client, InteractionService interactionService)
+        public LoggingService(ILogger<LoggingService> logger, DiscordShardedClient client)
         {
             _logger = logger;
             _client = client;
-            _interactionService = interactionService;
         }
 
         public Task OnReadyAsync(DiscordSocketClient socketClient)

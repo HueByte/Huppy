@@ -7,6 +7,7 @@ using Huppy.Core.IRepositories;
 using Huppy.Core.Services.AiStabilizerService;
 using Huppy.Core.Services.CommandService;
 using Huppy.Core.Services.GPTService;
+using Huppy.Core.Services.HuppyCacheService;
 using Huppy.Core.Services.LoggerService;
 using Huppy.Infrastructure;
 using Huppy.Infrastructure.Repositories;
@@ -73,6 +74,7 @@ namespace Huppy.App.Configuration
         {
             _services.AddScoped<IGPTService, GPTService>();
             _services.AddSingleton<IAiStabilizerService, AiStabilizerService>();
+            _services.AddSingleton<CacheService>();
 
             _services.AddScoped<IUserRepository, UserRepository>();
             _services.AddScoped<ICommandLogRepository, CommandLogRepository>();

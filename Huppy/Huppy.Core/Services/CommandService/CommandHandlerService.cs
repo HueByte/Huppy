@@ -1,14 +1,12 @@
-using System.Net;
 using System.Reflection;
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Huppy.Core.Common.Constants;
-using Huppy.Core.Entities;
 using Huppy.Core.IRepositories;
 using Huppy.Core.Models;
+using Huppy.Core.Services.HuppyCacheService;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Serilog;
 
 namespace Huppy.Core.Services.CommandService
@@ -21,8 +19,8 @@ namespace Huppy.Core.Services.CommandService
         private readonly Microsoft.Extensions.Logging.ILogger _logger;
         private readonly ICommandLogRepository _commandRepository;
         private readonly IUserRepository _userRepository;
-        public Dictionary<ulong, string?> _userCache = new();
-        public CommandHandlerService(DiscordShardedClient client, InteractionService interactionService, IServiceProvider serviceProvider, ILogger<CommandHandlerService> logger, ICommandLogRepository commandRepository, IUserRepository userRepository)
+        private readonly CacheService _cacheService;
+        public CommandHandlerService(DiscordShardedClient client, InteractionService interactionService, IServiceProvider serviceProvider, ILogger<CommandHandlerService> logger, ICommandLogRepository commandRepository, IUserRepository userRepository, CacheService cacheService)
         {
             _client = client;
             _interactionService = interactionService;
@@ -30,16 +28,13 @@ namespace Huppy.Core.Services.CommandService
             _logger = logger;
             _commandRepository = commandRepository;
             _userRepository = userRepository;
+            _cacheService = cacheService;
         }
 
         public async Task InitializeAsync()
         {
             await _interactionService.AddModulesAsync(Assembly.GetEntryAssembly(), _serviceProvider);
-            _userCache = await _userRepository.GetUsersForCacheAsync();
         }
-
-        public List<string> GetUserNames() =>
-            _userCache.Values.ToList()!;
 
         public async Task SlashCommandExecuted(SlashCommandInfo commandInfo, Discord.IInteractionContext context, IResult result)
         {
@@ -102,7 +97,7 @@ namespace Huppy.Core.Services.CommandService
 
         public async Task HandleCommandAsync(SocketInteraction command)
         {
-            if (!_userCache.ContainsKey(command.User.Id))
+            if (!_cacheService.UserBasicData.ContainsKey(command.User.Id))
             {
                 _logger.LogInformation("Adding new user [{Username}] to database", command.User.Username);
                 User user = new()
@@ -113,7 +108,7 @@ namespace Huppy.Core.Services.CommandService
                 };
 
                 await _userRepository.AddAsync(user);
-                _userCache.TryAdd(command.User.Id, command.User.Username);
+                await _cacheService.AddBasicUserData(command.User.Id, command.User.Username);
             }
 
             try
