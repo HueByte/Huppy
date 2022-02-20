@@ -18,7 +18,7 @@ namespace Huppy.App.Configuration
     public class ModuleConfigurator
     {
         private readonly IServiceCollection _services;
-        private AppSettings _appSettings;
+        private AppSettings? _appSettings;
 
         public ModuleConfigurator(IServiceCollection? services = null)
         {
@@ -64,7 +64,7 @@ namespace Huppy.App.Configuration
 
         public ModuleConfigurator AddDatabase()
         {
-            _services.AddDbContext(_appSettings.ConnectionString!);
+            _services.AddDbContext(_appSettings?.ConnectionString!);
 
             return this;
         }
@@ -82,10 +82,10 @@ namespace Huppy.App.Configuration
         {
             _services.AddHttpClient("GPT", httpclient =>
             {
-                httpclient.BaseAddress = new Uri(_appSettings.GPT!.BaseUrl!);
+                httpclient.BaseAddress = new Uri(_appSettings?.GPT!.BaseUrl!);
 
-                httpclient.DefaultRequestHeaders.Add("Authorization", $"Bearer {_appSettings.GPT.ApiKey}");
-                httpclient.DefaultRequestHeaders.Add("OpenAI-Organization", _appSettings.GPT.Orgranization);
+                httpclient.DefaultRequestHeaders.Add("Authorization", $"Bearer {_appSettings?.GPT!.ApiKey}");
+                httpclient.DefaultRequestHeaders.Add("OpenAI-Organization", _appSettings?.GPT!.Orgranization);
 
             });
 

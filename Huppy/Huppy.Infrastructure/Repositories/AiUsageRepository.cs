@@ -20,18 +20,6 @@ namespace Huppy.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task<List<AiUsage>> GetAll()
-        {
-            return await _context.AiUsages.ToListAsync();
-        }
-
-        public async Task<Dictionary<ulong, string?>> GetUsersFromArray(List<ulong> users)
-        {
-            return await _context.AiUsages.Where(en => users.Any(r => r == en.UserId))
-                .GroupBy(en => en.UserId)
-                .ToDictionaryAsync(en => en.Key, en => en.First().Username);
-        }
-
         public async Task<List<ulong>> GetUserIDs()
         {
             return await _context.AiUsages.Select(e => e.UserId)
@@ -56,11 +44,6 @@ namespace Huppy.Infrastructure.Repositories
             }
 
             return returnDictionary;
-        }
-
-        public async Task GetStats()
-        {
-            var aiCommands = _context.AiUsages.ToList();
         }
     }
 }

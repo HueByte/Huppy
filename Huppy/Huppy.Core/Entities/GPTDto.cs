@@ -5,7 +5,7 @@ namespace Huppy.Core.Entities
     public class GPTDto
     {
         [JsonPropertyName("prompt")]
-        public string Prompt { get; set; }
+        public string? Prompt { get; set; }
 
         [JsonPropertyName("max_tokens")]
         public int MaxTokens { get; set; }
@@ -23,9 +23,9 @@ namespace Huppy.Core.Entities
         public bool Stream { get; set; }
 
         [JsonPropertyName("logprobs")]
-        public object Logprobs { get; set; }
+        public object? Logprobs { get; set; }
 
         [JsonPropertyName("stop")]
-        public string Stop { get; set; }
+        public string? Stop { get; set; }
     }
 }

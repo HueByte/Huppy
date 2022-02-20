@@ -20,7 +20,7 @@ namespace Huppy.Core.Entities
     public class GPTResponse
     {
         [JsonPropertyName("id")]
-        public string Id { get; set; }
+        public string? Id { get; set; }
 
         [JsonPropertyName("object")]
         public string? Object { get; set; }

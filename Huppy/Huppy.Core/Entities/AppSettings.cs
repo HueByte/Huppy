@@ -13,10 +13,10 @@ namespace Huppy.Core.Entities
         public string? HomeGuilds { get; set; }
         public string? ConnectionString { get; set; }
         public Logger? Logger { get; set; }
-        public GPT GPT { get; set; }
+        public GPT? GPT { get; set; }
 
         [JsonIgnore]
-        private static string FILE_NAME = AppContext.BaseDirectory + "appsettings.json";
+        private readonly static string FILE_NAME = AppContext.BaseDirectory + "appsettings.json";
 
         [JsonIgnore]
         public static bool IsCreated
