@@ -1,6 +1,7 @@
 using System.Text;
 using Discord;
 using Discord.Interactions;
+using Huppy.Core.IRepositories;
 using Huppy.Core.Services.AiStabilizerService;
 using Microsoft.Extensions.Logging;
 
@@ -10,11 +11,13 @@ namespace Huppy.App.Commands
     {
         private readonly ILogger _logger;
         private readonly IAiStabilizerService _stabilizerService;
+        private readonly IAiUsageRepository _usageRepository;
 
-        public StatisticCommands(ILogger<StatisticCommands> logger, IAiStabilizerService stabilizerService)
+        public StatisticCommands(ILogger<StatisticCommands> logger, IAiStabilizerService stabilizerService, IAiUsageRepository usageRepository)
         {
             _logger = logger;
             _stabilizerService = stabilizerService;
+            _usageRepository = usageRepository;
         }
 
         [SlashCommand("aistats", "Get statistics of the bot")]
@@ -22,15 +25,14 @@ namespace Huppy.App.Commands
         public async Task GetAiStats()
         {
             var stats = await _stabilizerService.GetStatistics();
-            var topStats = stats.OrderByDescending(x => x.Value).Take(5);
+            var topStats = stats.OrderByDescending(x => x.Value.Count).Take(5);
 
             StringBuilder sb = new();
             sb.AppendLine("✨ Top Huppy friends ✨\n");
             foreach (var item in topStats)
             {
-                sb.AppendLine($"<@!{item.Key}> : `{item.Value}`\n");
+                sb.AppendLine($"> **{item.Value.Username}** : `{item.Value.Count}`\n");
             }
-
 
             var embed = new EmbedBuilder().WithCurrentTimestamp()
                                           .WithTitle("Statistics for AI service usage")
@@ -38,7 +40,7 @@ namespace Huppy.App.Commands
                                           .WithColor(Color.Magenta)
                                           .WithDescription(sb.ToString());
 
-            embed.AddField("Total commands used: ", stats.Sum(x => x.Value));
+            embed.AddField("Total commands used: ", stats.Sum(x => x.Value.Count));
 
             await ModifyOriginalResponseAsync((msg) => msg.Embed = embed.Build());
         }
