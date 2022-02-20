@@ -25,7 +25,7 @@ namespace Huppy.App.Commands
         [RequireOwner]
         public async Task GetAiStats()
         {
-            var stats = await _stabilizerService.GetStatistics();
+            var stats = await _stabilizerService.GetAiStatistics();
             var topStats = stats.OrderByDescending(x => x.Value.Count).Take(5);
 
             StringBuilder sb = new();
@@ -41,7 +41,8 @@ namespace Huppy.App.Commands
                                           .WithColor(Color.Magenta)
                                           .WithDescription(sb.ToString());
 
-            embed.AddField("Total commands used: ", stats.Sum(x => x.Value.Count));
+            embed.AddField("Total commands used", stats.Sum(x => x.Value.Count), true);
+            embed.AddField("Huppy friend count", stats.Keys.Count, true);
 
             await ModifyOriginalResponseAsync((msg) => msg.Embed = embed.Build());
         }

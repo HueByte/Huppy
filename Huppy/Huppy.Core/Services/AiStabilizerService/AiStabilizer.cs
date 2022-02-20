@@ -39,10 +39,8 @@ namespace Huppy.Core.Services.AiStabilizerService
             await AddToCache(UserId, Username);
         }
 
-        public async Task<Dictionary<ulong, AiUser>> GetStatistics()
-        {
-            return _userAiUsage.ToDictionary(p => p.Key, p => p.Value);
-        }
+        public async Task<Dictionary<ulong, AiUser>> GetAiStatistics() =>
+            _userAiUsage.ToDictionary(p => p.Key, p => p.Value);
 
         private async Task AddToCache(ulong UserId, string Username)
         {
