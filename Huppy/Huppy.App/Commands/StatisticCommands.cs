@@ -20,7 +20,6 @@ namespace Huppy.App.Commands
         }
 
         [SlashCommand("aistats", "Get statistics of the bot")]
-        [RequireOwner]
         public async Task GetAiStats()
         {
             var stats = await _stabilizerService.GetAiStatistics();

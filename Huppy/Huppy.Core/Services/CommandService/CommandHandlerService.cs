@@ -21,7 +21,7 @@ namespace Huppy.Core.Services.CommandService
         private readonly Microsoft.Extensions.Logging.ILogger _logger;
         private readonly ICommandLogRepository _commandRepository;
         private readonly IUserRepository _userRepository;
-        private Dictionary<ulong, string?> _userCache = new();
+        public Dictionary<ulong, string?> _userCache = new();
         public CommandHandlerService(DiscordShardedClient client, InteractionService interactionService, IServiceProvider serviceProvider, ILogger<CommandHandlerService> logger, ICommandLogRepository commandRepository, IUserRepository userRepository)
         {
             _client = client;
@@ -37,6 +37,9 @@ namespace Huppy.Core.Services.CommandService
             await _interactionService.AddModulesAsync(Assembly.GetEntryAssembly(), _serviceProvider);
             _userCache = await _userRepository.GetUsersForCacheAsync();
         }
+
+        public List<string> GetUserNames() =>
+            _userCache.Values.ToList()!;
 
         public async Task SlashCommandExecuted(SlashCommandInfo commandInfo, Discord.IInteractionContext context, IResult result)
         {

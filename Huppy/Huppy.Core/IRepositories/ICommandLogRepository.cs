@@ -7,5 +7,7 @@ namespace Huppy.Core.IRepositories
     {
         Task AddAsync(CommandLog commandLog);
         Task<Dictionary<ulong, AiUser>> GetAiUsage();
+        Task<List<CommandLog>> GetAll();
+        Task<int> GetCount();
     }
 }

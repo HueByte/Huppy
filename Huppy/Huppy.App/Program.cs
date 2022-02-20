@@ -1,12 +1,8 @@
-﻿using System.Text.Json;
-using Huppy.App;
+﻿using Huppy.App;
 using Huppy.App.Configuration;
 using Huppy.Core.Entities;
 using Huppy.Core.Lib;
-using Huppy.Infrastructure;
-using Newtonsoft.Json;
 using Serilog;
-using Serilog.Events;
 
 Logo.Print();
 
