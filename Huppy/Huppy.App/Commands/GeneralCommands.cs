@@ -100,16 +100,21 @@ namespace Huppy.App.Commands
         }
 
         [SlashCommand("configure", "Configure Huppy for your server")]
-        public async Task ConfigureHuppy(bool UseGreet, string? GreetingMessage, IRole? DefaultRole = null, SocketGuildChannel? HuppyRoom = null)
+        public async Task ConfigureHuppy(bool? UseGreet = null, string? GreetingMessage = null, IRole? DefaultRole = null, SocketGuildChannel? HuppyRoom = null)
         {
             var server = await _serverRepository.GetOrCreateAsync(Context);
 
             server.ServerName = Context.Guild.Name;
-            server.UseGreet = UseGreet;
-            server.GreetMessage = GreetingMessage;
+
+            if (UseGreet is not null)
+                server.UseGreet = (bool)UseGreet;
+
+            if (GreetingMessage is not null)
+                server.GreetMessage = GreetingMessage;
 
             if (HuppyRoom is not null)
                 server.OutputRoom = HuppyRoom.Id;
+
             if (DefaultRole is not null)
                 server.RoleID = DefaultRole.Id;
 
