@@ -74,23 +74,9 @@ namespace Huppy.App.Commands
 
         [SlashCommand("server", "Get current configuration for this server")]
         [RequireUserPermission(GuildPermission.ManageGuild)]
-        public async Task GetConfiguration()
+        public async Task GetServerInfo()
         {
-            var server = await _serverRepository.GetOneAsync(Context.Guild.Id);
-
-            if (server is null)
-            {
-                server = new()
-                {
-                    ID = Context.Guild.Id,
-                    GreetMessage = "",
-                    OutputRoom = Context.Guild.DefaultChannel.Id,
-                    UseGreet = false,
-                    ServerName = Context.Guild.Name
-                };
-
-                await _serverRepository.AddOneAsync(server);
-            }
+            var server = await _serverRepository.GetOrCreateAsync(Context);
 
             var embed = new EmbedBuilder().WithAuthor(Context.User)
                                           .WithColor(Color.DarkPurple)
@@ -106,39 +92,28 @@ namespace Huppy.App.Commands
             embed.AddField("Use Greet", server.UseGreet, true);
             embed.AddField("Greet message", string.IsNullOrEmpty(server.GreetMessage) ? "`empty`" : server.GreetMessage);
 
+            var defaultRole = Context.Guild.GetRole(server.RoleID);
+            if (defaultRole is not null)
+                embed.AddField("Default role", defaultRole.Mention, true);
+
             await ModifyOriginalResponseAsync((msg) => msg.Embed = embed.Build());
         }
 
         [SlashCommand("configure", "Configure Huppy for your server")]
-        public async Task ConfigureHuppy(bool UseGreet, string? GreetingMessage, SocketGuildChannel? HuppyRoom = null)
+        public async Task ConfigureHuppy(bool UseGreet, string? GreetingMessage, IRole? DefaultRole = null, SocketGuildChannel? HuppyRoom = null)
         {
-            // TODO put this into server repository
-            var server = await _serverRepository.GetOneAsync(Context.Guild.Id);
-            if (server is not null)
-            {
-                server.ServerName = Context.Guild.Name;
-                server.UseGreet = UseGreet;
-                server.GreetMessage = GreetingMessage;
+            var server = await _serverRepository.GetOrCreateAsync(Context);
 
-                if (HuppyRoom is not null)
-                    server.OutputRoom = HuppyRoom.Id;
+            server.ServerName = Context.Guild.Name;
+            server.UseGreet = UseGreet;
+            server.GreetMessage = GreetingMessage;
 
+            if (HuppyRoom is not null)
+                server.OutputRoom = HuppyRoom.Id;
+            if (DefaultRole is not null)
+                server.RoleID = DefaultRole.Id;
 
-                await _serverRepository.UpdateOne(server);
-            }
-            else
-            {
-                server = new()
-                {
-                    ID = Context.Guild.Id,
-                    GreetMessage = GreetingMessage ?? "",
-                    OutputRoom = HuppyRoom?.Id ?? Context.Guild.DefaultChannel.Id,
-                    UseGreet = UseGreet,
-                    ServerName = Context.Guild.Name
-                };
-
-                await _serverRepository.AddOneAsync(server);
-            }
+            await _serverRepository.UpdateOne(server);
 
             var embed = new EmbedBuilder().WithDescription("Updated your server settings")
                                           .WithThumbnailUrl(Icons.Huppy1)

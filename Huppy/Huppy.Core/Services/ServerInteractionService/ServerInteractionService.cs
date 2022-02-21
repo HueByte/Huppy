@@ -4,6 +4,7 @@ using Discord.WebSocket;
 using Huppy.Core.Common.Constants;
 using Huppy.Core.Common.HuppyMessages;
 using Huppy.Core.IRepositories;
+using Huppy.Core.Models;
 using Microsoft.Extensions.Logging;
 
 namespace Huppy.Core.Services.ServerInteractionService
@@ -43,15 +44,31 @@ namespace Huppy.Core.Services.ServerInteractionService
                                               .WithTitle("Hello!")
                                               .WithThumbnailUrl(user.GetAvatarUrl());
 
-                ISocketMessageChannel? channel = null;
-                if (server!.OutputRoom != 0)
+                ISocketMessageChannel? channel;
+                if (server!.OutputRoom > 0)
                     channel = user.Guild.GetChannel(server.OutputRoom) as ISocketMessageChannel;
 
                 else
                     channel = user.Guild.DefaultChannel as ISocketMessageChannel;
 
                 await channel!.SendMessageAsync(null, false, embed.Build());
-                // await user.SendMessageAsync(null, false, embed.Build());
+            }
+            if (server!.RoleID > 0)
+            {
+                try
+                {
+                    var role = user.Guild.GetRole(server.RoleID);
+                    if (role is null)
+                        throw new Exception("This role doesn't exists");
+
+                    await (user as IGuildUser).AddRoleAsync(server.RoleID);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning("Role with [{RoleID}] ID on [{ServerName}] is not found. Updating default role to none", server.RoleID, user.Guild.Name);
+                    server.RoleID = 0;
+                    await _serverRepository.UpdateOne(server);
+                }
             }
         }
     }
