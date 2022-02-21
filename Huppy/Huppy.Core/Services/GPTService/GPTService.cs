@@ -37,7 +37,7 @@ namespace Huppy.Core.Services.GPTService
             {
                 MaxTokens = 75,
                 Prompt = prompt,
-                Temperature = 0.3,
+                Temperature = 0.6,
                 N = 1
             };
 

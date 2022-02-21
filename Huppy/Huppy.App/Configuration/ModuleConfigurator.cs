@@ -52,7 +52,8 @@ namespace Huppy.App.Configuration
             DiscordShardedClient client = new(new DiscordSocketConfig
             {
                 LogLevel = LogSeverity.Info,
-                MessageCacheSize = 1000
+                MessageCacheSize = 1000,
+                GatewayIntents = GatewayIntents.AllUnprivileged | GatewayIntents.GuildMembers | GatewayIntents.GuildBans
             });
 
             InteractionService interactionService = new(client);
@@ -75,7 +76,7 @@ namespace Huppy.App.Configuration
         {
             _services.AddSingleton<CacheService>();
             _services.AddSingleton<IAiStabilizerService, AiStabilizerService>();
-            _services.AddScoped<IServerInteractionService, ServerInteractionService>();
+            _services.AddSingleton<IServerInteractionService, ServerInteractionService>();
             _services.AddScoped<IGPTService, GPTService>();
 
             _services.AddScoped<IUserRepository, UserRepository>();

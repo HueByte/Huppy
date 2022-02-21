@@ -66,7 +66,7 @@ namespace Huppy.App
             _client.InteractionCreated += _commandHandler.HandleCommandAsync;
             _client.Log += _loggingService.OnLogAsync;
             _client.ShardReady += _loggingService.OnReadyAsync;
-            _client.UserJoined += _serverInteractionService.WelcomeUser;
+            _client.UserJoined += _serverInteractionService.OnUserJoined;
             _client.JoinedGuild += _serverInteractionService.HuppyJoined;
 
             // interaction service events
@@ -88,7 +88,7 @@ namespace Huppy.App
                 {
                     _logger.LogInformation("Registering commands to [ {guild} ]", guild);
                     await _interactionService.RegisterCommandsToGuildAsync(guild);
-                    await Task.Delay(2000);
+                    await Task.Delay(1000);
                 }
             }
             catch (Exception exp)

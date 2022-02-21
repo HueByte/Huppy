@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Huppy.Core.Models
 {
+    // TODO add default role
     public class Server
     {
         [Key]
