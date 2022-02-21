@@ -88,7 +88,7 @@ namespace Huppy.App.Commands
             embed.AddField("Server Name", Context.Guild.Name, true);
             embed.AddField("User count", Context.Guild.MemberCount, true);
             embed.AddField("Huppy output room", $"<#{server.OutputRoom}>", true);
-            embed.AddField("Default channel", Context.Guild.DefaultChannel.Name, true);
+            embed.AddField("Default room", $"<#{Context.Guild.DefaultChannel.Id}>", true);
             embed.AddField("Use Greet", server.UseGreet, true);
             embed.AddField("Greet message", string.IsNullOrEmpty(server.GreetMessage) ? "`empty`" : server.GreetMessage);
 
