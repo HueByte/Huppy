@@ -9,6 +9,7 @@ using Huppy.Core.Services.CommandService;
 using Huppy.Core.Services.GPTService;
 using Huppy.Core.Services.HuppyCacheService;
 using Huppy.Core.Services.LoggerService;
+using Huppy.Core.Services.ServerInteractionService;
 using Huppy.Infrastructure;
 using Huppy.Infrastructure.Repositories;
 using Microsoft.Extensions.DependencyInjection;
@@ -72,11 +73,13 @@ namespace Huppy.App.Configuration
 
         public ModuleConfigurator AddServices()
         {
-            _services.AddScoped<IGPTService, GPTService>();
-            _services.AddSingleton<IAiStabilizerService, AiStabilizerService>();
             _services.AddSingleton<CacheService>();
+            _services.AddSingleton<IAiStabilizerService, AiStabilizerService>();
+            _services.AddScoped<IServerInteractionService, ServerInteractionService>();
+            _services.AddScoped<IGPTService, GPTService>();
 
             _services.AddScoped<IUserRepository, UserRepository>();
+            _services.AddScoped<IServerRepository, ServerRepository>();
             _services.AddScoped<ICommandLogRepository, CommandLogRepository>();
 
             return this;

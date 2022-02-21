@@ -1,16 +1,14 @@
-using System.Windows.Input;
 using Discord;
 using Discord.Interactions;
-using Discord.Net;
 using Discord.WebSocket;
 using Huppy.Core.Entities;
 using Huppy.Core.Services.CommandService;
 using Huppy.Core.Services.LoggerService;
+using Huppy.Core.Services.ServerInteractionService;
 using Huppy.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Serilog;
 
 namespace Huppy.App
@@ -25,6 +23,7 @@ namespace Huppy.App
         private readonly LoggingService _loggingService;
         private readonly ILogger<Creator> _logger;
         private readonly HuppyDbContext _dbContext;
+        private readonly IServerInteractionService _serverInteractionService;
 
         public Creator(IServiceProvider serviceProvider)
         {
@@ -36,6 +35,7 @@ namespace Huppy.App
             _loggingService = _serviceProvider.GetRequiredService<LoggingService>();
             _logger = _serviceProvider.GetRequiredService<ILogger<Creator>>();
             _dbContext = _serviceProvider.GetRequiredService<HuppyDbContext>();
+            _serverInteractionService = _serviceProvider.GetRequiredService<IServerInteractionService>();
         }
 
         public async Task CreateDatabase()
@@ -66,6 +66,8 @@ namespace Huppy.App
             _client.InteractionCreated += _commandHandler.HandleCommandAsync;
             _client.Log += _loggingService.OnLogAsync;
             _client.ShardReady += _loggingService.OnReadyAsync;
+            _client.UserJoined += _serverInteractionService.WelcomeUser;
+            _client.JoinedGuild += _serverInteractionService.HuppyJoined;
 
             // interaction service events
             _interactionService.SlashCommandExecuted += _commandHandler.SlashCommandExecuted;
