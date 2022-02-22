@@ -97,6 +97,14 @@ namespace Huppy.App.Configuration
 
             });
 
+            _services.AddHttpClient("Urban", httpClient =>
+            {
+                httpClient.BaseAddress = new Uri(_appSettings?.UrbanApi!.BaseUrl!);
+
+                httpClient.DefaultRequestHeaders.Add("x-rapidapi-host", _appSettings?.UrbanApi!.Host);
+                httpClient.DefaultRequestHeaders.Add("x-rapidapi-key", _appSettings?.UrbanApi!.Key);
+            });
+
             return this;
         }
 

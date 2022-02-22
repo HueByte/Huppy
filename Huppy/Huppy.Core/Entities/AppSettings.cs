@@ -58,6 +58,7 @@ namespace Huppy.Core.Entities
                 },
                 UrbanApi = new()
                 {
+                    BaseUrl = "https://mashape-community-urban-dictionary.p.rapidapi.com/define",
                     Host = "mashape-community-urban-dictionary.p.rapidapi.com",
                     Key = ""
                 }
@@ -91,6 +92,7 @@ namespace Huppy.Core.Entities
 
     public class UrbanApi
     {
+        public string? BaseUrl { get; set; }
         public string? Host { get; set; }
         public string? Key { get; set; }
     }

@@ -31,7 +31,7 @@ namespace Huppy.Core.Services.GPTService
         public async Task<string> DavinciCompletion(string prompt)
         {
             if (String.IsNullOrEmpty(prompt))
-                throw new Exception("Prompt was empty");
+                throw new Exception("Prompt for GPT was empty");
 
             GPTDto model = new()
             {
@@ -55,7 +55,7 @@ namespace Huppy.Core.Services.GPTService
                 var failedResponse = await response.Content.ReadAsStringAsync();
                 _logger.LogError(failedResponse);
 
-                throw new Exception("GPT doesn't returned 200");
+                throw new Exception("GPT request wasn't successful");
             }
         }
     }
