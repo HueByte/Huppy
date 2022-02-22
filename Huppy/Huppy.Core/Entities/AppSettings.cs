@@ -10,6 +10,7 @@ namespace Huppy.Core.Entities
         public string? ConnectionString { get; set; }
         public Logger? Logger { get; set; }
         public GPT? GPT { get; set; }
+        public UrbanApi? UrbanApi { get; set; }
 
         [JsonIgnore]
         private readonly static string FILE_NAME = AppContext.BaseDirectory + "appsettings.json";
@@ -54,6 +55,11 @@ namespace Huppy.Core.Entities
                     Orgranization = "",
                     FreeMessageQuota = 0,
                     IsEnabled = false,
+                },
+                UrbanApi = new()
+                {
+                    Host = "mashape-community-urban-dictionary.p.rapidapi.com",
+                    Key = ""
                 }
             };
 
@@ -81,5 +87,11 @@ namespace Huppy.Core.Entities
         public string? Orgranization { get; set; }
         public int FreeMessageQuota { get; set; }
         public bool IsEnabled { get; set; }
+    }
+
+    public class UrbanApi
+    {
+        public string? Host { get; set; }
+        public string? Key { get; set; }
     }
 }
