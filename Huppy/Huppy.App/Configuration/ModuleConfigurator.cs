@@ -10,6 +10,7 @@ using Huppy.Core.Services.GPTService;
 using Huppy.Core.Services.HuppyCacheService;
 using Huppy.Core.Services.LoggerService;
 using Huppy.Core.Services.ServerInteractionService;
+using Huppy.Core.Services.UrbanService;
 using Huppy.Infrastructure;
 using Huppy.Infrastructure.Repositories;
 using Microsoft.Extensions.DependencyInjection;
@@ -78,6 +79,7 @@ namespace Huppy.App.Configuration
             _services.AddSingleton<IAiStabilizerService, AiStabilizerService>();
             _services.AddSingleton<IServerInteractionService, ServerInteractionService>();
             _services.AddScoped<IGPTService, GPTService>();
+            _services.AddScoped<IUrbanService, UrbanService>();
 
             _services.AddScoped<IUserRepository, UserRepository>();
             _services.AddScoped<IServerRepository, ServerRepository>();
