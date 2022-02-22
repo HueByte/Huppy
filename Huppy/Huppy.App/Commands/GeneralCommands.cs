@@ -120,7 +120,7 @@ namespace Huppy.App.Commands
 
             await _serverRepository.UpdateOne(server);
 
-            var embed = new EmbedBuilder().WithDescription("Updated your server settings")
+            var embed = new EmbedBuilder().WithDescription("Updated your server settings\nUse `/server` command to see current configuration")
                                           .WithThumbnailUrl(Icons.Huppy1)
                                           .WithColor(Color.Magenta)
                                           .WithCurrentTimestamp()

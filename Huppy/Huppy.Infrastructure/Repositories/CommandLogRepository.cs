@@ -40,7 +40,7 @@ namespace Huppy.Infrastructure.Repositories
             Dictionary<ulong, AiUser> result = new();
 
             var commandLogs = await _context.CommandLogs?.Include(e => e.User)
-                                                         .Where(x => x.Date!.Value.Month == DateTime.UtcNow.Month && x.CommandName == "ai")
+                                                         .Where(x => x.Date!.Value.Month == DateTime.UtcNow.Month && x.CommandName == "chat")
                                                          .ToListAsync()!;
 
             var uniqueUsers = commandLogs.GroupBy(e => e.UserId)
