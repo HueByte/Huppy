@@ -52,7 +52,8 @@ namespace Huppy.Core.Entities
                     BaseUrl = "",
                     ApiKey = "",
                     Orgranization = "",
-                    FreeMessageQuota = 0
+                    FreeMessageQuota = 0,
+                    IsEnabled = false,
                 }
             };
 
@@ -79,5 +80,6 @@ namespace Huppy.Core.Entities
         public string? ApiKey { get; set; }
         public string? Orgranization { get; set; }
         public int FreeMessageQuota { get; set; }
+        public bool IsEnabled { get; set; }
     }
 }
