@@ -22,6 +22,7 @@ namespace Huppy.App.Commands
             _cacheService = cacheService;
             _serverRepository = serverRepository;
         }
+
         [SlashCommand("info", "Get current configuration for this server")]
         [RequireUserPermission(GuildPermission.ManageGuild)]
         public async Task GetServerInfo()

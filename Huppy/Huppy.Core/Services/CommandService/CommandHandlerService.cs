@@ -1,4 +1,7 @@
 using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
@@ -125,6 +128,21 @@ namespace Huppy.Core.Services.CommandService
                 await command.ModifyOriginalResponseAsync((msg) => msg.Content = "Something went wrong");
                 throw;
             }
+        }
+
+        public async Task ButtonHandler(SocketMessageComponent component)
+        {
+            // component.Data.
+            _logger.LogInformation("component [{name}] with info {0}, {1}", component.Id, component.Message, component.Data.CustomId);
+            CommandLog log = new()
+            {
+                CommandName = component.Data.CustomId,
+                Date = DateTime.UtcNow,
+                IsSuccess = component.IsValidToken,
+                UserId = component.User.Id
+            };
+
+            await _commandRepository.AddAsync(log);
         }
     }
 }

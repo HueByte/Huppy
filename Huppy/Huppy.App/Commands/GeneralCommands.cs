@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Text;
 using Discord;
 using Discord.Interactions;
@@ -68,6 +69,41 @@ namespace Huppy.App.Commands
             embed.AddField("Commands Used", await _commandRepository.GetCount(), true);
 
             await ModifyOriginalResponseAsync((msg) => msg.Embed = embed.Build());
+        }
+
+        [SlashCommand("help", "Display help information")]
+        public async Task Help()
+        {
+            var embed = new EmbedBuilder().WithTitle("test");
+            var component = new ComponentBuilder().WithButton("◀", "help-left").WithButton("▶", "help-right");
+
+            await ModifyOriginalResponseAsync((msg) =>
+            {
+                msg.Embed = embed.Build();
+                msg.Components = component.Build();
+            });
+        }
+
+        [ComponentInteraction("help-left")]
+        public async Task HelpLeft()
+        {
+            _logger.LogInformation("Left invoked");
+        }
+
+        [ComponentInteraction("help-right")]
+        public async Task HelpRight()
+        {
+            var msg = (Context.Interaction as SocketMessageComponent);
+            var test = msg.Data.Values.FirstOrDefault();
+            _logger.LogInformation("Left invoked");
+            var embed = new EmbedBuilder().WithTitle("updated test");
+
+            await ModifyOriginalResponseAsync((msg) =>
+            {
+                var values = msg.Components.GetValueOrDefault();
+                _logger.LogInformation(values.ToString());
+                msg.Embed = embed.Build();
+            });
         }
     }
 }
