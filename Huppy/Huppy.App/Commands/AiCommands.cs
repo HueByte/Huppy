@@ -29,9 +29,8 @@ namespace Huppy.App.Commands
             //     return;
             // }
 
-            var aiContext = "You are Huppy, genderless Ai bot and your creator is HueByte\n";
 
-            var result = await _aiService.DavinciCompletion(aiContext += message);
+            var result = await _aiService.DavinciCompletion(message);
 
             var embed = new EmbedBuilder().WithCurrentTimestamp()
                                           .WithDescription(result)
@@ -75,7 +74,7 @@ namespace Huppy.App.Commands
                                           .WithColor(Color.Magenta)
                                           .WithDescription(sb.ToString());
 
-            embed.AddField("Total commands used", stats.Sum(x => x.Value.Count), true);
+            embed.AddField("Conversations", stats.Sum(x => x.Value.Count), true);
             embed.AddField("Huppy friend count", stats.Keys.Count, true);
 
             await ModifyOriginalResponseAsync((msg) => msg.Embed = embed.Build());

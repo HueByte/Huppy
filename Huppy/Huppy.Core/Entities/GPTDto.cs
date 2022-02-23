@@ -26,6 +26,12 @@ namespace Huppy.Core.Entities
         public object? Logprobs { get; set; }
 
         [JsonPropertyName("stop")]
-        public string? Stop { get; set; }
+        public string[]? Stop { get; set; }
+
+        [JsonPropertyName("frequency_penalty")]
+        public int FrequencyPenalty { get; set; }
+
+        [JsonPropertyName("presence_penalty")]
+        public int PresencePenalty { get; set; }
     }
 }

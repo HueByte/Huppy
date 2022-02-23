@@ -33,10 +33,14 @@ namespace Huppy.Core.Services.GPTService
             if (String.IsNullOrEmpty(prompt))
                 throw new Exception("Prompt for GPT was empty");
 
+            var aiContext = "You are Huppy, genderless bot and your creator is Hue.\n\n";
+
+            aiContext += prompt;
+
             GPTDto model = new()
             {
-                MaxTokens = 75,
-                Prompt = prompt,
+                MaxTokens = 100,
+                Prompt = aiContext,
                 Temperature = 0.6,
                 N = 1
             };
