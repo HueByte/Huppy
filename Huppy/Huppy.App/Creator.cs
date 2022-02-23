@@ -64,7 +64,7 @@ namespace Huppy.App
             // sharded client events
             _client.ShardReady += CreateSlashCommands;
             _client.InteractionCreated += _commandHandler.HandleCommandAsync;
-            _client.ButtonExecuted += _commandHandler.ButtonHandler;
+            _client.ButtonExecuted += _commandHandler.ComponentHandler;
             _client.Log += _loggingService.OnLogAsync;
             _client.ShardReady += _loggingService.OnReadyAsync;
             _client.UserJoined += _serverInteractionService.OnUserJoined;
