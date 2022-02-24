@@ -80,10 +80,11 @@ namespace Huppy.App.Configuration
             _services.AddSingleton<CacheService>();
             _services.AddSingleton<IAiStabilizerService, AiStabilizerService>();
             _services.AddSingleton<IServerInteractionService, ServerInteractionService>();
+            _services.AddSingleton<ITimedEventsService, TimedEventsService>();
+
             _services.AddScoped<IGPTService, GPTService>();
             _services.AddScoped<IUrbanService, UrbanService>();
             _services.AddScoped<INewsApiService, NewsApiService>();
-            _services.AddSingleton<ITimedEventsService, TimedEventsService>();
 
             _services.AddScoped<IUserRepository, UserRepository>();
             _services.AddScoped<IServerRepository, ServerRepository>();
@@ -97,16 +98,13 @@ namespace Huppy.App.Configuration
             _services.AddHttpClient("GPT", httpclient =>
             {
                 httpclient.BaseAddress = new Uri(_appSettings?.GPT!.BaseUrl!);
-
                 httpclient.DefaultRequestHeaders.Add("Authorization", $"Bearer {_appSettings?.GPT!.ApiKey}");
                 httpclient.DefaultRequestHeaders.Add("OpenAI-Organization", _appSettings?.GPT!.Orgranization);
-
             });
 
             _services.AddHttpClient("Urban", httpClient =>
             {
                 httpClient.BaseAddress = new Uri(_appSettings?.UrbanApi!.BaseUrl!);
-
                 httpClient.DefaultRequestHeaders.Add("x-rapidapi-host", _appSettings?.UrbanApi!.Host);
                 httpClient.DefaultRequestHeaders.Add("x-rapidapi-key", _appSettings?.UrbanApi!.Key);
             });
@@ -114,7 +112,6 @@ namespace Huppy.App.Configuration
             _services.AddHttpClient("News", httpClient =>
             {
                 httpClient.BaseAddress = new Uri(_appSettings?.NewsAPI!.BaseUrl!);
-
                 httpClient.DefaultRequestHeaders.Add("X-Api-Key", _appSettings?.NewsAPI!.ApiKey);
             });
 
