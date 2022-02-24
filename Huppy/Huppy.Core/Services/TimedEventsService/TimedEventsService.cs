@@ -17,7 +17,6 @@ namespace Huppy.Core.Services.TimedEventsService
         public Task StartTimers()
         {
             NewsEvent();
-
             return Task.CompletedTask;
         }
 

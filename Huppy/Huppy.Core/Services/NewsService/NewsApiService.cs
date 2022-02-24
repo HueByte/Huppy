@@ -64,7 +64,7 @@ namespace Huppy.Core.Services.NewsService
                     count++;
                 }
 
-                var embed = new EmbedBuilder().WithTitle("✨ Hello I'm Huppy! ✨")
+                var embed = new EmbedBuilder().WithTitle("✨ Most recent news ✨")
                                   .WithColor(Color.Teal)
                                   .WithDescription(sb.ToString())
                                   .WithThumbnailUrl(Icons.Huppy1)
