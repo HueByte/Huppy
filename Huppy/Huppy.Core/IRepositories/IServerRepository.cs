@@ -7,6 +7,7 @@ namespace Huppy.Core.IRepositories
     {
         Task AddOneAsync(Server server);
         Task AddOneAsync(ShardedInteractionContext DiscordContext);
+        Task<List<Server>> GetAll();
         Task<Server> GetOneAsync(ulong ID);
         Task<Server> GetOrCreateAsync(ShardedInteractionContext DiscordContext);
         Task UpdateOne(Server server);

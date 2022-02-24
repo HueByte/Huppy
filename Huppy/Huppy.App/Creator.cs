@@ -5,6 +5,7 @@ using Huppy.Core.Entities;
 using Huppy.Core.Services.CommandService;
 using Huppy.Core.Services.LoggerService;
 using Huppy.Core.Services.ServerInteractionService;
+using Huppy.Core.Services.TimedEventsService;
 using Huppy.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,6 +25,7 @@ namespace Huppy.App
         private readonly ILogger<Creator> _logger;
         private readonly HuppyDbContext _dbContext;
         private readonly IServerInteractionService _serverInteractionService;
+        private readonly ITimedEventsService _timedEventService;
 
         public Creator(IServiceProvider serviceProvider)
         {
@@ -36,6 +38,7 @@ namespace Huppy.App
             _logger = _serviceProvider.GetRequiredService<ILogger<Creator>>();
             _dbContext = _serviceProvider.GetRequiredService<HuppyDbContext>();
             _serverInteractionService = _serviceProvider.GetRequiredService<IServerInteractionService>();
+            _timedEventService = _serviceProvider.GetRequiredService<ITimedEventsService>();
         }
 
         public async Task CreateDatabase()
@@ -63,6 +66,7 @@ namespace Huppy.App
 
             // sharded client events
             _client.ShardReady += CreateSlashCommands;
+            _client.ShardReady += StartTimedEvents;
             _client.InteractionCreated += _commandHandler.HandleCommandAsync;
             _client.ButtonExecuted += _commandHandler.ComponentHandler;
             _client.Log += _loggingService.OnLogAsync;
@@ -73,6 +77,11 @@ namespace Huppy.App
             // interaction service events
             _interactionService.SlashCommandExecuted += _commandHandler.SlashCommandExecuted;
             _interactionService.Log += _loggingService.OnLogAsync;
+        }
+
+        public async Task StartTimedEvents(DiscordSocketClient socketClient)
+        {
+            await _timedEventService.StartTimers();
         }
 
         private async Task CreateSlashCommands(DiscordSocketClient socketClient)

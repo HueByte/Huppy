@@ -13,6 +13,11 @@ namespace Huppy.Infrastructure.Repositories
             _context = context;
         }
 
+        public async Task<List<Server>> GetAll()
+        {
+            return await _context.Servers.ToListAsync();
+        }
+
         public async Task AddOneAsync(Server server)
         {
             await _context.Servers.AddAsync(server);

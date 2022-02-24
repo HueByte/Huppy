@@ -34,4 +34,6 @@ await bot.CreateEvents();
 
 await bot.CreateBot();
 
+// await bot.StartTimedEvents();
+
 await Task.Delay(-1);

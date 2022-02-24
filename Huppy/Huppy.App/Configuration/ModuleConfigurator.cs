@@ -11,6 +11,7 @@ using Huppy.Core.Services.HuppyCacheService;
 using Huppy.Core.Services.LoggerService;
 using Huppy.Core.Services.NewsService;
 using Huppy.Core.Services.ServerInteractionService;
+using Huppy.Core.Services.TimedEventsService;
 using Huppy.Core.Services.UrbanService;
 using Huppy.Infrastructure;
 using Huppy.Infrastructure.Repositories;
@@ -82,6 +83,7 @@ namespace Huppy.App.Configuration
             _services.AddScoped<IGPTService, GPTService>();
             _services.AddScoped<IUrbanService, UrbanService>();
             _services.AddScoped<INewsApiService, NewsApiService>();
+            _services.AddSingleton<ITimedEventsService, TimedEventsService>();
 
             _services.AddScoped<IUserRepository, UserRepository>();
             _services.AddScoped<IServerRepository, ServerRepository>();
