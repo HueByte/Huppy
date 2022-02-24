@@ -9,6 +9,7 @@ using Huppy.Core.Services.CommandService;
 using Huppy.Core.Services.GPTService;
 using Huppy.Core.Services.HuppyCacheService;
 using Huppy.Core.Services.LoggerService;
+using Huppy.Core.Services.NewsService;
 using Huppy.Core.Services.ServerInteractionService;
 using Huppy.Core.Services.UrbanService;
 using Huppy.Infrastructure;
@@ -80,6 +81,7 @@ namespace Huppy.App.Configuration
             _services.AddSingleton<IServerInteractionService, ServerInteractionService>();
             _services.AddScoped<IGPTService, GPTService>();
             _services.AddScoped<IUrbanService, UrbanService>();
+            _services.AddScoped<INewsApiService, NewsApiService>();
 
             _services.AddScoped<IUserRepository, UserRepository>();
             _services.AddScoped<IServerRepository, ServerRepository>();
@@ -105,6 +107,13 @@ namespace Huppy.App.Configuration
 
                 httpClient.DefaultRequestHeaders.Add("x-rapidapi-host", _appSettings?.UrbanApi!.Host);
                 httpClient.DefaultRequestHeaders.Add("x-rapidapi-key", _appSettings?.UrbanApi!.Key);
+            });
+
+            _services.AddHttpClient("News", httpClient =>
+            {
+                httpClient.BaseAddress = new Uri(_appSettings?.NewsAPI!.BaseUrl!);
+
+                httpClient.DefaultRequestHeaders.Add("X-Api-Key", _appSettings?.NewsAPI!.ApiKey);
             });
 
             return this;

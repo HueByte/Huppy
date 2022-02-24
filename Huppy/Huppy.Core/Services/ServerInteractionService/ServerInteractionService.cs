@@ -40,7 +40,7 @@ namespace Huppy.Core.Services.ServerInteractionService
             {
                 var embed = new EmbedBuilder().WithColor(Color.Teal)
                                               .WithCurrentTimestamp()
-                                              .WithDescription(server?.GreetMessage!.Replace("{username}", $"**{user.Username}**"))
+                                              .WithDescription(server?.GreetMessage!.Replace("{username}", $"**{user.Username}**").Replace("\\n", "\n"))
                                               .WithTitle("Hello!")
                                               .WithThumbnailUrl(user.GetAvatarUrl());
 

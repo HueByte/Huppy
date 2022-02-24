@@ -11,6 +11,7 @@ namespace Huppy.Core.Entities
         public Logger? Logger { get; set; }
         public GPT? GPT { get; set; }
         public UrbanApi? UrbanApi { get; set; }
+        public NewsAPI? NewsAPI { get; set; }
 
         [JsonIgnore]
         private readonly static string FILE_NAME = AppContext.BaseDirectory + "appsettings.json";
@@ -61,6 +62,11 @@ namespace Huppy.Core.Entities
                     BaseUrl = "https://mashape-community-urban-dictionary.p.rapidapi.com/define",
                     Host = "mashape-community-urban-dictionary.p.rapidapi.com",
                     Key = ""
+                },
+                NewsAPI = new()
+                {
+                    BaseUrl = "",
+                    ApiKey = ""
                 }
             };
 
@@ -95,5 +101,11 @@ namespace Huppy.Core.Entities
         public string? BaseUrl { get; set; }
         public string? Host { get; set; }
         public string? Key { get; set; }
+    }
+
+    public class NewsAPI
+    {
+        public string? BaseUrl { get; set; }
+        public string? ApiKey { get; set; }
     }
 }

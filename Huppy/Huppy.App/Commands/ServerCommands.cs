@@ -51,11 +51,18 @@ namespace Huppy.App.Commands
         }
 
         [SlashCommand("configure", "Configure Huppy for your server")]
-        public async Task ConfigureHuppy(bool? UseGreet = null, string? GreetingMessage = null, IRole? DefaultRole = null, SocketGuildChannel? HuppyRoom = null)
+        [RequireUserPermission(GuildPermission.Administrator)]
+        public async Task ConfigureHuppy(bool? UseGreet = null, string? GreetingMessage = null, IRole? DefaultRole = null, SocketGuildChannel? HuppyRoom = null, bool? EnableNews = false, SocketGuildChannel? NewsRoom = null)
         {
             var server = await _serverRepository.GetOrCreateAsync(Context);
 
             server.ServerName = Context.Guild.Name;
+
+            if (EnableNews is not null)
+                server.AreNewsEnabled = (bool)EnableNews;
+
+            if (NewsRoom is not null)
+                server.NewsOutputRoom = NewsRoom.Id;
 
             if (UseGreet is not null)
                 server.UseGreet = (bool)UseGreet;

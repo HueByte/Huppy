@@ -11,6 +11,8 @@ namespace Huppy.Core.Models
         public bool UseGreet { get; set; }
         public string? GreetMessage { get; set; }
         public ulong OutputRoom { get; set; }
+        public ulong NewsOutputRoom { get; set; }
+        public bool AreNewsEnabled { get; set; }
         public ulong RoleID { get; set; }
     }
 }

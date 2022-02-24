@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Net;
 using System.Text;
 using Discord;
 using Discord.Interactions;
@@ -11,6 +12,7 @@ using Huppy.Core.Models;
 using Huppy.Core.Services.CommandService;
 using Huppy.Core.Services.GPTService;
 using Huppy.Core.Services.HuppyCacheService;
+using Huppy.Core.Services.NewsService;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.Extensions.Logging;
 
@@ -21,11 +23,13 @@ namespace Huppy.App.Commands
         private readonly ILogger _logger;
         private readonly ICommandLogRepository _commandRepository;
         private readonly CacheService _cacheService;
-        public GeneralCommands(ILogger<GeneralCommands> logger, CacheService cacheService, ICommandLogRepository commandLogRepository)
+        private readonly INewsApiService _newsService;
+        public GeneralCommands(ILogger<GeneralCommands> logger, CacheService cacheService, ICommandLogRepository commandLogRepository, INewsApiService newsService)
         {
             _logger = logger;
             _commandRepository = commandLogRepository;
             _cacheService = cacheService;
+            _newsService = newsService;
         }
 
         [SlashCommand("ping", "return pong")]
@@ -104,6 +108,30 @@ namespace Huppy.App.Commands
                 _logger.LogInformation(values.ToString());
                 msg.Embed = embed.Build();
             });
+        }
+
+        [SlashCommand("testnews", "Get news")]
+        public async Task GetNews()
+        {
+            var result = (await _newsService.GetNews()).Articles!.Take(5);
+
+            StringBuilder sb = new();
+            int count = 1;
+            foreach (var article in result)
+            {
+                sb.AppendLine($"**{count}. {article.Title}**\n");
+                sb.AppendLine($"> {article.Description}\n");
+                sb.AppendLine($"*{article.Author} {article.Source!.Name}*\n");
+                count++;
+            }
+
+            var embed = new EmbedBuilder().WithTitle("✨ Hello I'm Huppy! ✨")
+                              .WithColor(Color.Teal)
+                              .WithDescription(sb.ToString())
+                              .WithThumbnailUrl(Icons.Huppy1)
+                              .WithCurrentTimestamp();
+
+            await ModifyOriginalResponseAsync((msg) => msg.Embed = embed.Build());
         }
     }
 }
