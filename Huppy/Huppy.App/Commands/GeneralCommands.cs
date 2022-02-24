@@ -121,7 +121,7 @@ namespace Huppy.App.Commands
             {
                 sb.AppendLine($"**{count}. {article.Title}**\n");
                 sb.AppendLine($"> {article.Description}\n");
-                sb.AppendLine($"*{article.Author} {article.Source!.Name}*\n");
+                sb.AppendLine($"*{article.Author} - {article.Source!.Name}*\n");
                 count++;
             }
 
