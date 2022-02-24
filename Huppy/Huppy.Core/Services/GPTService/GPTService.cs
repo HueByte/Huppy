@@ -2,6 +2,7 @@ using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 using Huppy.Core.Common.Constants;
+using Huppy.Core.Dto;
 using Huppy.Core.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -51,7 +52,7 @@ namespace Huppy.Core.Services.GPTService
 
             if (response.IsSuccessStatusCode)
             {
-                var result = await response.Content!.ReadFromJsonAsync<Entities.GPTResponse>();
+                var result = await response.Content!.ReadFromJsonAsync<GPTResponse>();
                 return result!.Choices!.First()!.Text!;
             }
             else

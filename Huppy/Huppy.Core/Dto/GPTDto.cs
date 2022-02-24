@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Huppy.Core.Entities
+namespace Huppy.Core.Dto
 {
     public class GPTDto
     {
