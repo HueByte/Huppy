@@ -56,7 +56,9 @@ namespace Huppy.Infrastructure.Repositories
                 OutputRoom = DiscordContext.Guild.DefaultChannel.Id,
                 UseGreet = false,
                 ServerName = DiscordContext.Guild.Name,
-                RoleID = 0
+                RoleID = 0,
+                AreNewsEnabled = false,
+                NewsOutputRoom = 0
             };
 
             await _context.Servers.AddAsync(server);
