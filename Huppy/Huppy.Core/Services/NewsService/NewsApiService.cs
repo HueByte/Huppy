@@ -60,7 +60,8 @@ namespace Huppy.Core.Services.NewsService
                 {
                     sb.AppendLine($"**{count}. {article.Title}**\n");
                     sb.AppendLine($"> {article.Description}\n");
-                    sb.AppendLine($"*{article.Author} - {article.Source!.Name}*\n");
+                    sb.AppendLine($"*{article.Author} - {article.Source!.Name}*");
+                    sb.AppendLine($"{article.Url}\n");
                     count++;
                 }
 

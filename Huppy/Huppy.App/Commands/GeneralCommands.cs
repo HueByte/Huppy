@@ -75,18 +75,18 @@ namespace Huppy.App.Commands
             await ModifyOriginalResponseAsync((msg) => msg.Embed = embed.Build());
         }
 
-        [SlashCommand("help", "Display help information")]
-        public async Task Help()
-        {
-            var embed = new EmbedBuilder().WithTitle("test");
-            var component = new ComponentBuilder().WithButton("◀", "help-left").WithButton("▶", "help-right");
+        // [SlashCommand("help", "Display help information")]
+        // public async Task Help()
+        // {
+        //     var embed = new EmbedBuilder().WithTitle("test");
+        //     var component = new ComponentBuilder().WithButton("◀", "help-left").WithButton("▶", "help-right");
 
-            await ModifyOriginalResponseAsync((msg) =>
-            {
-                msg.Embed = embed.Build();
-                msg.Components = component.Build();
-            });
-        }
+        //     await ModifyOriginalResponseAsync((msg) =>
+        //     {
+        //         msg.Embed = embed.Build();
+        //         msg.Components = component.Build();
+        //     });
+        // }
 
         [ComponentInteraction("help-left")]
         public async Task HelpLeft()
@@ -108,30 +108,6 @@ namespace Huppy.App.Commands
                 _logger.LogInformation(values.ToString());
                 msg.Embed = embed.Build();
             });
-        }
-
-        [SlashCommand("testnews", "Get news")]
-        public async Task GetNews()
-        {
-            var result = (await _newsService.GetNews()).Articles!.Take(5);
-
-            StringBuilder sb = new();
-            int count = 1;
-            foreach (var article in result)
-            {
-                sb.AppendLine($"**{count}. {article.Title}**\n");
-                sb.AppendLine($"> {article.Description}\n");
-                sb.AppendLine($"*{article.Author} - {article.Source!.Name}*\n");
-                count++;
-            }
-
-            var embed = new EmbedBuilder().WithTitle("✨ Hello I'm Huppy! ✨")
-                              .WithColor(Color.Teal)
-                              .WithDescription(sb.ToString())
-                              .WithThumbnailUrl(Icons.Huppy1)
-                              .WithCurrentTimestamp();
-
-            await ModifyOriginalResponseAsync((msg) => msg.Embed = embed.Build());
         }
     }
 }

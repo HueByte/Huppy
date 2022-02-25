@@ -53,6 +53,7 @@ namespace Huppy.Core.Services.ServerInteractionService
 
                 await channel!.SendMessageAsync(null, false, embed.Build());
             }
+
             if (server!.RoleID > 0)
             {
                 try
