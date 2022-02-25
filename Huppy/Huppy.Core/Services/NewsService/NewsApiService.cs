@@ -27,7 +27,7 @@ namespace Huppy.Core.Services.NewsService
 
         public async Task<NewsResponse> GetNews()
         {
-            var fromTime = DateTime.UtcNow.AddMinutes(-30).ToString("o");
+            var fromTime = DateTime.UtcNow.AddMinutes(-60).ToString("o");
             var toTime = DateTime.UtcNow.ToString("o");
 
             var client = _clientFactory.CreateClient("News");
@@ -58,9 +58,9 @@ namespace Huppy.Core.Services.NewsService
                 int count = 1;
                 foreach (var article in news)
                 {
-                    sb.AppendLine($"**{count}. {article.Title}**\n");
-                    sb.AppendLine($"> {article.Description}\n");
-                    sb.AppendLine($"*{article.Author} - {article.Source!.Name}*");
+                    sb.AppendLine($"**{count}. {article.Title?.Replace("*", String.Empty)}**\n");
+                    sb.AppendLine($"> {article.Description?.Replace("*", String.Empty)}\n");
+                    sb.AppendLine($"*{article.Author?.Replace("*", String.Empty)} - {article.Source!.Name?.Replace("*", String.Empty)}*");
                     sb.AppendLine($"{article.Url}\n");
                     count++;
                 }

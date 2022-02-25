@@ -22,7 +22,7 @@ namespace Huppy.Core.Services.TimedEventsService
 
         private Task NewsEvent()
         {
-            var looper = TimeSpan.FromMinutes(30);
+            var looper = TimeSpan.FromMinutes(60);
 
             _newsTimer = new Timer(async (e) =>
             {
