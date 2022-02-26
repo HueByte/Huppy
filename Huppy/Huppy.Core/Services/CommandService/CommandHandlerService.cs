@@ -100,6 +100,8 @@ namespace Huppy.Core.Services.CommandService
 
         public async Task HandleCommandAsync(SocketInteraction command)
         {
+            await command.DeferAsync();
+
             if (!_cacheService.UserBasicData.ContainsKey(command.User.Id))
             {
                 _logger.LogInformation("Adding new user [{Username}] to database", command.User.Username);
@@ -116,10 +118,7 @@ namespace Huppy.Core.Services.CommandService
 
             try
             {
-                await command.DeferAsync();
-
                 var ctx = new ShardedInteractionContext(_client, command);
-
                 await _interactionService.ExecuteCommandAsync(ctx, _serviceProvider);
             }
             catch (Exception ex)
