@@ -1,10 +1,8 @@
-using System.Text;
 using Discord;
 using Discord.WebSocket;
 using Huppy.Core.Common.Constants;
 using Huppy.Core.Common.HuppyMessages;
 using Huppy.Core.IRepositories;
-using Huppy.Core.Models;
 using Microsoft.Extensions.Logging;
 
 namespace Huppy.Core.Services.ServerInteractionService

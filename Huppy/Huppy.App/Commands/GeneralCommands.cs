@@ -1,19 +1,11 @@
-using System.ComponentModel;
-using System.Net;
-using System.Text;
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Huppy.Core.Common.Constants;
 using Huppy.Core.Common.HuppyMessages;
-using Huppy.Core.Entities;
 using Huppy.Core.IRepositories;
-using Huppy.Core.Models;
-using Huppy.Core.Services.CommandService;
-using Huppy.Core.Services.GPTService;
 using Huppy.Core.Services.HuppyCacheService;
 using Huppy.Core.Services.NewsService;
-using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.Extensions.Logging;
 
 namespace Huppy.App.Commands

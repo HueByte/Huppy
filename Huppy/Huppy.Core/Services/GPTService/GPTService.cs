@@ -1,13 +1,8 @@
 using System.Net.Http.Json;
-using System.Text;
-using System.Text.Json;
 using Huppy.Core.Common.Constants;
 using Huppy.Core.Dto;
-using Huppy.Core.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Serilog.Sinks.SystemConsole.Themes;
-// using Newtonsoft.Json;
 
 namespace Huppy.Core.Services.GPTService
 {

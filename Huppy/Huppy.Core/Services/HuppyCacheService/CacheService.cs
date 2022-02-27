@@ -1,4 +1,3 @@
-using System.Security.Cryptography.X509Certificates;
 using Huppy.Core.Entities;
 using Huppy.Core.IRepositories;
 

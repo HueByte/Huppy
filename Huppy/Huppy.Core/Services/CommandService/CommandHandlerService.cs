@@ -1,7 +1,4 @@
 using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
@@ -131,7 +128,7 @@ namespace Huppy.Core.Services.CommandService
 
         public async Task ComponentHandler(SocketMessageComponent component)
         {
-            _logger.LogInformation("component [{name}] with info {0}, {1}", component.Id, component.Message, component.Data.CustomId);
+            _logger.LogInformation("component [{name}] with info {message}, {dataId}", component.Id, component.Message, component.Data.CustomId);
             CommandLog log = new()
             {
                 CommandName = component.Data.CustomId,

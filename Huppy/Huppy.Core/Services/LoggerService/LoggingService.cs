@@ -1,7 +1,5 @@
 using Discord;
-using Discord.Interactions;
 using Discord.WebSocket;
-using Huppy.Core.Common.Constants;
 using Microsoft.Extensions.Logging;
 
 namespace Huppy.Core.Services.LoggerService

@@ -1,12 +1,10 @@
 using System.Net.Http.Json;
 using System.Text;
-using System.Threading.Channels;
 using Discord;
 using Discord.WebSocket;
 using Huppy.Core.Common.Constants;
 using Huppy.Core.Dto;
 using Huppy.Core.IRepositories;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
 
 namespace Huppy.Core.Services.NewsService

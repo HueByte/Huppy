@@ -1,8 +1,5 @@
-using System.Runtime.InteropServices;
-using Discord;
 using Discord.Interactions;
 using Huppy.Core.Services.CommandService;
-using Serilog;
 
 namespace Huppy.App.Commands
 {

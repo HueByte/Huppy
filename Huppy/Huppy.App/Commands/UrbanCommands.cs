@@ -2,7 +2,6 @@ using System.Text;
 using Discord;
 using Discord.Interactions;
 using Huppy.Core.Common.Constants;
-using Huppy.Core.Dto;
 using Huppy.Core.Services.UrbanService;
 using Microsoft.Extensions.Logging;
 

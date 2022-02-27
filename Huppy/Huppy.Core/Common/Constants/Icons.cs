@@ -1,5 +1,3 @@
-using System.Runtime.Serialization;
-
 namespace Huppy.Core.Common.Constants
 {
     public class Icons

@@ -1,4 +1,3 @@
-using System.Net;
 using Huppy.Core.IRepositories;
 using Huppy.Core.Models;
 using Microsoft.EntityFrameworkCore;
