@@ -29,7 +29,7 @@ namespace Huppy.Core.Services.NewsService
             var toTime = DateTime.UtcNow.ToString("o");
 
             var client = _clientFactory.CreateClient("News");
-            var response = await client.GetAsync($"everything?q=\"war\"+\"US\"+\"Russia\"+\"ukraine\"&SortBy=relevancy&from={fromTime}&to={toTime}");
+            var response = await client.GetAsync($"everything?q=\"war\"+\"US\"+\"Russia\"+\"ukraine\"&SortBy=popularity&from={fromTime}&to={toTime}");
 
             if (response.IsSuccessStatusCode)
             {
