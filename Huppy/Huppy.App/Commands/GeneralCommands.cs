@@ -38,16 +38,18 @@ namespace Huppy.App.Commands
 
         [SlashCommand("embed", "Send embed message")]
         [RequireUserPermission(GuildPermission.ManageRoles)]
-        public async Task SendEmbed(string title, string content, string? thumbnail = null)
+        public async Task SendEmbed(string title, string content, bool withAuthor = true, string? thumbnail = null)
         {
             content = content.Replace("\\n", "\n");
 
             EmbedBuilder embed = new EmbedBuilder().WithTitle(title)
                 .WithCurrentTimestamp()
-                .WithThumbnailUrl(thumbnail ?? "https://i.kym-cdn.com/entries/icons/facebook/000/017/618/pepefroggie.jpg")
+                .WithThumbnailUrl(thumbnail ?? "")
                 .WithDescription(content)
-                .WithColor(Color.Teal)
-                .WithAuthor(Context.User);
+                .WithColor(Color.Teal);
+
+            if (withAuthor)
+                embed.WithAuthor(Context.User);
 
             await ModifyOriginalResponseAsync((msg) => msg.Embed = embed.Build());
         }
@@ -67,18 +69,18 @@ namespace Huppy.App.Commands
             await ModifyOriginalResponseAsync((msg) => msg.Embed = embed.Build());
         }
 
-        // [SlashCommand("help", "Display help information")]
-        // public async Task Help()
-        // {
-        //     var embed = new EmbedBuilder().WithTitle("test");
-        //     var component = new ComponentBuilder().WithButton("◀", "help-left").WithButton("▶", "help-right");
+        [SlashCommand("help", "Display help information")]
+        public async Task Help()
+        {
+            var embed = new EmbedBuilder().WithTitle("test");
+            var component = new ComponentBuilder().WithButton("◀", "help-left").WithButton("▶", "help-right");
 
-        //     await ModifyOriginalResponseAsync((msg) =>
-        //     {
-        //         msg.Embed = embed.Build();
-        //         msg.Components = component.Build();
-        //     });
-        // }
+            await ModifyOriginalResponseAsync((msg) =>
+            {
+                msg.Embed = embed.Build();
+                msg.Components = component.Build();
+            });
+        }
 
         [ComponentInteraction("help-left")]
         public async Task HelpLeft()
