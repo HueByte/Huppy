@@ -22,12 +22,15 @@ namespace Huppy.Core.Entities
 
         [JsonIgnore]
         public static string SavePath
-            => Path.Combine(AppContext.BaseDirectory, @"save/save.sqlite");
+            => Path.Combine(AppContext.BaseDirectory, "save", "save.sqlite");
 
         public static AppSettings Load()
         {
             var readBytes = File.ReadAllBytes(FILE_NAME);
             var config = JsonSerializer.Deserialize<AppSettings>(readBytes);
+
+            CreateFolders();
+
             return config!;
         }
 
@@ -36,8 +39,7 @@ namespace Huppy.Core.Entities
             if (IsCreated)
                 return Load();
 
-            if (!Directory.Exists(Path.Combine(AppContext.BaseDirectory, "save")))
-                Directory.CreateDirectory(Path.Combine(AppContext.BaseDirectory, "save"));
+            CreateFolders();
 
             var config = new AppSettings()
             {
@@ -78,6 +80,12 @@ namespace Huppy.Core.Entities
             File.WriteAllBytes(FILE_NAME, JsonSerializer.SerializeToUtf8Bytes(config, options));
 
             return config;
+        }
+
+        private static void CreateFolders()
+        {
+            if (!Directory.Exists(Path.Combine(AppContext.BaseDirectory, "save")))
+                Directory.CreateDirectory(Path.Combine(AppContext.BaseDirectory, "save"));
         }
     }
 
