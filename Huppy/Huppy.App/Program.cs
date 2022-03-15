@@ -28,6 +28,8 @@ var bot = new Creator(_serviceProvider);
 
 await bot.CreateDatabase();
 
+await bot.PopulateSingletons();
+
 await bot.CreateCommands();
 
 await bot.CreateEvents();

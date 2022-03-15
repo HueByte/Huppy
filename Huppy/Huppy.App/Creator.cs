@@ -3,6 +3,7 @@ using Discord.Interactions;
 using Discord.WebSocket;
 using Huppy.Core.Entities;
 using Huppy.Core.Services.CommandService;
+using Huppy.Core.Services.HuppyCacheService;
 using Huppy.Core.Services.LoggerService;
 using Huppy.Core.Services.ServerInteractionService;
 using Huppy.Core.Services.TimedEventsService;
@@ -26,6 +27,7 @@ namespace Huppy.App
         private readonly HuppyDbContext _dbContext;
         private readonly IServerInteractionService _serverInteractionService;
         private readonly ITimedEventsService _timedEventService;
+        private readonly CacheService _cacheService;
 
         public Creator(IServiceProvider serviceProvider)
         {
@@ -39,11 +41,17 @@ namespace Huppy.App
             _dbContext = _serviceProvider.GetRequiredService<HuppyDbContext>();
             _serverInteractionService = _serviceProvider.GetRequiredService<IServerInteractionService>();
             _timedEventService = _serviceProvider.GetRequiredService<ITimedEventsService>();
+            _cacheService = _serviceProvider.GetRequiredService<CacheService>();
         }
 
         public async Task CreateDatabase()
         {
             await _dbContext.Database.MigrateAsync();
+        }
+
+        public async Task PopulateSingletons()
+        {
+            await _cacheService.Initialize();
         }
 
         public async Task CreateCommands() =>
