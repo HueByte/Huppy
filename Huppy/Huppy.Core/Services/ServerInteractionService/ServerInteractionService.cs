@@ -3,6 +3,7 @@ using Discord.WebSocket;
 using Huppy.Core.Common.Constants;
 using Huppy.Core.Common.HuppyMessages;
 using Huppy.Core.IRepositories;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Huppy.Core.Services.ServerInteractionService
@@ -10,11 +11,11 @@ namespace Huppy.Core.Services.ServerInteractionService
     public class ServerInteractionService : IServerInteractionService
     {
         private readonly ILogger _logger;
-        private readonly IServerRepository _serverRepository;
-        public ServerInteractionService(ILogger<ServerInteractionService> logger, IServerRepository serverRepository)
+        private readonly IServiceScopeFactory _serviceFactory;
+        public ServerInteractionService(ILogger<ServerInteractionService> logger, IServiceScopeFactory serviceScopeFactory)
         {
             _logger = logger;
-            _serverRepository = serverRepository;
+            _serviceFactory = serviceScopeFactory;
         }
 
         public async Task HuppyJoined(SocketGuild guild)
@@ -31,7 +32,10 @@ namespace Huppy.Core.Services.ServerInteractionService
 
         public async Task OnUserJoined(SocketGuildUser user)
         {
-            _logger.LogInformation("New user joined [{Username}] at [{ServerName}", user.Username, user.Guild.Name);
+            using var scope = _serviceFactory.CreateAsyncScope();
+            var _serverRepository = scope.ServiceProvider.GetRequiredService<IServerRepository>();
+
+            _logger.LogInformation("New user joined [{Username}] at [{ServerName}]", user.Username, user.Guild.Name);
 
             var server = await _serverRepository.GetOneAsync(user.Guild.Id);
             if (server is not null && server.UseGreet)

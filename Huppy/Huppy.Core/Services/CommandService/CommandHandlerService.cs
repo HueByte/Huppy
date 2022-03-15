@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
@@ -6,6 +7,7 @@ using Huppy.Core.Common.Constants;
 using Huppy.Core.IRepositories;
 using Huppy.Core.Models;
 using Huppy.Core.Services.HuppyCacheService;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog;
 
@@ -17,18 +19,16 @@ namespace Huppy.Core.Services.CommandService
         private readonly InteractionService _interactionService;
         private readonly IServiceProvider _serviceProvider;
         private readonly Microsoft.Extensions.Logging.ILogger _logger;
-        private readonly ICommandLogRepository _commandRepository;
-        private readonly IUserRepository _userRepository;
         private readonly CacheService _cacheService;
-        public CommandHandlerService(DiscordShardedClient client, InteractionService interactionService, IServiceProvider serviceProvider, ILogger<CommandHandlerService> logger, ICommandLogRepository commandRepository, IUserRepository userRepository, CacheService cacheService)
+        private readonly IServiceScopeFactory _serviceFactory;
+        public CommandHandlerService(DiscordShardedClient client, InteractionService interactionService, IServiceProvider serviceProvider, ILogger<CommandHandlerService> logger, CacheService cacheService, IServiceScopeFactory serviceFactory)
         {
             _client = client;
             _interactionService = interactionService;
             _serviceProvider = serviceProvider;
             _logger = logger;
-            _commandRepository = commandRepository;
-            _userRepository = userRepository;
             _cacheService = cacheService;
+            _serviceFactory = serviceFactory;
         }
 
         public async Task InitializeAsync()
@@ -38,6 +38,9 @@ namespace Huppy.Core.Services.CommandService
 
         public async Task SlashCommandExecuted(SlashCommandInfo commandInfo, Discord.IInteractionContext context, IResult result)
         {
+            using var scope = _serviceFactory.CreateAsyncScope();
+            var _commandRepository = scope.ServiceProvider.GetRequiredService<ICommandLogRepository>();
+
             CommandLog log = new()
             {
                 CommandName = commandInfo.Name,
@@ -60,6 +63,7 @@ namespace Huppy.Core.Services.CommandService
                                               .WithThumbnailUrl(Icons.Error);
 
                 _logger.LogError("Command [{CommandName}] resulted in error: [{Error}]", commandInfo.Name, result.ErrorReason);
+
                 switch (result.Error)
                 {
                     case InteractionCommandError.UnmetPrecondition:
@@ -97,6 +101,10 @@ namespace Huppy.Core.Services.CommandService
 
         public async Task HandleCommandAsync(SocketInteraction command)
         {
+            using var scope = _serviceFactory.CreateAsyncScope();
+            var _commandRepository = scope.ServiceProvider.GetRequiredService<ICommandLogRepository>();
+            var _userRepository = scope.ServiceProvider.GetRequiredService<IUserRepository>();
+
             await command.DeferAsync();
 
             if (!_cacheService.UserBasicData.ContainsKey(command.User.Id))
@@ -128,6 +136,9 @@ namespace Huppy.Core.Services.CommandService
 
         public async Task ComponentHandler(SocketMessageComponent component)
         {
+            using var scope = _serviceFactory.CreateAsyncScope();
+            var _commandRepository = scope.ServiceProvider.GetRequiredService<ICommandLogRepository>();
+
             _logger.LogInformation("component [{name}] with info {message}, {dataId}", component.Id, component.Message, component.Data.CustomId);
             CommandLog log = new()
             {
