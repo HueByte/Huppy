@@ -25,7 +25,7 @@ namespace Huppy.Core.Services.NewsService
 
         public async Task<NewsResponse> GetNews()
         {
-            var fromTime = DateTime.UtcNow.AddMinutes(-60).ToString("o");
+            var fromTime = DateTime.UtcNow.AddMinutes(-180).ToString("o");
             var toTime = DateTime.UtcNow.ToString("o");
 
             var client = _clientFactory.CreateClient("News");
@@ -45,6 +45,7 @@ namespace Huppy.Core.Services.NewsService
             }
         }
 
+        // TODO better handler for errors
         public async Task PostNews()
         {
             var servers = (await _serverRepository.GetAll()).Where(en => en.AreNewsEnabled);
@@ -75,7 +76,10 @@ namespace Huppy.Core.Services.NewsService
                     var guild = _client.GetGuild(server.ID);
 
                     if (guild is null)
-                        throw new Exception($"Didn't find server with ID {server.ID}");
+                    {
+                        _logger.LogError("Didn't find server with ID {ServerID}", server.ID);
+                        continue;
+                    }
 
                     var room = server.NewsOutputRoom > 0
                         ? guild.GetTextChannel(server.NewsOutputRoom)
