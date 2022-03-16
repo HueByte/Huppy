@@ -10,7 +10,14 @@ namespace Huppy.Infrastructure
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) { }
 
-        protected override void OnModelCreating(ModelBuilder builder) { }
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            builder.Entity<Server>()
+                   .HasOne(e => e.Rooms)
+                   .WithOne(e => e.Server)
+                   .HasForeignKey<ServerRooms>(k => k.ServerRoomsID)
+                   .OnDelete(DeleteBehavior.Cascade);
+        }
 
         public DbSet<User> Users { get; set; }
         public DbSet<CommandLog> CommandLogs { get; set; }

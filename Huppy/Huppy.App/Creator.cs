@@ -101,7 +101,6 @@ namespace Huppy.App
                 string[] guilds = _appSettings.HomeGuilds!.Split(';').ToArray();
                 ulong[] homeGuilds = Array.ConvertAll(guilds, UInt64.Parse);
 
-
                 foreach (var guild in homeGuilds)
                 {
                     _logger.LogInformation("Registering commands to [ {guild} ]", guild);

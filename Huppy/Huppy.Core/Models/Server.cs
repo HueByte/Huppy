@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Huppy.Core.Models
 {
-    // TODO add default role
     public class Server
     {
         [Key]
@@ -10,9 +10,11 @@ namespace Huppy.Core.Models
         public string? ServerName { get; set; }
         public bool UseGreet { get; set; }
         public string? GreetMessage { get; set; }
-        public ulong OutputRoom { get; set; }
-        public ulong NewsOutputRoom { get; set; }
         public bool AreNewsEnabled { get; set; }
         public ulong RoleID { get; set; }
+
+        [ForeignKey("ServerRoomsId")]
+        public ulong? ServerRoomsID { get; set; }
+        public virtual ServerRooms? Rooms { get; set; }
     }
 }

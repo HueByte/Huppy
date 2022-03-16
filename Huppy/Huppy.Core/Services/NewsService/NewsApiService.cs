@@ -81,13 +81,13 @@ namespace Huppy.Core.Services.NewsService
                         continue;
                     }
 
-                    var room = server.NewsOutputRoom > 0
-                        ? guild.GetTextChannel(server.NewsOutputRoom)
+                    var room = server.Rooms.NewsOutputRoom > 0
+                        ? guild.GetTextChannel(server.Rooms.NewsOutputRoom)
                         : guild.DefaultChannel;
 
                     if (room is null)
                     {
-                        throw new Exception($"Could find a room with [{server.NewsOutputRoom}] ID");
+                        throw new Exception($"Could find a room with [{server.Rooms.NewsOutputRoom}] ID");
                     }
 
                     _logger.LogInformation("Sending news to [{servername}] to room [{room}]", guild.Name, room.Name);

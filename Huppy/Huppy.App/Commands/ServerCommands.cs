@@ -38,9 +38,12 @@ namespace Huppy.App.Commands
             embed.AddField("ID", server.ID, true);
             embed.AddField("Server Name", Context.Guild.Name, true);
             embed.AddField("User count", Context.Guild.MemberCount, true);
-            embed.AddField("Huppy output room", $"<#{server.OutputRoom}>", true);
+
             embed.AddField("Default room", $"<#{Context.Guild.DefaultChannel.Id}>", true);
-            embed.AddField("News room", server.NewsOutputRoom > 0 ? $"<#{server.NewsOutputRoom}>" : $"<#{Context.Guild.DefaultChannel.Id}>", true);
+            embed.AddField("Huppy output room", server.Rooms?.OutputRoom > 0 ? $"<#{server.Rooms?.OutputRoom}>" : $"<#{Context.Guild.DefaultChannel.Id}>", true);
+            embed.AddField("Greeting room", server.Rooms?.GreetingRoom > 0 ? $"<#{server.Rooms?.GreetingRoom}>" : $"<#{Context.Guild.DefaultChannel.Id}>", true);
+            embed.AddField("News room", server.Rooms?.NewsOutputRoom > 0 ? $"<#{server.Rooms?.NewsOutputRoom}>" : $"<#{Context.Guild.DefaultChannel.Id}>", true);
+
             embed.AddField("News enabled", server.AreNewsEnabled, true);
             embed.AddField("Use Greet", server.UseGreet, true);
             embed.AddField("Greet message", string.IsNullOrEmpty(server.GreetMessage) ? "`empty`" : server.GreetMessage);
@@ -54,7 +57,7 @@ namespace Huppy.App.Commands
 
         [SlashCommand("configure", "Configure Huppy for your server")]
         [RequireUserPermission(GuildPermission.Administrator)]
-        public async Task ConfigureHuppy(bool? UseGreet = null, string? GreetingMessage = null, IRole? DefaultRole = null, SocketGuildChannel? HuppyRoom = null, bool? EnableNews = false, SocketGuildChannel? NewsRoom = null)
+        public async Task ConfigureHuppy(bool? UseGreet = null, string? GreetingMessage = null, IRole? DefaultRole = null, bool? EnableNews = false, SocketGuildChannel? HuppyRoom = null, SocketGuildChannel? NewsRoom = null, SocketGuildChannel? GreetingRoom = null)
         {
             var server = await _serverRepository.GetOrCreateAsync(Context);
 
@@ -63,24 +66,30 @@ namespace Huppy.App.Commands
             if (EnableNews is not null)
                 server.AreNewsEnabled = (bool)EnableNews;
 
-            if (NewsRoom is not null)
-                server.NewsOutputRoom = NewsRoom.Id;
-
             if (UseGreet is not null)
                 server.UseGreet = (bool)UseGreet;
 
             if (GreetingMessage is not null)
                 server.GreetMessage = GreetingMessage;
 
-            if (HuppyRoom is not null)
-                server.OutputRoom = HuppyRoom.Id;
-
             if (DefaultRole is not null)
                 server.RoleID = DefaultRole.Id;
 
+            if (server.Rooms is not null)
+            {
+                if (NewsRoom is not null)
+                    server.Rooms.NewsOutputRoom = NewsRoom.Id;
+
+                if (HuppyRoom is not null)
+                    server.Rooms.OutputRoom = HuppyRoom.Id;
+
+                if (GreetingRoom is not null)
+                    server.Rooms.GreetingRoom = GreetingRoom.Id;
+            }
+
             await _serverRepository.UpdateOne(server);
 
-            var embed = new EmbedBuilder().WithDescription("Updated your server settings\nUse `/server` command to see current configuration")
+            var embed = new EmbedBuilder().WithDescription("Updated your server settings\nUse `/server info` command to see current configuration")
                                           .WithThumbnailUrl(Icons.Huppy1)
                                           .WithColor(Color.Magenta)
                                           .WithCurrentTimestamp()
