@@ -92,6 +92,7 @@ namespace Huppy.Core.Services.NewsService
 
                     _logger.LogInformation("Sending news to [{servername}] to room [{room}]", guild.Name, room.Name);
 
+                    // TODO possible crash bug
                     await room.SendMessageAsync(null, false, embed);
                 }
             }

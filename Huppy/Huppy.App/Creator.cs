@@ -54,8 +54,10 @@ namespace Huppy.App
             await _cacheService.Initialize();
         }
 
-        public async Task CreateCommands() =>
+        public async Task CreateCommands()
+        {
             await _serviceProvider.GetRequiredService<ICommandHandlerService>().InitializeAsync();
+        }
 
         public async Task CreateBot()
         {
@@ -72,18 +74,22 @@ namespace Huppy.App
         {
             _logger.LogInformation("Creating events");
 
-            // sharded client events
+            // shard events
             _client.ShardReady += CreateSlashCommands;
             _client.ShardReady += StartTimedEvents;
-            _client.InteractionCreated += _commandHandler.HandleCommandAsync;
-            _client.ButtonExecuted += _commandHandler.ComponentHandler;
-            _client.Log += _loggingService.OnLogAsync;
             _client.ShardReady += _loggingService.OnReadyAsync;
+
+            // interaction event
             _client.UserJoined += _serverInteractionService.OnUserJoined;
             _client.JoinedGuild += _serverInteractionService.HuppyJoined;
 
-            // interaction service events
+            // command events
+            _client.InteractionCreated += _commandHandler.HandleCommandAsync;
             _interactionService.SlashCommandExecuted += _commandHandler.SlashCommandExecuted;
+            _client.ButtonExecuted += _commandHandler.ComponentHandler;
+
+            // logger events
+            _client.Log += _loggingService.OnLogAsync;
             _interactionService.Log += _loggingService.OnLogAsync;
         }
 

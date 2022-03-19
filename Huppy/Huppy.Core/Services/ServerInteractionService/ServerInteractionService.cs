@@ -51,27 +51,24 @@ namespace Huppy.Core.Services.ServerInteractionService
                     channel = user.Guild.GetChannel(server.Rooms.OutputRoom) as ISocketMessageChannel;
 
                 else
-                    channel = user.Guild.DefaultChannel as ISocketMessageChannel;
+                    channel = user.Guild.DefaultChannel;
 
                 await channel!.SendMessageAsync(null, false, embed.Build());
             }
 
             if (server!.RoleID > 0)
             {
-                try
-                {
-                    var role = user.Guild.GetRole(server.RoleID);
-                    if (role is null)
-                        throw new Exception("This role doesn't exists");
 
-                    await (user as IGuildUser).AddRoleAsync(server.RoleID);
-                }
-                catch (Exception ex)
+                var role = user.Guild.GetRole(server.RoleID);
+                if (role is null)
                 {
                     _logger.LogWarning("Role with [{RoleID}] ID on [{ServerName}] is not found. Updating default role to none", server.RoleID, user.Guild.Name);
                     server.RoleID = 0;
                     await _serverRepository.UpdateOne(server);
+                    return;
                 }
+
+                await (user as IGuildUser).AddRoleAsync(server.RoleID);
             }
         }
     }

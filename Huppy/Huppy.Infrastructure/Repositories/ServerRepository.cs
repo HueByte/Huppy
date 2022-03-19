@@ -80,7 +80,7 @@ namespace Huppy.Infrastructure.Repositories
             server = new()
             {
                 ID = DiscordContext.Guild.Id,
-                GreetMessage = "",
+                GreetMessage = "Welcome {username}!",
                 Rooms = new()
                 {
                     OutputRoom = DiscordContext.Guild.DefaultChannel.Id,
