@@ -27,18 +27,13 @@ namespace Huppy.Infrastructure.Repositories
 
         public async Task AddOneAsync(ShardedInteractionContext DiscordContext)
         {
-            var server = await _context.Servers.Include(e => e.Rooms)
-                                               .FirstOrDefaultAsync(en => en.ID == DiscordContext.Guild.Id);
-
-            if (server is not null)
-            {
+            if (await _context.Servers.AnyAsync(en => en.ID == DiscordContext.Guild.Id))
                 throw new Exception($"Server with [{DiscordContext.Guild.Id}] ID already exists");
-            }
 
-            server = new()
+            Server server = new()
             {
                 ID = DiscordContext.Guild.Id,
-                GreetMessage = "",
+                GreetMessage = "Welcome {username}!",
                 Rooms = new()
                 {
                     OutputRoom = DiscordContext.Guild.DefaultChannel.Id,
@@ -47,7 +42,8 @@ namespace Huppy.Infrastructure.Repositories
                 },
                 UseGreet = false,
                 ServerName = DiscordContext.Guild.Name,
-                RoleID = 0
+                RoleID = 0,
+                AreNewsEnabled = false
             };
 
             await _context.Servers.AddAsync(server);
