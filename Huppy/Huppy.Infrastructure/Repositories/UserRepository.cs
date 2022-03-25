@@ -19,7 +19,7 @@ namespace Huppy.Infrastructure.Repositories
         }
 
         public async Task<Dictionary<ulong, string?>> GetUsersForCacheAsync() =>
-            await _context.Users!.ToDictionaryAsync(p => p.Id, p => p.Username)!;
+            await _context.Users?.ToDictionaryAsync(p => p.Id, p => p.Username)!;
 
     }
 }
