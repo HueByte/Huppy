@@ -9,6 +9,7 @@
 build/
 Release/
 Deploy/
+Discord.NET/
 
 # pem
 *.pem

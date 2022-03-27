@@ -1,3 +1,4 @@
+using System.Text;
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
@@ -16,12 +17,14 @@ namespace Huppy.App.Commands
         private readonly ICommandLogRepository _commandRepository;
         private readonly CacheService _cacheService;
         private readonly INewsApiService _newsService;
-        public GeneralCommands(ILogger<GeneralCommands> logger, CacheService cacheService, ICommandLogRepository commandLogRepository, INewsApiService newsService)
+        private readonly InteractionService _interactionService;
+        public GeneralCommands(ILogger<GeneralCommands> logger, CacheService cacheService, ICommandLogRepository commandLogRepository, INewsApiService newsService, InteractionService interactionService)
         {
             _logger = logger;
             _commandRepository = commandLogRepository;
             _cacheService = cacheService;
             _newsService = newsService;
+            _interactionService = interactionService;
         }
 
         [SlashCommand("ping", "return pong")]
@@ -72,14 +75,38 @@ namespace Huppy.App.Commands
         [SlashCommand("help", "Display help information")]
         public async Task Help()
         {
-            var embed = new EmbedBuilder().WithTitle("test");
-            var component = new ComponentBuilder().WithButton("◀", "help-left").WithButton("▶", "help-right");
+            var commandGroups = _interactionService.Modules.OrderBy(e => e.SlashCommands.Count).ToList();
 
-            await ModifyOriginalResponseAsync((msg) =>
+
+            StringBuilder sb = new();
+            foreach (var group in commandGroups)
             {
-                msg.Embed = embed.Build();
-                msg.Components = component.Build();
-            });
+                if (!(group.SlashCommands.Count > 0))
+                    continue;
+
+                sb.AppendLine($"> 🔰 **{(string.IsNullOrEmpty(group.SlashGroupName) ? "Other" : group.SlashGroupName)}**");
+                foreach (var command in group.SlashCommands)
+                {
+                    sb.AppendLine($"- *{command.Name}*: {command.Description}");
+                }
+                sb.AppendLine("\n");
+            }
+
+            var embed = new EmbedBuilder().WithTitle("Help")
+                                          .WithColor(Color.Teal)
+                                          .WithThumbnailUrl(Icons.Huppy1)
+                                          .WithDescription(sb.ToString());
+
+            await ModifyOriginalResponseAsync((msg) => msg.Embed = embed.Build());
+
+            // var embed = new EmbedBuilder().WithTitle("test");
+            // var component = new ComponentBuilder().WithButton("◀", "help-left").WithButton("▶", "help-right");
+
+            // await ModifyOriginalResponseAsync((msg) =>
+            // {
+            //     msg.Embed = embed.Build();
+            //     msg.Components = component.Build();
+            // });
         }
 
         [ComponentInteraction("help-left")]

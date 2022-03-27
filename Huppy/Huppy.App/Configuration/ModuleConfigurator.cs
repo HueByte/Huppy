@@ -31,12 +31,11 @@ namespace Huppy.App.Configuration
 
         public ModuleConfigurator AddAppSettings(AppSettings? settings = null)
         {
-            settings ??= AppSettings.IsCreated
+            _appSettings = settings ?? (AppSettings.IsCreated
                 ? AppSettings.Load()
-                : AppSettings.Create();
+                : AppSettings.Create());
 
-            _services.AddSingleton(settings);
-            _appSettings = settings;
+            _services.AddSingleton(_appSettings);
 
             return this;
         }
