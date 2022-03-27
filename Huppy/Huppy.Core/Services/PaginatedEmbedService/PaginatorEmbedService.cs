@@ -10,6 +10,9 @@ namespace Huppy.Core.Services.PaginatedEmbedService
             _logger = logger;
         }
 
+        public async Task SendPaginatedMessage()
+        {
 
+        }
     }
 }

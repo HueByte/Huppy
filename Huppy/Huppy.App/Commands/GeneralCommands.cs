@@ -4,6 +4,7 @@ using Discord.Interactions;
 using Discord.WebSocket;
 using Huppy.Core.Common.Constants;
 using Huppy.Core.Common.HuppyMessages;
+using Huppy.Core.Entities;
 using Huppy.Core.IRepositories;
 using Huppy.Core.Services.HuppyCacheService;
 using Huppy.Core.Services.NewsService;
@@ -109,6 +110,23 @@ namespace Huppy.App.Commands
             // });
         }
 
+        [SlashCommand("test", "paginator test")]
+        public async Task PaginatorTest()
+        {
+            var embed = new EmbedBuilder().WithTitle("Paginator test")
+                                          .WithColor(Color.DarkRed);
+
+            var component = new ComponentBuilder().WithButton("◀", "help-left").WithButton("▶", "help-right");
+
+            var result = await ModifyOriginalResponseAsync((msg) =>
+            {
+                msg.Embed = embed.Build();
+                msg.Components = component.Build();
+            });
+
+            await _cacheService.AddPaginatedMessage(result.Id, new PaginatedMessage(result.Id, 0));
+        }
+
         [ComponentInteraction("help-left")]
         public async Task HelpLeft()
         {
@@ -119,14 +137,13 @@ namespace Huppy.App.Commands
         public async Task HelpRight()
         {
             var msg = (Context.Interaction as SocketMessageComponent);
-            var test = msg.Data.Values.FirstOrDefault();
-            _logger.LogInformation("Left invoked");
-            var embed = new EmbedBuilder().WithTitle("updated test");
+            var test = await _cacheService.GetPaginatedMessage(msg!.Message!.Id);
+            await _cacheService.UpdatePaginatedMessage(msg!.Message!.Id, new PaginatedMessage(msg.Message.Id, (byte)(test!.CurrentPage + 1)));
+
+            var embed = new EmbedBuilder().WithTitle(test.CurrentPage.ToString());
 
             await ModifyOriginalResponseAsync((msg) =>
             {
-                var values = msg.Components.GetValueOrDefault();
-                _logger.LogInformation(values.ToString());
                 msg.Embed = embed.Build();
             });
         }

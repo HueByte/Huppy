@@ -12,14 +12,31 @@ namespace Huppy.Core.Services.HuppyCacheService
             if (PaginatedMessages.Count == _maxCacheMessageSize)
                 PaginatedMessages.RemoveAt(PaginatedMessages.Count - 1);
 
+            if (message is null)
+                throw new Exception("Paginated message was empty");
+
             PaginatedMessages.Insert(0, messageId, message);
+
+            return Task.CompletedTask;
+        }
+
+        public Task UpdatePaginatedMessage(ulong key, PaginatedMessage message)
+        {
+            if (PaginatedMessages.Contains(key))
+                PaginatedMessages[(object)key] = message;
 
             return Task.CompletedTask;
         }
 
         public Task<PaginatedMessage?> GetPaginatedMessage(ulong key)
         {
-            var result = PaginatedMessages[key] as PaginatedMessage;
+            var result = (PaginatedMessage?)PaginatedMessages[(object)key];
+            return Task.FromResult(result);
+        }
+
+        public Task<PaginatedMessage?> GetPaginatedMessage(int index)
+        {
+            var result = PaginatedMessages[index] as PaginatedMessage;
             return Task.FromResult(result);
         }
     }

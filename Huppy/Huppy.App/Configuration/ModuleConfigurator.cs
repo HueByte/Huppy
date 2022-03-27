@@ -9,6 +9,7 @@ using Huppy.Core.Services.GPTService;
 using Huppy.Core.Services.HuppyCacheService;
 using Huppy.Core.Services.LoggerService;
 using Huppy.Core.Services.NewsService;
+using Huppy.Core.Services.PaginatedEmbedService;
 using Huppy.Core.Services.ServerInteractionService;
 using Huppy.Core.Services.TimedEventsService;
 using Huppy.Core.Services.UrbanService;
@@ -79,6 +80,7 @@ namespace Huppy.App.Configuration
             _services.AddSingleton<IAiStabilizerService, AiStabilizerService>();
             _services.AddSingleton<IServerInteractionService, ServerInteractionService>();
             _services.AddSingleton<ITimedEventsService, TimedEventsService>();
+            _services.AddSingleton<IPaginatorEmbedService, PaginatorEmbedService>();
 
             _services.AddScoped<IGPTService, GPTService>();
             _services.AddScoped<IUrbanService, UrbanService>();
