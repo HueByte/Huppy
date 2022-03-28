@@ -66,9 +66,9 @@ namespace Huppy.Core.Services.PaginatedEmbedService
 
         public async Task SendPaginatedMessage(SocketInteraction interaction, PaginatorEntry paginatedEntry, int page = 0)
         {
-            // if PaginatedEntry is provided add it to collection
-            if (!_staticPaginatorEntries.Any(e => e.Name == paginatedEntry.Name))
-                await AddStaticEntry(paginatedEntry);
+            // if PaginatedEntry is provided add it to collection (Dynamic entries)
+            // if (!_staticPaginatorEntries.Any(e => e.Name == paginatedEntry.Name))
+            //     await AddStaticEntry(paginatedEntry);
 
             var result = await ExecutePaginatedMessage(interaction, paginatedEntry, page);
             if (result > 0)
