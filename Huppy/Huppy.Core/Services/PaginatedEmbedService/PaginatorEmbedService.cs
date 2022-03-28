@@ -11,6 +11,7 @@ namespace Huppy.Core.Services.PaginatedEmbedService
 {
     public class PaginatorEmbedService : IPaginatorEmbedService
     {
+        // TODO: remake it to dictionary with static entry name as key as it must be unique
         private readonly List<PaginatorEntry> _staticPaginatorEntries = new();
         private readonly ILogger<PaginatorEmbedService> _logger;
         private readonly InteractionService _interactionService;
@@ -30,14 +31,19 @@ namespace Huppy.Core.Services.PaginatedEmbedService
 
         public List<PaginatorEntry> GetStaticPaginatorEntries() => _staticPaginatorEntries;
 
-        public Task AddStaticPaginatorEntry(PaginatorEntry entry)
+        public async Task AddStaticPaginatorEntry(PaginatorEntry entry)
         {
             if (_staticPaginatorEntries.Any(en => en.Name == entry.Name))
             {
                 _logger.LogError("Tried to add paginator entry but entry with that name already existed");
-                return Task.CompletedTask;
+                return;
             }
 
+            await AddStaticEntry(entry);
+        }
+
+        private Task AddStaticEntry(PaginatorEntry entry)
+        {
             _staticPaginatorEntries.Add(entry);
 
             return Task.CompletedTask;
@@ -62,7 +68,7 @@ namespace Huppy.Core.Services.PaginatedEmbedService
         {
             // if PaginatedEntry is provided add it to collection
             if (!_staticPaginatorEntries.Any(e => e.Name == paginatedEntry.Name))
-                _staticPaginatorEntries.Add(paginatedEntry);
+                await AddStaticEntry(paginatedEntry);
 
             var result = await ExecutePaginatedMessage(interaction, paginatedEntry, page);
             if (result > 0)
@@ -76,13 +82,14 @@ namespace Huppy.Core.Services.PaginatedEmbedService
                 await _cacheService.UpdatePaginatedMessage(result, new PaginatedMessage(result, (ushort)page, paginatedEntry.Name));
         }
 
-        private async Task<ulong> ExecutePaginatedMessage(SocketInteraction interaction, PaginatorEntry paginatedEntry, int page)
+        private static async Task<ulong> ExecutePaginatedMessage(SocketInteraction interaction, PaginatorEntry paginatedEntry, int page)
         {
             // check range
             if (page < 0 || page >= paginatedEntry.Pages.Count)
                 return 0;
 
-            var component = new ComponentBuilder().WithButton("◀", "page-left").WithButton("▶", "page-right");
+            var component = new ComponentBuilder().WithButton("◀", "page-left")
+                                                  .WithButton("▶", "page-right");
 
             var result = await interaction.ModifyOriginalResponseAsync((msg) =>
             {
@@ -92,24 +99,6 @@ namespace Huppy.Core.Services.PaginatedEmbedService
 
             return result.Id;
         }
-
-        // private void Test()
-        // {
-        //     PaginatorEntry entry = new()
-        //     {
-        //         Name = "Test",
-        //         Pages = new()
-        //     };
-
-        //     PaginatorPage page = new()
-        //     {
-        //         Name = "Page1",
-        //         PageNumber = 0,
-        //         Embed = new EmbedBuilder().Build()
-        //     };
-
-        //     entry.Pages.Add(page);
-        // }
 
         private PaginatorEntry BuildHelp()
         {
