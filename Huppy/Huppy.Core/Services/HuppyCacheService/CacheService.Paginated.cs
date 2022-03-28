@@ -9,11 +9,11 @@ namespace Huppy.Core.Services.HuppyCacheService
         public void SetMaxMessageCacheSize(int size) => _maxCacheMessageSize = size;
         public Task AddPaginatedMessage(ulong messageId, PaginatedMessage message)
         {
-            if (PaginatedMessages.Count == _maxCacheMessageSize)
-                PaginatedMessages.RemoveAt(PaginatedMessages.Count - 1);
-
             if (message is null)
                 throw new Exception("Paginated message was empty");
+
+            if (PaginatedMessages.Count == _maxCacheMessageSize)
+                PaginatedMessages.RemoveAt(PaginatedMessages.Count - 1);
 
             PaginatedMessages.Insert(0, messageId, message);
 
