@@ -139,7 +139,7 @@ namespace Huppy.Core.Services.CommandService
             using var scope = _serviceFactory.CreateAsyncScope();
             var _commandRepository = scope.ServiceProvider.GetRequiredService<ICommandLogRepository>();
 
-            _logger.LogInformation("component [{name}] with info {message}, {dataId}", component.Id, component.Message, component.Data.CustomId);
+            _logger.LogInformation("component [{dataid}] used by [{username}]}", component.Data.CustomId, component.User.Username);
             CommandLog log = new()
             {
                 CommandName = component.Data.CustomId,
