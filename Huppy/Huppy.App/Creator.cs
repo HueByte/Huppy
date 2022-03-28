@@ -5,6 +5,7 @@ using Huppy.Core.Entities;
 using Huppy.Core.Services.CommandService;
 using Huppy.Core.Services.HuppyCacheService;
 using Huppy.Core.Services.LoggerService;
+using Huppy.Core.Services.PaginatedEmbedService;
 using Huppy.Core.Services.ServerInteractionService;
 using Huppy.Core.Services.TimedEventsService;
 using Huppy.Infrastructure;
@@ -28,6 +29,7 @@ namespace Huppy.App
         private readonly IServerInteractionService _serverInteractionService;
         private readonly ITimedEventsService _timedEventService;
         private readonly CacheService _cacheService;
+        private readonly IPaginatorEmbedService _paginatorService;
 
         public Creator(IServiceProvider serviceProvider)
         {
@@ -42,6 +44,7 @@ namespace Huppy.App
             _serverInteractionService = _serviceProvider.GetRequiredService<IServerInteractionService>();
             _timedEventService = _serviceProvider.GetRequiredService<ITimedEventsService>();
             _cacheService = _serviceProvider.GetRequiredService<CacheService>();
+            _paginatorService = _serviceProvider.GetRequiredService<IPaginatorEmbedService>();
         }
 
         public async Task CreateDatabase()
@@ -52,6 +55,7 @@ namespace Huppy.App
         public async Task PopulateSingletons()
         {
             await _cacheService.Initialize();
+            await _paginatorService.Initialize();
         }
 
         public async Task CreateCommands()

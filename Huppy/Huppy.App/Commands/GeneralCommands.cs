@@ -8,6 +8,7 @@ using Huppy.Core.Entities;
 using Huppy.Core.IRepositories;
 using Huppy.Core.Services.HuppyCacheService;
 using Huppy.Core.Services.NewsService;
+using Huppy.Core.Services.PaginatedEmbedService;
 using Microsoft.Extensions.Logging;
 
 namespace Huppy.App.Commands
@@ -19,13 +20,15 @@ namespace Huppy.App.Commands
         private readonly CacheService _cacheService;
         private readonly INewsApiService _newsService;
         private readonly InteractionService _interactionService;
-        public GeneralCommands(ILogger<GeneralCommands> logger, CacheService cacheService, ICommandLogRepository commandLogRepository, INewsApiService newsService, InteractionService interactionService)
+        private readonly IPaginatorEmbedService _paginatorEmbedService;
+        public GeneralCommands(ILogger<GeneralCommands> logger, CacheService cacheService, ICommandLogRepository commandLogRepository, INewsApiService newsService, InteractionService interactionService, IPaginatorEmbedService paginatorEmbedService)
         {
             _logger = logger;
             _commandRepository = commandLogRepository;
             _cacheService = cacheService;
             _newsService = newsService;
             _interactionService = interactionService;
+            _paginatorEmbedService = paginatorEmbedService;
         }
 
         [SlashCommand("ping", "return pong")]
@@ -78,7 +81,6 @@ namespace Huppy.App.Commands
         {
             var commandGroups = _interactionService.Modules.OrderBy(e => e.SlashCommands.Count).ToList();
 
-
             StringBuilder sb = new();
             foreach (var group in commandGroups)
             {
@@ -99,53 +101,96 @@ namespace Huppy.App.Commands
                                           .WithDescription(sb.ToString());
 
             await ModifyOriginalResponseAsync((msg) => msg.Embed = embed.Build());
-
-            // var embed = new EmbedBuilder().WithTitle("test");
-            // var component = new ComponentBuilder().WithButton("◀", "help-left").WithButton("▶", "help-right");
-
-            // await ModifyOriginalResponseAsync((msg) =>
-            // {
-            //     msg.Embed = embed.Build();
-            //     msg.Components = component.Build();
-            // });
         }
 
         [SlashCommand("test", "paginator test")]
         public async Task PaginatorTest()
         {
-            var embed = new EmbedBuilder().WithTitle("Paginator test")
-                                          .WithColor(Color.DarkRed);
+            // var embed = new EmbedBuilder().WithTitle("Paginator test")
+            //                               .WithColor(Color.DarkRed);
 
-            var component = new ComponentBuilder().WithButton("◀", "help-left").WithButton("▶", "help-right");
+            // var component = new ComponentBuilder().WithButton("◀", "help-left").WithButton("▶", "help-right");
+
+            // var result = await ModifyOriginalResponseAsync((msg) =>
+            // {
+            //     msg.Embed = embed.Build();
+            //     msg.Components = component.Build();
+            // });
+
+            // await _cacheService.AddPaginatedMessage(result.Id, new PaginatedMessage(result.Id, 0));
+        }
+
+        [SlashCommand("test2", "paginator test")]
+        public async Task PaginatorTestNew()
+        {
+            var help = _paginatorEmbedService.GetPaginatorEntries()
+                                             .FirstOrDefault(e => e.Name == PaginatorEntriesNames.Help);
+
+            var component = new ComponentBuilder().WithButton("◀", "paginator-left").WithButton("▶", "paginator-right");
 
             var result = await ModifyOriginalResponseAsync((msg) =>
             {
-                msg.Embed = embed.Build();
+                msg.Embed = help.Pages.First().Embed;
                 msg.Components = component.Build();
             });
 
-            await _cacheService.AddPaginatedMessage(result.Id, new PaginatedMessage(result.Id, 0));
+            await _cacheService.AddPaginatedMessage(result.Id, new PaginatedMessage(result.Id, 0, PaginatorEntriesNames.Help));
         }
 
-        [ComponentInteraction("help-left")]
+        [ComponentInteraction("paginator-left")]
         public async Task HelpLeft()
         {
-            _logger.LogInformation("Left invoked");
+            var msg = (Context.Interaction as SocketMessageComponent);
+            var cacheMessage = await _cacheService.GetPaginatedMessage(msg.Message.Id);
+            var paginatedMessage = _paginatorEmbedService.GetPaginatorEntries()
+                                                         .FirstOrDefault(e => e.Name == cacheMessage.EntryName);
+
+            var component = new ComponentBuilder().WithButton("◀", "paginator-left").WithButton("▶", "paginator-right");
+
+
+            if (cacheMessage is null)
+                return;
+
+            if (cacheMessage.CurrentPage == 0 && cacheMessage.CurrentPage >= paginatedMessage.Pages.Count)
+                return;
+
+            ushort currentPage = (byte)(cacheMessage.CurrentPage - 1);
+
+            var result = await ModifyOriginalResponseAsync((msg) =>
+            {
+                msg.Embed = paginatedMessage!.Pages[currentPage].Embed;
+                msg.Components = component.Build();
+            });
+
+            await _cacheService.UpdatePaginatedMessage(result.Id, new PaginatedMessage(result.Id, currentPage, cacheMessage.EntryName));
         }
 
-        [ComponentInteraction("help-right")]
+        [ComponentInteraction("paginator-right")]
         public async Task HelpRight()
         {
             var msg = (Context.Interaction as SocketMessageComponent);
-            var test = await _cacheService.GetPaginatedMessage(msg!.Message!.Id);
-            await _cacheService.UpdatePaginatedMessage(msg!.Message!.Id, new PaginatedMessage(msg.Message.Id, (byte)(test!.CurrentPage + 1)));
+            var cacheMessage = await _cacheService.GetPaginatedMessage(msg.Message.Id);
+            var paginatedMessage = _paginatorEmbedService.GetPaginatorEntries()
+                                                         .FirstOrDefault(e => e.Name == cacheMessage.EntryName);
 
-            var embed = new EmbedBuilder().WithTitle(test.CurrentPage.ToString());
+            var component = new ComponentBuilder().WithButton("◀", "paginator-left").WithButton("▶", "paginator-right");
 
-            await ModifyOriginalResponseAsync((msg) =>
+
+            if (cacheMessage is null)
+                return;
+
+            if (cacheMessage.CurrentPage == 0 && cacheMessage.CurrentPage >= paginatedMessage.Pages.Count)
+                return;
+
+            ushort currentPage = (byte)(cacheMessage.CurrentPage + 1);
+
+            var result = await ModifyOriginalResponseAsync((msg) =>
             {
-                msg.Embed = embed.Build();
+                msg.Embed = paginatedMessage!.Pages[currentPage].Embed;
+                msg.Components = component.Build();
             });
+
+            await _cacheService.UpdatePaginatedMessage(result.Id, new PaginatedMessage(result.Id, currentPage, cacheMessage.EntryName));
         }
     }
 }
