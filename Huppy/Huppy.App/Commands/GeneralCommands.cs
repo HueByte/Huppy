@@ -107,7 +107,7 @@ namespace Huppy.App.Commands
         public async Task PaginatorTestNew()
         {
             // Get Paginated entry by name 
-            var help = _paginatorEmbedService.GetPaginatorEntries()
+            var help = _paginatorEmbedService.GetStaticPaginatorEntries()
                                              .FirstOrDefault(e => e.Name == PaginatorEntriesNames.Help);
 
             if (help is null)

@@ -11,7 +11,7 @@ namespace Huppy.Core.Services.PaginatedEmbedService
 {
     public class PaginatorEmbedService : IPaginatorEmbedService
     {
-        private readonly List<PaginatorEntry> _paginatorEntries = new();
+        private readonly List<PaginatorEntry> _staticPaginatorEntries = new();
         private readonly ILogger<PaginatorEmbedService> _logger;
         private readonly InteractionService _interactionService;
         private readonly CacheService _cacheService;
@@ -24,16 +24,29 @@ namespace Huppy.Core.Services.PaginatedEmbedService
 
         public Task Initialize()
         {
-            _paginatorEntries.Add(BuildHelp());
+            _staticPaginatorEntries.Add(BuildHelp());
             return Task.CompletedTask;
         }
 
-        public List<PaginatorEntry> GetPaginatorEntries() => _paginatorEntries;
+        public List<PaginatorEntry> GetStaticPaginatorEntries() => _staticPaginatorEntries;
+
+        public Task AddStaticPaginatorEntry(PaginatorEntry entry)
+        {
+            if (_staticPaginatorEntries.Any(en => en.Name == entry.Name))
+            {
+                _logger.LogError("Tried to add paginator entry but entry with that name already existed");
+                return Task.CompletedTask;
+            }
+
+            _staticPaginatorEntries.Add(entry);
+
+            return Task.CompletedTask;
+        }
 
         public async Task SendPaginatedMessage(SocketInteraction interaction, string paginatedMessageName, int page = 0)
         {
             // check if PaginatedEntry exists with this name
-            var paginatedEntry = _paginatorEntries.FirstOrDefault(en => en.Name == paginatedMessageName);
+            var paginatedEntry = _staticPaginatorEntries.FirstOrDefault(en => en.Name == paginatedMessageName);
             if (paginatedEntry is null)
             {
                 _logger.LogError("Couldn't find paginated message with {name} name", paginatedMessageName);
@@ -48,8 +61,8 @@ namespace Huppy.Core.Services.PaginatedEmbedService
         public async Task SendPaginatedMessage(SocketInteraction interaction, PaginatorEntry paginatedEntry, int page = 0)
         {
             // if PaginatedEntry is provided add it to collection
-            if (!_paginatorEntries.Any(e => e.Name == paginatedEntry.Name))
-                _paginatorEntries.Add(paginatedEntry);
+            if (!_staticPaginatorEntries.Any(e => e.Name == paginatedEntry.Name))
+                _staticPaginatorEntries.Add(paginatedEntry);
 
             var result = await ExecutePaginatedMessage(interaction, paginatedEntry, page);
             if (result > 0)

@@ -40,7 +40,7 @@ namespace Huppy.App.Commands
             if (cacheMessage is null)
                 return;
 
-            var paginatedMessage = _paginatorService.GetPaginatorEntries()
+            var paginatedMessage = _paginatorService.GetStaticPaginatorEntries()
                                                     .FirstOrDefault(en => en.Name == cacheMessage.EntryName);
 
             if (paginatedMessage is null)
