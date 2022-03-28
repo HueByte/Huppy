@@ -76,7 +76,7 @@ namespace Huppy.App.Commands
             await ModifyOriginalResponseAsync((msg) => msg.Embed = embed.Build());
         }
 
-        [SlashCommand("help", "Display help information")]
+        [SlashCommand("helpold", "Display help information")]
         public async Task Help()
         {
             var commandGroups = _interactionService.Modules.OrderBy(e => e.SlashCommands.Count).ToList();
@@ -103,7 +103,7 @@ namespace Huppy.App.Commands
             await ModifyOriginalResponseAsync((msg) => msg.Embed = embed.Build());
         }
 
-        [SlashCommand("test", "paginator test")]
+        [SlashCommand("help", "Display help information")]
         public async Task PaginatorTestNew()
         {
             // Get Paginated entry by name 
@@ -127,7 +127,7 @@ namespace Huppy.App.Commands
         [ComponentInteraction("paginator-left")]
         public async Task HelpLeft()
         {
-            var msg = (Context.Interaction as SocketMessageComponent);
+            var msg = Context.Interaction as SocketMessageComponent;
 
             // fetch message from cache by id
             var cacheMessage = await _cacheService.GetPaginatedMessage(msg!.Message.Id);
@@ -159,7 +159,7 @@ namespace Huppy.App.Commands
         [ComponentInteraction("paginator-right")]
         public async Task HelpRight()
         {
-            var msg = (Context.Interaction as SocketMessageComponent);
+            var msg = Context.Interaction as SocketMessageComponent;
 
             // fetch message from cache by id
             var cacheMessage = await _cacheService.GetPaginatedMessage(msg!.Message.Id);

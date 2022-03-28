@@ -42,7 +42,7 @@ namespace Huppy.Core.Services.PaginatedEmbedService
             var commandGroups = _interactionService.Modules.OrderBy(e => e.SlashCommands.Count)
                                                            .ToList();
 
-            int count = 0;
+            int pageNumber = 0;
             foreach (var group in commandGroups)
             {
                 if (group.SlashCommands.Count == 0)
@@ -50,7 +50,8 @@ namespace Huppy.Core.Services.PaginatedEmbedService
 
                 var embed = new EmbedBuilder().WithTitle(group.SlashGroupName)
                                               .WithColor(Color.Teal)
-                                              .WithThumbnailUrl(Icons.Huppy1);
+                                              .WithThumbnailUrl(Icons.Huppy1)
+                                              .WithFooter($"Page {pageNumber + 1}/{commandGroups.Where(e => e.SlashCommands.Count > 0).Count()}");
 
                 foreach (var command in group.SlashCommands)
                 {
@@ -60,12 +61,12 @@ namespace Huppy.Core.Services.PaginatedEmbedService
                 PaginatorPage page = new()
                 {
                     Name = group.Name,
-                    PageNumber = (byte)count,
+                    PageNumber = (byte)pageNumber,
                     Embed = embed.Build()
                 };
 
                 entry.Pages.Add(page);
-                count++;
+                pageNumber++;
             }
 
             return entry;
