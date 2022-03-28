@@ -86,7 +86,7 @@ namespace Huppy.App.Commands
             if (help is null)
                 throw new Exception("Didn't find contents of help");
 
-            await _paginatorEmbedService.SendPaginatedMessage(Context.Interaction, help, 0);
+            await _paginatorEmbedService.SendStaticPaginatedMessage(Context.Interaction, help, 0);
         }
     }
 }

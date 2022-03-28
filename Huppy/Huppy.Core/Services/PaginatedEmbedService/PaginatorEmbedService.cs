@@ -12,6 +12,7 @@ namespace Huppy.Core.Services.PaginatedEmbedService
     public class PaginatorEmbedService : IPaginatorEmbedService
     {
         // TODO: remake it to dictionary with static entry name as key as it must be unique
+        // TODO: implement dynamic cachable paginated entries
         private readonly List<PaginatorEntry> _staticPaginatorEntries = new();
         private readonly ILogger<PaginatorEmbedService> _logger;
         private readonly InteractionService _interactionService;
@@ -49,7 +50,7 @@ namespace Huppy.Core.Services.PaginatedEmbedService
             return Task.CompletedTask;
         }
 
-        public async Task SendPaginatedMessage(SocketInteraction interaction, string paginatedMessageName, int page = 0)
+        public async Task SendStaticPaginatedMessage(SocketInteraction interaction, string paginatedMessageName, int page = 0)
         {
             // check if PaginatedEntry exists with this name
             var paginatedEntry = _staticPaginatorEntries.FirstOrDefault(en => en.Name == paginatedMessageName);
@@ -64,7 +65,7 @@ namespace Huppy.Core.Services.PaginatedEmbedService
                 await _cacheService.AddPaginatedMessage(result, new PaginatedMessage(result, 0, paginatedEntry.Name));
         }
 
-        public async Task SendPaginatedMessage(SocketInteraction interaction, PaginatorEntry paginatedEntry, int page = 0)
+        public async Task SendStaticPaginatedMessage(SocketInteraction interaction, PaginatorEntry paginatedEntry, int page = 0)
         {
             // if PaginatedEntry is provided add it to collection (Dynamic entries)
             // if (!_staticPaginatorEntries.Any(e => e.Name == paginatedEntry.Name))
