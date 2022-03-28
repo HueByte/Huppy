@@ -104,36 +104,23 @@ namespace Huppy.App.Commands
         }
 
         [SlashCommand("test", "paginator test")]
-        public async Task PaginatorTest()
-        {
-            // var embed = new EmbedBuilder().WithTitle("Paginator test")
-            //                               .WithColor(Color.DarkRed);
-
-            // var component = new ComponentBuilder().WithButton("◀", "help-left").WithButton("▶", "help-right");
-
-            // var result = await ModifyOriginalResponseAsync((msg) =>
-            // {
-            //     msg.Embed = embed.Build();
-            //     msg.Components = component.Build();
-            // });
-
-            // await _cacheService.AddPaginatedMessage(result.Id, new PaginatedMessage(result.Id, 0));
-        }
-
-        [SlashCommand("test2", "paginator test")]
         public async Task PaginatorTestNew()
         {
+            // Get Paginated entry by name 
             var help = _paginatorEmbedService.GetPaginatorEntries()
                                              .FirstOrDefault(e => e.Name == PaginatorEntriesNames.Help);
 
+            // create buttons 
             var component = new ComponentBuilder().WithButton("◀", "paginator-left").WithButton("▶", "paginator-right");
 
             var result = await ModifyOriginalResponseAsync((msg) =>
             {
-                msg.Embed = help.Pages.First().Embed;
+                // respond with first page
+                msg.Embed = help!.Pages.First().Embed;
                 msg.Components = component.Build();
             });
 
+            // save message to cache with current page (0) and it's name
             await _cacheService.AddPaginatedMessage(result.Id, new PaginatedMessage(result.Id, 0, PaginatorEntriesNames.Help));
         }
 
@@ -141,21 +128,25 @@ namespace Huppy.App.Commands
         public async Task HelpLeft()
         {
             var msg = (Context.Interaction as SocketMessageComponent);
-            var cacheMessage = await _cacheService.GetPaginatedMessage(msg.Message.Id);
-            var paginatedMessage = _paginatorEmbedService.GetPaginatorEntries()
-                                                         .FirstOrDefault(e => e.Name == cacheMessage.EntryName);
 
-            var component = new ComponentBuilder().WithButton("◀", "paginator-left").WithButton("▶", "paginator-right");
-
+            // fetch message from cache by id
+            var cacheMessage = await _cacheService.GetPaginatedMessage(msg!.Message.Id);
 
             if (cacheMessage is null)
                 return;
 
-            if (cacheMessage.CurrentPage == 0 && cacheMessage.CurrentPage >= paginatedMessage.Pages.Count)
+            // get Paginated entry by name 
+            var paginatedMessage = _paginatorEmbedService.GetPaginatorEntries()
+                                                         .FirstOrDefault(e => e.Name == cacheMessage.EntryName);
+
+            if (cacheMessage.CurrentPage == 0)
                 return;
 
-            ushort currentPage = (byte)(cacheMessage.CurrentPage - 1);
+            // create buttons
+            var component = new ComponentBuilder().WithButton("◀", "paginator-left").WithButton("▶", "paginator-right");
 
+
+            ushort currentPage = (byte)(cacheMessage.CurrentPage - 1);
             var result = await ModifyOriginalResponseAsync((msg) =>
             {
                 msg.Embed = paginatedMessage!.Pages[currentPage].Embed;
@@ -169,21 +160,25 @@ namespace Huppy.App.Commands
         public async Task HelpRight()
         {
             var msg = (Context.Interaction as SocketMessageComponent);
-            var cacheMessage = await _cacheService.GetPaginatedMessage(msg.Message.Id);
-            var paginatedMessage = _paginatorEmbedService.GetPaginatorEntries()
-                                                         .FirstOrDefault(e => e.Name == cacheMessage.EntryName);
 
-            var component = new ComponentBuilder().WithButton("◀", "paginator-left").WithButton("▶", "paginator-right");
-
+            // fetch message from cache by id
+            var cacheMessage = await _cacheService.GetPaginatedMessage(msg!.Message.Id);
 
             if (cacheMessage is null)
                 return;
 
-            if (cacheMessage.CurrentPage == 0 && cacheMessage.CurrentPage >= paginatedMessage.Pages.Count)
+            // get Paginated entry by name 
+            var paginatedMessage = _paginatorEmbedService.GetPaginatorEntries()
+                                                         .FirstOrDefault(e => e.Name == cacheMessage.EntryName);
+
+
+            if (cacheMessage.CurrentPage == paginatedMessage!.Pages.Count - 1)
                 return;
 
-            ushort currentPage = (byte)(cacheMessage.CurrentPage + 1);
+            // create buttons
+            var component = new ComponentBuilder().WithButton("◀", "paginator-left").WithButton("▶", "paginator-right");
 
+            ushort currentPage = (byte)(cacheMessage.CurrentPage + 1);
             var result = await ModifyOriginalResponseAsync((msg) =>
             {
                 msg.Embed = paginatedMessage!.Pages[currentPage].Embed;

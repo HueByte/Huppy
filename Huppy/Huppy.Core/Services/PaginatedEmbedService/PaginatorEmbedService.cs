@@ -45,6 +45,9 @@ namespace Huppy.Core.Services.PaginatedEmbedService
             int count = 0;
             foreach (var group in commandGroups)
             {
+                if (group.SlashCommands.Count == 0)
+                    continue;
+
                 var embed = new EmbedBuilder().WithTitle(group.SlashGroupName)
                                               .WithColor(Color.Teal)
                                               .WithThumbnailUrl(Icons.Huppy1);
