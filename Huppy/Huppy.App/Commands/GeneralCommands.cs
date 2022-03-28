@@ -76,33 +76,6 @@ namespace Huppy.App.Commands
             await ModifyOriginalResponseAsync((msg) => msg.Embed = embed.Build());
         }
 
-        [SlashCommand("helpold", "Display help information")]
-        public async Task Help()
-        {
-            var commandGroups = _interactionService.Modules.OrderBy(e => e.SlashCommands.Count).ToList();
-
-            StringBuilder sb = new();
-            foreach (var group in commandGroups)
-            {
-                if (!(group.SlashCommands.Count > 0))
-                    continue;
-
-                sb.AppendLine($"> 🔰 **{(string.IsNullOrEmpty(group.SlashGroupName) ? "Other" : group.SlashGroupName)}**");
-                foreach (var command in group.SlashCommands)
-                {
-                    sb.AppendLine($"- *{command.Name}*: {command.Description}");
-                }
-                sb.AppendLine("\n");
-            }
-
-            var embed = new EmbedBuilder().WithTitle("Help")
-                                          .WithColor(Color.Teal)
-                                          .WithThumbnailUrl(Icons.Huppy1)
-                                          .WithDescription(sb.ToString());
-
-            await ModifyOriginalResponseAsync((msg) => msg.Embed = embed.Build());
-        }
-
         [SlashCommand("help", "Display help information")]
         public async Task PaginatorTestNew()
         {

@@ -81,7 +81,7 @@ namespace Huppy.Core.Services.NewsService
                         continue;
                     }
 
-                    var room = server.Rooms!.NewsOutputRoom > 0
+                    var room = server.Rooms?.NewsOutputRoom > 0
                         ? guild.GetTextChannel(server.Rooms.NewsOutputRoom)
                         : guild.DefaultChannel;
 
