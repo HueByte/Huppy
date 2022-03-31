@@ -13,7 +13,7 @@ namespace Huppy.Core.Services.PaginatedEmbedService
     {
         // TODO: remake it to dictionary with static entry name as key as it must be unique
         // TODO: implement dynamic cachable paginated entries
-        private readonly List<PaginatorEntry> _staticPaginatorEntries = new();
+        private List<PaginatorEntry> _staticPaginatorEntries = new();
         private readonly ILogger<PaginatorEmbedService> _logger;
         private readonly InteractionService _interactionService;
         private readonly CacheService _cacheService;
@@ -26,7 +26,9 @@ namespace Huppy.Core.Services.PaginatedEmbedService
 
         public Task Initialize()
         {
-            _staticPaginatorEntries.Add(BuildHelp());
+            StaticPaginatedEntriesBuilder entriesBuilder = new(_interactionService);
+            _staticPaginatorEntries = entriesBuilder.Build();
+
             return Task.CompletedTask;
         }
 
@@ -82,7 +84,6 @@ namespace Huppy.Core.Services.PaginatedEmbedService
             if (result > 0)
                 await _cacheService.UpdatePaginatedMessage(result, new PaginatedMessage(result, (ushort)page, paginatedEntry.Name));
         }
-
         private static async Task<ulong> ExecutePaginatedMessage(SocketInteraction interaction, PaginatorEntry paginatedEntry, int page)
         {
             // check range
@@ -99,47 +100,6 @@ namespace Huppy.Core.Services.PaginatedEmbedService
             });
 
             return result.Id;
-        }
-
-        private PaginatorEntry BuildHelp()
-        {
-            PaginatorEntry entry = new()
-            {
-                Name = PaginatorEntriesNames.Help,
-                Pages = new()
-            };
-
-            var commandGroups = _interactionService.Modules.OrderBy(e => e.SlashCommands.Count)
-                                                           .ToList();
-
-            int pageNumber = 0;
-            foreach (var group in commandGroups)
-            {
-                if (group.SlashCommands.Count == 0)
-                    continue;
-
-                var embed = new EmbedBuilder().WithTitle(group.SlashGroupName)
-                                              .WithColor(Color.Teal)
-                                              .WithThumbnailUrl(Icons.Huppy1)
-                                              .WithFooter($"Page {pageNumber + 1}/{commandGroups.Where(e => e.SlashCommands.Count > 0).Count()}");
-
-                foreach (var command in group.SlashCommands)
-                {
-                    embed.AddField($"🔰 {command.Name}", command.Description);
-                }
-
-                PaginatorPage page = new()
-                {
-                    Name = group.Name,
-                    PageNumber = (byte)pageNumber,
-                    Embed = embed.Build()
-                };
-
-                entry.Pages.Add(page);
-                pageNumber++;
-            }
-
-            return entry;
         }
     }
 }
