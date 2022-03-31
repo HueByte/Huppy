@@ -34,27 +34,53 @@ namespace Huppy.Core.Services.PaginatedEmbedService
 
         public List<PaginatorEntry> GetStaticPaginatorEntries() => _staticPaginatorEntries;
 
-        public async Task AddStaticPaginatorEntry(PaginatorEntry entry)
+        public Task AddStaticPaginatorEntry(PaginatorEntry entry)
         {
-            if (_staticPaginatorEntries.Any(en => en.Name == entry.Name))
-            {
-                _logger.LogError("Tried to add paginator entry but entry with that name already existed");
-                return;
-            }
+            if (_staticPaginatorEntries.Any(e => e.Name == entry.Name))
+                throw new Exception("Static paginator entries must have unique name");
 
-            await AddStaticEntry(entry);
-        }
-
-        private Task AddStaticEntry(PaginatorEntry entry)
-        {
             _staticPaginatorEntries.Add(entry);
-
             return Task.CompletedTask;
         }
 
         public async Task SendStaticPaginatedMessage(SocketInteraction interaction, string paginatedMessageName, int page = 0)
         {
-            // check if PaginatedEntry exists with this name
+            // check if that static paginated entry exists
+            var paginatedEntry = _staticPaginatorEntries.FirstOrDefault(en => en.Name == paginatedMessageName);
+            if (paginatedEntry is null)
+            {
+                _logger.LogError("Couldn't find paginated message with {name} name", paginatedMessageName);
+                return;
+            }
+
+            // execute paginated message and receive the message ID
+            var result = await ExecutePaginatedMessage(interaction, paginatedEntry, page);
+
+            // if message was executed successfully add it to cache
+            if (result > 0)
+                await _cacheService.AddPaginatedMessage(result, new PaginatedMessage(result, 0, paginatedEntry.Name));
+        }
+
+        public async Task SendStaticPaginatedMessage(SocketInteraction interaction, PaginatorEntry paginatedEntry, int page = 0)
+        {
+            // check if that static paginated entry exists
+            if (!_staticPaginatorEntries.Any(e => e.Name == paginatedEntry.Name))
+            {
+                _logger.LogError("Couldn't find paginated message with {name} name", paginatedEntry.Name);
+                return;
+            }
+
+            // execute paginated message and receive the message ID
+            var result = await ExecutePaginatedMessage(interaction, paginatedEntry, page);
+
+            // if message was executed successfully add it to cache
+            if (result > 0)
+                await _cacheService.AddPaginatedMessage(result, new PaginatedMessage(result, 0, paginatedEntry.Name));
+        }
+
+        public async Task UpdatePaginatedMessage(SocketInteraction interaction, string paginatedMessageName, int page = 0)
+        {
+            // check if that static paginated entry exists
             var paginatedEntry = _staticPaginatorEntries.FirstOrDefault(en => en.Name == paginatedMessageName);
             if (paginatedEntry is null)
             {
@@ -64,26 +90,9 @@ namespace Huppy.Core.Services.PaginatedEmbedService
 
             var result = await ExecutePaginatedMessage(interaction, paginatedEntry, page);
             if (result > 0)
-                await _cacheService.AddPaginatedMessage(result, new PaginatedMessage(result, 0, paginatedEntry.Name));
-        }
-
-        public async Task SendStaticPaginatedMessage(SocketInteraction interaction, PaginatorEntry paginatedEntry, int page = 0)
-        {
-            // if PaginatedEntry is provided add it to collection (Dynamic entries)
-            // if (!_staticPaginatorEntries.Any(e => e.Name == paginatedEntry.Name))
-            //     await AddStaticEntry(paginatedEntry);
-
-            var result = await ExecutePaginatedMessage(interaction, paginatedEntry, page);
-            if (result > 0)
-                await _cacheService.AddPaginatedMessage(result, new PaginatedMessage(result, 0, paginatedEntry.Name));
-        }
-
-        public async Task UpdatePaginatedMessage(SocketInteraction interaction, PaginatorEntry paginatedEntry, int page = 0)
-        {
-            var result = await ExecutePaginatedMessage(interaction, paginatedEntry, page);
-            if (result > 0)
                 await _cacheService.UpdatePaginatedMessage(result, new PaginatedMessage(result, (ushort)page, paginatedEntry.Name));
         }
+
         private static async Task<ulong> ExecutePaginatedMessage(SocketInteraction interaction, PaginatorEntry paginatedEntry, int page)
         {
             // check range

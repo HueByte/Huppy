@@ -1,9 +1,7 @@
-using System.Reflection.Metadata;
 using Discord;
 using Discord.Interactions;
 using Huppy.Core.Common.Constants;
 using Huppy.Core.Entities;
-using Microsoft.Extensions.Logging;
 
 namespace Huppy.Core.Services.PaginatedEmbedService
 {
