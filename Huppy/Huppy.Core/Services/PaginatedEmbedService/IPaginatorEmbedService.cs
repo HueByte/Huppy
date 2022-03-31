@@ -11,5 +11,6 @@ namespace Huppy.Core.Services.PaginatedEmbedService
         Task SendStaticPaginatedMessage(SocketInteraction interaction, string paginatedMessageName, int page = 0);
         Task UpdatePaginatedMessage(SocketInteraction interaction, string paginatedMessageName, int page = 0);
         Task AddStaticPaginatorEntry(PaginatorEntry entry);
+        Task SendDynamicPaginatedMessage(SocketInteraction interaction, PaginatorEntry paginatedEntry, int page = 0);
     }
 }

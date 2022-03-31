@@ -58,7 +58,7 @@ namespace Huppy.Core.Services.PaginatedEmbedService
 
             // if message was executed successfully add it to cache
             if (result > 0)
-                await _cacheService.AddPaginatedMessage(result, new PaginatedMessage(result, 0, paginatedEntry.Name));
+                await _cacheService.AddPaginatedMessage(result, new PaginatedMessage(result, 0, paginatedEntry.Name, false));
         }
 
         public async Task SendStaticPaginatedMessage(SocketInteraction interaction, PaginatorEntry paginatedEntry, int page = 0)
@@ -75,7 +75,15 @@ namespace Huppy.Core.Services.PaginatedEmbedService
 
             // if message was executed successfully add it to cache
             if (result > 0)
-                await _cacheService.AddPaginatedMessage(result, new PaginatedMessage(result, 0, paginatedEntry.Name));
+                await _cacheService.AddPaginatedMessage(result, new PaginatedMessage(result, 0, paginatedEntry.Name, false));
+        }
+
+        public async Task SendDynamicPaginatedMessage(SocketInteraction interaction, PaginatorEntry paginatedEntry, int page = 0)
+        {
+            var result = await ExecutePaginatedMessage(interaction, paginatedEntry, page);
+
+            if (result > 0)
+                await _cacheService.AddPaginatedMessage(result, new PaginatedMessage(result, 0, paginatedEntry.Name, true));
         }
 
         public async Task UpdatePaginatedMessage(SocketInteraction interaction, string paginatedMessageName, int page = 0)
@@ -90,7 +98,7 @@ namespace Huppy.Core.Services.PaginatedEmbedService
 
             var result = await ExecutePaginatedMessage(interaction, paginatedEntry, page);
             if (result > 0)
-                await _cacheService.UpdatePaginatedMessage(result, new PaginatedMessage(result, (ushort)page, paginatedEntry.Name));
+                await _cacheService.UpdatePaginatedMessage(result, new PaginatedMessage(result, (ushort)page, paginatedEntry.Name, false));
         }
 
         private static async Task<ulong> ExecutePaginatedMessage(SocketInteraction interaction, PaginatorEntry paginatedEntry, int page)

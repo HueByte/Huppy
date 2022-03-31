@@ -2,8 +2,10 @@ using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Huppy.Core.Common.Constants;
+using Huppy.Core.Entities;
 using Huppy.Core.IRepositories;
 using Huppy.Core.Services.HuppyCacheService;
+using Huppy.Core.Services.PaginatedEmbedService;
 using Microsoft.Extensions.Logging;
 
 namespace Huppy.App.Commands
@@ -15,12 +17,47 @@ namespace Huppy.App.Commands
         private readonly ICommandLogRepository _commandRepository;
         private readonly IServerRepository _serverRepository;
         private readonly CacheService _cacheService;
-        public ServerCommands(ILogger<ServerCommands> logger, CacheService cacheService, ICommandLogRepository commandLogRepository, IServerRepository serverRepository)
+        private readonly IPaginatorEmbedService _paginatorService;
+        public ServerCommands(ILogger<ServerCommands> logger, CacheService cacheService, ICommandLogRepository commandLogRepository, IServerRepository serverRepository, IPaginatorEmbedService paginatorService)
         {
             _logger = logger;
             _commandRepository = commandLogRepository;
             _cacheService = cacheService;
             _serverRepository = serverRepository;
+            _paginatorService = paginatorService;
+        }
+
+        [SlashCommand("new-info-test", "Paginated into test")]
+        [RequireUserPermission(GuildPermission.ManageChannels)]
+        public async Task GetInfoTest()
+        {
+            PaginatorEntry test = new()
+            {
+                Name = Guid.NewGuid().ToString(),
+                Pages = new()
+            };
+
+            PaginatorPage page = new()
+            {
+                Name = "Rooms",
+                PageNumber = 0,
+            };
+
+            PaginatorPage page2 = new()
+            {
+                Name = "Rest",
+                PageNumber = 1,
+            };
+
+            var embed = new EmbedBuilder().WithDescription("Test for page 1 of dynamic pages");
+            var embed2 = new EmbedBuilder().WithDescription("Test for page 2 of dynamic pages");
+
+            page.Embed = embed.Build();
+            page2.Embed = embed2.Build();
+            test.Pages.Add(page);
+            test.Pages.Add(page2);
+
+            await _paginatorService.SendDynamicPaginatedMessage(Context.Interaction, test, 0);
         }
 
         [SlashCommand("info", "Get current configuration for this server")]
