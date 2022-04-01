@@ -79,7 +79,7 @@ namespace Huppy.App.Commands
         [SlashCommand("help", "Display help information")]
         public async Task PaginatorTestNew()
         {
-            // Get Paginated entry by name 
+            // Get static paginated entry by name 
             var help = _paginatorEmbedService.GetStaticPaginatorEntries()
                                              .FirstOrDefault(e => e.Name == PaginatorEntriesNames.Help);
 
