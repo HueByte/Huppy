@@ -47,8 +47,8 @@ namespace Huppy.Core.Services.ServerInteractionService
                                               .WithThumbnailUrl(user.GetAvatarUrl());
 
                 ISocketMessageChannel? channel;
-                if (server!.Rooms?.OutputRoom > 0)
-                    channel = user.Guild.GetChannel(server.Rooms.OutputRoom) as ISocketMessageChannel;
+                if (server!.Rooms?.GreetingRoom > 0)
+                    channel = user.Guild.GetChannel(server.Rooms.GreetingRoom) as ISocketMessageChannel;
 
                 else
                     channel = user.Guild.DefaultChannel;
