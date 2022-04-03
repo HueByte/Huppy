@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30114.105
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Huppy.App", "Huppy.App\Huppy.App.csproj", "{63A53A9E-3A99-47A7-BC56-757C4C484789}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Huppy.Core", "Huppy.Core\Huppy.Core.csproj", "{24DBA258-A21A-4C73-B2E4-1F095F6629D2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Huppy.Infrastructure", "Huppy.Infrastructure\Huppy.Infrastructure.csproj", "{63DCCC50-7380-445C-AF41-3DBD2A7FE953}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{63A53A9E-3A99-47A7-BC56-757C4C484789}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{63A53A9E-3A99-47A7-BC56-757C4C484789}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{63A53A9E-3A99-47A7-BC56-757C4C484789}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{63A53A9E-3A99-47A7-BC56-757C4C484789}.Release|Any CPU.Build.0 = Release|Any CPU
+		{24DBA258-A21A-4C73-B2E4-1F095F6629D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24DBA258-A21A-4C73-B2E4-1F095F6629D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24DBA258-A21A-4C73-B2E4-1F095F6629D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{24DBA258-A21A-4C73-B2E4-1F095F6629D2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{63DCCC50-7380-445C-AF41-3DBD2A7FE953}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{63DCCC50-7380-445C-AF41-3DBD2A7FE953}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{63DCCC50-7380-445C-AF41-3DBD2A7FE953}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{63DCCC50-7380-445C-AF41-3DBD2A7FE953}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
