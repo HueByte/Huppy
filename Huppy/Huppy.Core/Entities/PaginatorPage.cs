@@ -4,8 +4,8 @@ namespace Huppy.Core.Entities
 {
     public class PaginatorPage
     {
-        public string Name { get; set; }
-        public Embed Embed { get; set; }
+        public string Name { get; set; } = null!;
+        public Embed? Embed { get; set; }
         public ushort PageNumber { get; set; }
 
         public PaginatorPage() { }

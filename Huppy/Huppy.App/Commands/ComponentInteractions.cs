@@ -40,7 +40,7 @@ namespace Huppy.App.Commands
             if (cacheMessage is null)
                 return;
 
-            await _paginatorService.UpdatePaginatedMessage(Context.Interaction, cacheMessage.EntryName, cacheMessage.CurrentPage + value);
+            await _paginatorService.UpdatePaginatedMessage(Context.Interaction, cacheMessage, cacheMessage.CurrentPage + value);
         }
     }
 }
