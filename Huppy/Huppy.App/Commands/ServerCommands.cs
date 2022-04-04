@@ -34,7 +34,7 @@ namespace Huppy.App.Commands
         {
             PaginatorDynamicEntry entry = new()
             {
-                Name = Guid.NewGuid().ToString(),
+                Name = "info",
                 DynamicPages = new()
             };
 

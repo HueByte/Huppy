@@ -63,7 +63,7 @@ namespace Huppy.Core.Services.PaginatedEmbedService
 
             // if message was executed successfully add it to cache
             if (result > 0)
-                await _cacheService.AddPaginatedMessage(result, new PaginatedMessage(result, 0, paginatedEntry.Name, false));
+                await _cacheService.AddPaginatedMessage(result, new PaginatedMessageState(result, 0, paginatedEntry.Name, false));
         }
 
         public async Task SendStaticPaginatedMessage(SocketInteraction interaction, PaginatorEntry paginatedEntry, int page = 0)
@@ -80,7 +80,7 @@ namespace Huppy.Core.Services.PaginatedEmbedService
 
             // if message was executed successfully add it to cache
             if (result > 0)
-                await _cacheService.AddPaginatedMessage(result, new PaginatedMessage(result, 0, paginatedEntry.Name, false));
+                await _cacheService.AddPaginatedMessage(result, new PaginatedMessageState(result, 0, paginatedEntry.Name, false));
         }
 
         public async Task SendDynamicPaginatedMessage(SocketInteraction interaction, PaginatorDynamicEntry paginatedEntry, int page = 0)
@@ -90,13 +90,14 @@ namespace Huppy.Core.Services.PaginatedEmbedService
             if (_dynamicPaginatorEntires.Count > _maxDynamicEntries)
                 _dynamicPaginatorEntires.Remove(_dynamicPaginatorEntires.First());
 
-            _dynamicPaginatorEntires.Add(paginatedEntry);
+            if (!_dynamicPaginatorEntires.Any(e => e.Name == paginatedEntry.Name))
+                _dynamicPaginatorEntires.Add(paginatedEntry);
 
             if (result > 0)
-                await _cacheService.AddPaginatedMessage(result, new PaginatedMessage(result, 0, paginatedEntry.Name, true));
+                await _cacheService.AddPaginatedMessage(result, new PaginatedMessageState(result, 0, paginatedEntry.Name, true));
         }
 
-        public async Task UpdatePaginatedMessage(SocketInteraction interaction, PaginatedMessage paginatedMessage, int page = 0)
+        public async Task UpdatePaginatedMessage(SocketInteraction interaction, PaginatedMessageState paginatedMessage, int page = 0)
         {
             ulong result = 0;
             if (paginatedMessage.IsDynamic)
@@ -125,7 +126,7 @@ namespace Huppy.Core.Services.PaginatedEmbedService
             }
 
             if (result > 0)
-                await _cacheService.UpdatePaginatedMessage(result, new PaginatedMessage(result, (ushort)page, paginatedMessage.EntryName, paginatedMessage.IsDynamic));
+                await _cacheService.UpdatePaginatedMessage(result, new PaginatedMessageState(result, (ushort)page, paginatedMessage.EntryName, paginatedMessage.IsDynamic));
         }
 
         private async Task<ulong> ExecuteDynamicPaginatedMessage(SocketInteraction interaction, PaginatorDynamicEntry paginatedEntry, int page)

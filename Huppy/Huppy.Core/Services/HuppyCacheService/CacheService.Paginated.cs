@@ -7,7 +7,7 @@ namespace Huppy.Core.Services.HuppyCacheService
         private int _maxCacheMessageSize;
 
         public void SetMaxMessageCacheSize(int size) => _maxCacheMessageSize = size;
-        public Task AddPaginatedMessage(ulong messageId, PaginatedMessage message)
+        public Task AddPaginatedMessage(ulong messageId, PaginatedMessageState message)
         {
             if (message is null)
                 throw new Exception("Paginated message was empty");
@@ -20,7 +20,7 @@ namespace Huppy.Core.Services.HuppyCacheService
             return Task.CompletedTask;
         }
 
-        public Task UpdatePaginatedMessage(ulong key, PaginatedMessage message)
+        public Task UpdatePaginatedMessage(ulong key, PaginatedMessageState message)
         {
             if (PaginatedMessages.Contains(key))
                 PaginatedMessages[(object)key] = message;
@@ -28,15 +28,15 @@ namespace Huppy.Core.Services.HuppyCacheService
             return Task.CompletedTask;
         }
 
-        public Task<PaginatedMessage?> GetPaginatedMessage(ulong key)
+        public Task<PaginatedMessageState?> GetPaginatedMessage(ulong key)
         {
-            var result = (PaginatedMessage?)PaginatedMessages[(object)key];
+            var result = (PaginatedMessageState?)PaginatedMessages[(object)key];
             return Task.FromResult(result);
         }
 
-        public Task<PaginatedMessage?> GetPaginatedMessage(int index)
+        public Task<PaginatedMessageState?> GetPaginatedMessage(int index)
         {
-            var result = PaginatedMessages[index] as PaginatedMessage;
+            var result = PaginatedMessages[index] as PaginatedMessageState;
             return Task.FromResult(result);
         }
     }
