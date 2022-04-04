@@ -101,38 +101,6 @@ namespace Huppy.App.Commands
             await _paginatorService.SendDynamicPaginatedMessage(Context.Interaction, entry, 0);
         }
 
-        // [SlashCommand("info", "Get current configuration for this server")]
-        // [RequireUserPermission(GuildPermission.ManageGuild)]
-        // public async Task GetServerInfo()
-        // {
-        //     var server = await _serverRepository.GetOrCreateAsync(Context);
-
-        //     var embed = new EmbedBuilder().WithAuthor(Context.User)
-        //                                   .WithColor(Color.DarkPurple)
-        //                                   .WithTitle($"Current configuration of {Context.Guild.Name}")
-        //                                   .WithThumbnailUrl(Context.Guild.IconUrl)
-        //                                   .WithFooter("If you want to change server configuration use /configure");
-
-        //     embed.AddField("ID", server.ID, true);
-        //     embed.AddField("Server Name", Context.Guild.Name, true);
-        //     embed.AddField("User count", Context.Guild.MemberCount, true);
-
-        //     embed.AddField("Default room", $"<#{Context.Guild.DefaultChannel.Id}>", true);
-        //     embed.AddField("Huppy output room", server.Rooms?.OutputRoom > 0 ? $"<#{server.Rooms?.OutputRoom}>" : $"<#{Context.Guild.DefaultChannel.Id}>", true);
-        //     embed.AddField("Greeting room", server.Rooms?.GreetingRoom > 0 ? $"<#{server.Rooms?.GreetingRoom}>" : $"<#{Context.Guild.DefaultChannel.Id}>", true);
-        //     embed.AddField("News room", server.Rooms?.NewsOutputRoom > 0 ? $"<#{server.Rooms?.NewsOutputRoom}>" : $"<#{Context.Guild.DefaultChannel.Id}>", true);
-
-        //     embed.AddField("News enabled", server.AreNewsEnabled, true);
-        //     embed.AddField("Use Greet", server.UseGreet, true);
-        //     embed.AddField("Greet message", string.IsNullOrEmpty(server.GreetMessage) ? "`empty`" : server.GreetMessage);
-
-        //     var defaultRole = Context.Guild.GetRole(server.RoleID);
-        //     if (defaultRole is not null)
-        //         embed.AddField("Default role", defaultRole.Mention, true);
-
-        //     await ModifyOriginalResponseAsync((msg) => msg.Embed = embed.Build());
-        // }
-
         [SlashCommand("configure", "Configure Huppy for your server")]
         [RequireUserPermission(GuildPermission.Administrator)]
         public async Task ConfigureHuppy(bool? UseGreet = null, string? GreetingMessage = null, IRole? DefaultRole = null, bool? EnableNews = false, SocketGuildChannel? HuppyRoom = null, SocketGuildChannel? NewsRoom = null, SocketGuildChannel? GreetingRoom = null)
