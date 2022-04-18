@@ -99,7 +99,7 @@ namespace Huppy.Infrastructure.Repositories
         {
             return await _context.Servers.Include(e => e.Rooms)
                                          .Where(en => en.ID == ID)
-                                         .FirstOrDefaultAsync()!;
+                                         .FirstOrDefaultAsync();
         }
 
         public async Task UpdateOne(Server server)

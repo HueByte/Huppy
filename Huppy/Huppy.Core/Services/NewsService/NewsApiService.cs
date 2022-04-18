@@ -77,24 +77,22 @@ namespace Huppy.Core.Services.NewsService
 
                     if (guild is null)
                     {
-                        _logger.LogError("Didn't find server with ID {ServerID}", server.ID);
+                        _logger.LogWarning("Didn't find server with ID {ServerID}, no news sent", server.ID);
+                        
+                        server.UseGreet = false;
+                        
+                        // TODO: consider fire and forget
+                        await _serverRepository.UpdateOne(server);
                         continue;
                     }
 
-                    var room = server.Rooms?.NewsOutputRoom > 0
-                        ? guild.GetTextChannel(server.Rooms.NewsOutputRoom)
-                        : guild.DefaultChannel;
+                    ISocketMessageChannel? channel = default;
+                    if (server!.Rooms is not null && server!.Rooms.GreetingRoom > 0)
+                        channel = guild.GetChannel(server.Rooms.GreetingRoom) as ISocketMessageChannel;
 
-                    if (room is null)
-                    {
-                        _logger.LogError("Could find a room with [NewsOutputRoom] ID", server.Rooms.NewsOutputRoom);
-                        continue;
-                    }
+                    channel ??= guild.DefaultChannel;
 
-                    _logger.LogInformation("Sending news to [{servername}] to room [{room}]", guild.Name, room.Name);
-
-                    // TODO possible crash bug
-                    await room.SendMessageAsync(null, false, embed);
+                    await channel.SendMessageAsync(null, false, embed);
                 }
             }
             else
