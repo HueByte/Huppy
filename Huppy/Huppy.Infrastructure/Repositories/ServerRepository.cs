@@ -62,8 +62,8 @@ namespace Huppy.Infrastructure.Repositories
                     server.Rooms = new()
                     {
                         OutputRoom = DiscordContext.Guild.DefaultChannel.Id,
-                        NewsOutputRoom = 0,
-                        GreetingRoom = 0
+                        NewsOutputRoom = default,
+                        GreetingRoom = default
                     };
 
                     _context.Servers.Update(server);
@@ -83,9 +83,9 @@ namespace Huppy.Infrastructure.Repositories
                     NewsOutputRoom = 0,
                     GreetingRoom = 0
                 },
-                UseGreet = false,
                 ServerName = DiscordContext.Guild.Name,
                 RoleID = 0,
+                UseGreet = false,
                 AreNewsEnabled = false,
             };
 
