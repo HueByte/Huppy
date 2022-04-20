@@ -63,6 +63,7 @@ namespace Huppy.App.Commands
 
             StringBuilder sb = new();
             sb.AppendLine("✨ Top Huppy friends ✨\n");
+            
             foreach (var item in topStats)
             {
                 sb.AppendLine($"> **{item.Value.Username}** : `{item.Value.Count}`\n");

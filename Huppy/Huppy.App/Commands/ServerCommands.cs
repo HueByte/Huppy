@@ -61,6 +61,7 @@ namespace Huppy.App.Commands
                     embed.AddField("News enabled", server.AreNewsEnabled, true);
                     embed.AddField("Use Greet", server.UseGreet, true);
                     embed.AddField("Greet message", string.IsNullOrEmpty(server.GreetMessage) ? "`empty`" : server.GreetMessage);
+                    
                     var defaultRole = Context.Guild.GetRole(server.RoleID);
                     if (defaultRole is not null)
                         embed.AddField("Default role", defaultRole.Mention, true);
@@ -86,10 +87,10 @@ namespace Huppy.App.Commands
                               .WithThumbnailUrl(Context.Guild.IconUrl)
                               .WithFooter("If you want to change server configuration use /configure");
 
-                    embed.AddField("Default room", $"<#{Context.Guild.DefaultChannel.Id}>", true);
                     embed.AddField("Huppy output room", server.Rooms?.OutputRoom > 0 ? $"<#{server.Rooms?.OutputRoom}>" : $"<#{Context.Guild.DefaultChannel.Id}>", true);
                     embed.AddField("Greeting room", server.Rooms?.GreetingRoom > 0 ? $"<#{server.Rooms?.GreetingRoom}>" : $"<#{Context.Guild.DefaultChannel.Id}>", true);
                     embed.AddField("News room", server.Rooms?.NewsOutputRoom > 0 ? $"<#{server.Rooms?.NewsOutputRoom}>" : $"<#{Context.Guild.DefaultChannel.Id}>", true);
+                    embed.AddField("Default room", $"<#{Context.Guild.DefaultChannel.Id}>");
 
                     return embed.Build();
                 }
