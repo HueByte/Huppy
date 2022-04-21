@@ -48,56 +48,63 @@ namespace Huppy.Core.Services.NewsService
         // TODO better handler for errors
         public async Task PostNews()
         {
-            var servers = (await _serverRepository.GetAll()).Where(en => en.AreNewsEnabled);
-            if (servers.Any())
+            try
             {
-                var news = (await GetNews()).Articles!.Take(5);
-
-                StringBuilder sb = new();
-                int count = 1;
-                foreach (var article in news)
+                var servers = (await _serverRepository.GetAll()).Where(en => en.AreNewsEnabled);
+                if (servers.Any())
                 {
-                    sb.AppendLine($"**{count}. {article.Title?.Replace("*", String.Empty)}**\n");
-                    sb.AppendLine($"> {article.Description?.Replace("*", String.Empty)}\n");
-                    sb.AppendLine($"*{article.Author?.Replace("*", String.Empty)} - {article.Source!.Name?.Replace("*", String.Empty)}*");
-                    sb.AppendLine($"{article.Url}\n");
-                    count++;
-                }
+                    var news = (await GetNews()).Articles!.Take(5);
 
-                var embed = new EmbedBuilder().WithTitle("✨ Most recent news ✨")
-                                  .WithColor(Color.Teal)
-                                  .WithDescription(sb.ToString())
-                                  .WithThumbnailUrl(Icons.Huppy1)
-                                  .WithCurrentTimestamp()
-                                  .Build();
-
-                foreach (var server in servers)
-                {
-                    var guild = _client.GetGuild(server.ID);
-
-                    if (guild is null)
+                    StringBuilder sb = new();
+                    int count = 1;
+                    foreach (var article in news)
                     {
-                        _logger.LogWarning("Didn't find server with ID {ServerID}, no news sent", server.ID);
-                        
-                        server.UseGreet = false;
-                        
-                        // TODO: consider fire and forget
-                        await _serverRepository.UpdateOne(server);
-                        continue;
+                        sb.AppendLine($"**{count}. {article.Title?.Replace("*", String.Empty)}**\n");
+                        sb.AppendLine($"> {article.Description?.Replace("*", String.Empty)}\n");
+                        sb.AppendLine($"*{article.Author?.Replace("*", String.Empty)} - {article.Source!.Name?.Replace("*", String.Empty)}*");
+                        sb.AppendLine($"{article.Url}\n");
+                        count++;
                     }
 
-                    ISocketMessageChannel? channel = default;
-                    if (server!.Rooms is not null && server!.Rooms.GreetingRoom > 0)
-                        channel = guild.GetChannel(server.Rooms.GreetingRoom) as ISocketMessageChannel;
+                    var embed = new EmbedBuilder().WithTitle("✨ Most recent news ✨")
+                                      .WithColor(Color.Teal)
+                                      .WithDescription(sb.ToString())
+                                      .WithThumbnailUrl(Icons.Huppy1)
+                                      .WithCurrentTimestamp()
+                                      .Build();
 
-                    channel ??= guild.DefaultChannel;
+                    foreach (var server in servers)
+                    {
+                        var guild = _client.GetGuild(server.ID);
 
-                    await channel.SendMessageAsync(null, false, embed);
+                        if (guild is null)
+                        {
+                            _logger.LogWarning("Didn't find server with ID {ServerID}, no news sent", server.ID);
+
+                            server.UseGreet = false;
+
+                            // TODO: consider fire and forget
+                            await _serverRepository.UpdateOne(server);
+                            continue;
+                        }
+
+                        ISocketMessageChannel? channel = default;
+                        if (server!.Rooms is not null && server!.Rooms.GreetingRoom > 0)
+                            channel = guild.GetChannel(server.Rooms.GreetingRoom) as ISocketMessageChannel;
+
+                        channel ??= guild.DefaultChannel;
+
+                        await channel.SendMessageAsync(null, false, embed);
+                    }
+                }
+                else
+                {
+                    _logger.LogWarning("No servers use News API");
                 }
             }
-            else
+            catch(Exception e)
             {
-                _logger.LogWarning("No servers use News API");
+                _logger.LogError("News Error {message}\n{stack}", e.Message, e.StackTrace);
             }
         }
     }
