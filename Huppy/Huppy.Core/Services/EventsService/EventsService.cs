@@ -7,7 +7,7 @@ namespace Huppy.Core.Services.EventsService
         public ConcurrentDictionary<DateTime, Action> events = new();
         public EventsService() {}
 
-        public async Task AddEvent(DateTime time, Action event)
+        public async Task AddEvent(DateTime time, Action eventAction)
         {
             
         }
