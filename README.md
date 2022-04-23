@@ -1,2 +1,2 @@
 # Hello, Welcome To Huppy!
-Description in progress ⚗
+Working on description I swear
