@@ -1,9 +1,11 @@
 using System.Collections.Concurrent;
+using Microsoft.Extensions.Logging;
 
 namespace Huppy.Core.Services.EventService
 {
     public class EventService : IEventService
     {
+        private readonly ILogger _logger;
         public readonly Dictionary<ulong, List<Func<Task>>> events = new();
         private readonly object _lockObj = new();
         private Timer _timer;
@@ -11,7 +13,12 @@ namespace Huppy.Core.Services.EventService
         private readonly TimeSpan _ticker = TimeSpan.FromSeconds(1); // ticks
         private const int TICKS_PER_SECOND = 10000000;
 
-        public EventService()
+        public EventService(ILogger<EventService> logger)
+        {
+            _logger = logger;
+        }
+
+        public void Initialize()
         {
             _startDate = DateTime.Now;
             _timer = InitTimer();
@@ -78,8 +85,6 @@ namespace Huppy.Core.Services.EventService
                     events.Remove(key.Key);
                 }
             }
-
-            Console.WriteLine(targetTime);
         }
 
         private static async IAsyncEnumerable<Func<Task>> GenerateTaskSequence(List<Func<Task>> tasks)

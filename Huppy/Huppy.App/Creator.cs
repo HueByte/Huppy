@@ -3,6 +3,7 @@ using Discord.Interactions;
 using Discord.WebSocket;
 using Huppy.Core.Entities;
 using Huppy.Core.Services.CommandService;
+using Huppy.Core.Services.EventService;
 using Huppy.Core.Services.HuppyCacheService;
 using Huppy.Core.Services.LoggerService;
 using Huppy.Core.Services.PaginatedEmbedService;
@@ -30,6 +31,7 @@ namespace Huppy.App
         private readonly ITimedEventsService _timedEventService;
         private readonly CacheService _cacheService;
         private readonly IPaginatorEmbedService _paginatorService;
+        private readonly IEventService _eventService;
 
         public Creator(IServiceProvider serviceProvider)
         {
@@ -45,6 +47,7 @@ namespace Huppy.App
             _timedEventService = _serviceProvider.GetRequiredService<ITimedEventsService>();
             _cacheService = _serviceProvider.GetRequiredService<CacheService>();
             _paginatorService = _serviceProvider.GetRequiredService<IPaginatorEmbedService>();
+            _eventService = _serviceProvider.GetRequiredService<IEventService>();
         }
 
         public async Task CreateDatabase()
@@ -74,7 +77,7 @@ namespace Huppy.App
             await _client.SetGameAsync("Hello World!", null, Discord.ActivityType.Playing);
         }
 
-        public async Task CreateEvents()
+        public Task CreateEvents()
         {
             _logger.LogInformation("Creating events");
 
@@ -95,11 +98,14 @@ namespace Huppy.App
             // logger events
             _client.Log += _loggingService.OnLogAsync;
             _interactionService.Log += _loggingService.OnLogAsync;
+
+            return Task.CompletedTask;
         }
 
         public async Task StartTimedEvents(DiscordSocketClient socketClient)
         {
             await _timedEventService.StartTimers();
+            _eventService.Initialize();
         }
 
         private async Task CreateSlashCommands(DiscordSocketClient socketClient)
