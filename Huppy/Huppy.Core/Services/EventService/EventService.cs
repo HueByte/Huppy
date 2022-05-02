@@ -66,26 +66,32 @@ namespace Huppy.Core.Services.EventService
 
         private async Task ExecuteEvents()
         {
-            var targetTime = (ulong)(DateTime.Now.Ticks / TICKS_PER_SECOND);
-            var executionEvents = events.Where(e => e.Key < targetTime);
-
-            if (executionEvents.Any())
+            try
             {
-                foreach (var tasks in executionEvents)
+                var targetTime = (ulong)(DateTime.Now.Ticks / TICKS_PER_SECOND);
+                var executionEvents = events.Where(e => e.Key < targetTime);
+
+                if (executionEvents.Any())
                 {
-                    foreach (var task in tasks.Value)
+                    foreach (var tasks in executionEvents)
                     {
-                        _ = Task.Run(task);
+                        foreach (var task in tasks.Value)
+                        {
+                            _ = Task.Run(task);
+                        }
+                    }
+                }
+                foreach (var key in executionEvents)
+                {
+                    lock (_lockObj)
+                    {
+                        events.Remove(key.Key);
                     }
                 }
             }
-
-            foreach (var key in executionEvents)
+            catch (Exception e)
             {
-                lock (_lockObj)
-                {
-                    events.Remove(key.Key);
-                }
+                _logger.LogError("{message} - {stackTrace}", e.Message, e.StackTrace);
             }
         }
     }
