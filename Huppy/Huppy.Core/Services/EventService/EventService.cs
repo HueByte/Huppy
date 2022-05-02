@@ -35,6 +35,8 @@ namespace Huppy.Core.Services.EventService
 
         public void AddEvent(DateTime time, string eventName, Func<Task> action)
         {
+            if (string.IsNullOrEmpty(eventName)) return;
+
             List<TimedEvent> newEvents = new()
             {
                 new TimedEvent {
@@ -48,6 +50,8 @@ namespace Huppy.Core.Services.EventService
 
         public void AddEvent(DateTime time, string eventName, Task action)
         {
+            if (string.IsNullOrEmpty(eventName)) return;
+
             List<TimedEvent> newEvents = new()
             {
                 new TimedEvent {
@@ -61,7 +65,7 @@ namespace Huppy.Core.Services.EventService
 
         public void AddRange(DateTime time, List<TimedEvent> actions)
         {
-            var targetTime = GetTargetTime(DateTime.Now);
+            var targetTime = GetTargetTime(time);
             lock (_lockObj)
             {
                 if (events.ContainsKey(targetTime))
@@ -78,46 +82,55 @@ namespace Huppy.Core.Services.EventService
             }
         }
 
-        public void RemovePrecise(DateTime time, string name)
+        public Task RemovePrecise(DateTime? time, string name)
         {
-            var targetTime = GetTargetTime(DateTime.Now);
+            if (string.IsNullOrEmpty(name) || time is null) return Task.CompletedTask;
+
+            var targetTime = GetTargetTime((DateTime)time);
             if (events.ContainsKey(targetTime))
             {
                 events.TryGetValue(targetTime, out var eventList);
                 if (eventList is null)
                 {
                     _logger.LogError("Precise remove error {time} <{name}>: event list was null", time, name);
-                    return;
+                    return Task.CompletedTask;
                 }
 
                 var eventToRemove = eventList.FirstOrDefault(e => e.Name == name);
                 if (eventToRemove is null)
                 {
                     _logger.LogError("Precise remove error {time} <{name}>: didn't find event with provided name", time, name);
-                    return;
+                    return Task.CompletedTask;
                 }
 
                 eventList.Remove(eventToRemove);
+
                 lock (_lockObj)
                 {
                     events[targetTime] = eventList;
                 }
             }
+
+            return Task.CompletedTask;
         }
 
-        public void RemoveEventsByName(string name)
+        public Task RemoveEventsByName(string name)
         {
+            if (string.IsNullOrEmpty(name)) return Task.CompletedTask;
+
             var eventsToRemove = events.Where(e => e.Value.Any(e => e.Name == name));
 
             foreach (var time in eventsToRemove)
             {
                 events.Remove(time.Key);
             }
+
+            return Task.CompletedTask;
         }
 
-        public void RemoveEventsByTime(DateTime time)
+        public Task RemoveEventsByTime(DateTime time)
         {
-            var targetTime = GetTargetTime(DateTime.Now);
+            var targetTime = GetTargetTime(time);
             if (events.ContainsKey(targetTime))
             {
                 lock (_lockObj)
@@ -126,6 +139,8 @@ namespace Huppy.Core.Services.EventService
                         _logger.LogError("Failed to removed events at {time}", targetTime);
                 }
             }
+
+            return Task.CompletedTask;
         }
 
         public DateTime GetStartTime() => _startDate;
@@ -145,6 +160,8 @@ namespace Huppy.Core.Services.EventService
             try
             {
                 var targetTime = GetTargetTime(DateTime.Now);
+
+                // TODO: find better solution
                 var executionEvents = events.Where(e => e.Key < targetTime);
 
                 if (executionEvents.Any())

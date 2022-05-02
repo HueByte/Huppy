@@ -7,9 +7,9 @@ namespace Huppy.Core.Services.EventService
         void AddEvent(DateTime time, string eventName, Func<Task?> action);
         void AddEvent(DateTime time, string eventName, Task action);
         void AddRange(DateTime time, List<TimedEvent> actions);
-        void RemovePrecise(DateTime time, string name);
-        void RemoveEventsByName(string eventName);
-        void RemoveEventsByTime(DateTime time);
+        Task RemovePrecise(DateTime time, string name);
+        Task RemoveEventsByName(string eventName);
+        Task RemoveEventsByTime(DateTime time);
         DateTime GetStartTime();
     }
 }
