@@ -61,7 +61,7 @@ namespace Huppy.Core.Services.EventService
 
         public void AddRange(DateTime time, List<TimedEvent> actions)
         {
-            var targetTime = (ulong)(time.Ticks / TICKS_PER_SECOND);
+            var targetTime = GetTargetTime(DateTime.Now);
             lock (_lockObj)
             {
                 if (events.ContainsKey(targetTime))
@@ -78,15 +78,46 @@ namespace Huppy.Core.Services.EventService
             }
         }
 
-        public void RemoveEventByName(string name)
+        public void RemovePrecise(DateTime time, string name)
         {
-            var eventsToRemove = events.Where(e => e.Value.Any(e => e.Name == name));
-            // to finish
+            var targetTime = GetTargetTime(DateTime.Now);
+            if (events.ContainsKey(targetTime))
+            {
+                events.TryGetValue(targetTime, out var eventList);
+                if (eventList is null)
+                {
+                    _logger.LogError("Precise remove error {time} <{name}>: event list was null", time, name);
+                    return;
+                }
+
+                var eventToRemove = eventList.FirstOrDefault(e => e.Name == name);
+                if (eventToRemove is null)
+                {
+                    _logger.LogError("Precise remove error {time} <{name}>: didn't find event with provided name", time, name);
+                    return;
+                }
+
+                eventList.Remove(eventToRemove);
+                lock (_lockObj)
+                {
+                    events[targetTime] = eventList;
+                }
+            }
         }
 
-        public void RemoveEventByTime(DateTime time)
+        public void RemoveEventsByName(string name)
         {
-            var targetTime = (ulong)(time.Ticks / TICKS_PER_SECOND);
+            var eventsToRemove = events.Where(e => e.Value.Any(e => e.Name == name));
+
+            foreach (var time in eventsToRemove)
+            {
+                events.Remove(time.Key);
+            }
+        }
+
+        public void RemoveEventsByTime(DateTime time)
+        {
+            var targetTime = GetTargetTime(DateTime.Now);
             if (events.ContainsKey(targetTime))
             {
                 lock (_lockObj)
@@ -109,11 +140,11 @@ namespace Huppy.Core.Services.EventService
             return timer;
         }
 
-        private async Task ExecuteEvents()
+        private Task ExecuteEvents()
         {
             try
             {
-                var targetTime = (ulong)(DateTime.Now.Ticks / TICKS_PER_SECOND);
+                var targetTime = GetTargetTime(DateTime.Now);
                 var executionEvents = events.Where(e => e.Key < targetTime);
 
                 if (executionEvents.Any())
@@ -140,6 +171,13 @@ namespace Huppy.Core.Services.EventService
             {
                 _logger.LogError("{message} - {stackTrace}", e.Message, e.StackTrace);
             }
+
+            return Task.CompletedTask;
+        }
+
+        private ulong GetTargetTime(DateTime time)
+        {
+            return (ulong)(DateTime.Now.Ticks / TICKS_PER_SECOND);
         }
     }
 }
