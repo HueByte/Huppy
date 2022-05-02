@@ -10,7 +10,7 @@ namespace Huppy.Core.Services.EventService
         private readonly ILogger _logger;
         public readonly Dictionary<ulong, List<TimedEvent>> events = new();
         private readonly object _lockObj = new();
-        private Timer _timer;
+        private Timer? _timer;
         private DateTime _startDate;
         private readonly TimeSpan _ticker = TimeSpan.FromSeconds(1); // ticks
         private const int TICKS_PER_SECOND = 10000000;
