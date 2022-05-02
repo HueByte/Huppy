@@ -22,6 +22,8 @@ namespace Huppy.Core.Services.EventService
         {
             _startDate = DateTime.Now;
             _timer = InitTimer();
+
+            _logger.LogInformation("Started event loop");
         }
 
         public void AddEvent(DateTime time, Func<Task> action)
@@ -33,6 +35,8 @@ namespace Huppy.Core.Services.EventService
         {
             AddRange(time, new List<Func<Task>> { async () => await action });
         }
+
+        public DateTime GetStartTime() => _startDate;
 
         public void AddRange(DateTime time, List<Func<Task>> actions)
         {
@@ -63,35 +67,25 @@ namespace Huppy.Core.Services.EventService
         private async Task ExecuteEvents()
         {
             var targetTime = (ulong)(DateTime.Now.Ticks / TICKS_PER_SECOND);
-            var keyTasks = events.Where(e => e.Key < targetTime);
+            var executionEvents = events.Where(e => e.Key < targetTime);
 
-            if (keyTasks.Any())
+            if (executionEvents.Any())
             {
-                foreach (var events in keyTasks)
+                foreach (var tasks in executionEvents)
                 {
-                    var tasks = GenerateTaskSequence(events.Value);
-
-                    await foreach (var @event in tasks)
+                    foreach (var task in tasks.Value)
                     {
-                        _ = Task.Run(async () => await @event.Invoke());
+                        _ = Task.Run(task);
                     }
                 }
             }
 
-            foreach (var key in keyTasks)
+            foreach (var key in executionEvents)
             {
                 lock (_lockObj)
                 {
                     events.Remove(key.Key);
                 }
-            }
-        }
-
-        private static async IAsyncEnumerable<Func<Task>> GenerateTaskSequence(List<Func<Task>> tasks)
-        {
-            foreach (var task in tasks)
-            {
-                yield return task;
             }
         }
     }
