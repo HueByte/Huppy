@@ -1,4 +1,6 @@
 using System.Collections.Concurrent;
+using System.Reflection;
+using System.Reflection.Metadata.Ecma335;
 using Microsoft.Extensions.Logging;
 
 namespace Huppy.Core.Services.EventService
@@ -6,7 +8,7 @@ namespace Huppy.Core.Services.EventService
     public class EventService : IEventService
     {
         private readonly ILogger _logger;
-        public readonly Dictionary<ulong, List<Func<Task>>> events = new();
+        public readonly Dictionary<ulong, List<TimedEvent>> events = new();
         private readonly object _lockObj = new();
         private Timer _timer;
         private DateTime _startDate;
@@ -26,23 +28,42 @@ namespace Huppy.Core.Services.EventService
             _logger.LogInformation("Started event loop");
         }
 
-        public void AddEvent(DateTime time, Func<Task> action)
+        public void AddEvent(DateTime time, TimedEvent action)
         {
-            AddRange(time, new List<Func<Task>> { action });
+            AddRange(time, new List<TimedEvent> { action });
         }
 
-        public void AddEvent(DateTime time, Task action)
+        public void AddEvent(DateTime time, string eventName, Func<Task> action)
         {
-            AddRange(time, new List<Func<Task>> { async () => await action });
+            List<TimedEvent> newEvents = new()
+            {
+                new TimedEvent {
+                    Name = eventName,
+                    Event = action
+                }
+            };
+
+            AddRange(time, newEvents);
         }
 
-        public DateTime GetStartTime() => _startDate;
-
-        public void AddRange(DateTime time, List<Func<Task>> actions)
+        public void AddEvent(DateTime time, string eventName, Task action)
         {
+            List<TimedEvent> newEvents = new()
+            {
+                new TimedEvent {
+                    Name = eventName,
+                    Event = async () => await action
+                }
+            };
+
+            AddRange(time, newEvents);
+        }
+
+        public void AddRange(DateTime time, List<TimedEvent> actions)
+        {
+            var targetTime = (ulong)(time.Ticks / TICKS_PER_SECOND);
             lock (_lockObj)
             {
-                var targetTime = (ulong)(time.Ticks / TICKS_PER_SECOND);
                 if (events.ContainsKey(targetTime))
                 {
                     events.TryGetValue(targetTime, out var value);
@@ -50,9 +71,33 @@ namespace Huppy.Core.Services.EventService
                     value.AddRange(actions);
                 }
 
-                events.TryAdd(targetTime, actions);
+                if (events.TryAdd(targetTime, actions))
+                {
+                    _logger.LogDebug("Added {count} events {date}", actions.Count, time);
+                }
             }
         }
+
+        public void RemoveEventByName(string name)
+        {
+            var eventsToRemove = events.Where(e => e.Value.Any(e => e.Name == name));
+            // to finish
+        }
+
+        public void RemoveEventByTime(DateTime time)
+        {
+            var targetTime = (ulong)(time.Ticks / TICKS_PER_SECOND);
+            if (events.ContainsKey(targetTime))
+            {
+                lock (_lockObj)
+                {
+                    if (!events.Remove(targetTime))
+                        _logger.LogError("Failed to removed events at {time}", targetTime);
+                }
+            }
+        }
+
+        public DateTime GetStartTime() => _startDate;
 
         private Timer InitTimer()
         {
@@ -77,10 +122,12 @@ namespace Huppy.Core.Services.EventService
                     {
                         foreach (var task in tasks.Value)
                         {
-                            _ = Task.Run(task);
+                            // fire and forget
+                            _ = Task.Run(task.Event);
                         }
                     }
                 }
+
                 foreach (var key in executionEvents)
                 {
                     lock (_lockObj)
