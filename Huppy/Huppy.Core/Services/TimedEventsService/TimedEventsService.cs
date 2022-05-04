@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Huppy.Core.Services.TimedEventsService
 {
-    // TODO remake to hosted service
+    // TODO to remove
     public class TimedEventsService : ITimedEventsService
     {
         private readonly ILogger _logger;
