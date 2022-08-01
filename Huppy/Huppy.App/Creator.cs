@@ -55,26 +55,15 @@ namespace Huppy.App
             await _dbContext.Database.MigrateAsync();
         }
 
-        public async Task PopulateSingletons()
-        {
-            await _cacheService.Initialize();
-            await _paginatorService.Initialize();
-        }
-
         public async Task CreateCommands()
         {
             await _serviceProvider.GetRequiredService<ICommandHandlerService>().InitializeAsync();
         }
 
-        public async Task CreateBot()
+        public async Task PopulateSingletons()
         {
-            _logger.LogInformation("Starting the bot");
-
-            await _client.LoginAsync(TokenType.Bot, _appSettings.BotToken);
-
-            await _client.StartAsync();
-
-            await _client.SetGameAsync("Hello World!", null, Discord.ActivityType.Playing);
+            await _cacheService.Initialize();
+            await _paginatorService.Initialize();
         }
 
         public Task CreateEvents()
@@ -100,6 +89,17 @@ namespace Huppy.App
             _interactionService.Log += _loggingService.OnLogAsync;
 
             return Task.CompletedTask;
+        }
+
+        public async Task CreateBot()
+        {
+            _logger.LogInformation("Starting the bot");
+
+            await _client.LoginAsync(TokenType.Bot, _appSettings.BotToken);
+
+            await _client.StartAsync();
+
+            await _client.SetGameAsync("Hello World!", null, Discord.ActivityType.Playing);
         }
 
         public async Task StartTimedEvents(DiscordSocketClient socketClient)

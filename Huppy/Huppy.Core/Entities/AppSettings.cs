@@ -69,7 +69,8 @@ namespace Huppy.Core.Entities
                 {
                     BaseUrl = "",
                     ApiKey = "",
-                    IsEnabled = false
+                    IsEnabled = false,
+                    Frequency = 180,
                 }
             };
 
@@ -116,6 +117,7 @@ namespace Huppy.Core.Entities
     {
         public string? BaseUrl { get; set; }
         public string? ApiKey { get; set; }
+        public double? Frequency { get; set; }
         public bool IsEnabled { get; set; }
     }
 }

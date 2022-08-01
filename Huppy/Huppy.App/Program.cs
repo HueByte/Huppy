@@ -24,7 +24,7 @@ IServiceProvider _serviceProvider = new ModuleConfigurator().AddAppSettings(appS
                                                             .Build();
 
 // Start bot
-var bot = new Creator(_serviceProvider);
+Creator bot = new(_serviceProvider);
 
 await bot.CreateDatabase();
 

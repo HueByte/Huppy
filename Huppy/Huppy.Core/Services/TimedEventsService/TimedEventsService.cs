@@ -11,34 +11,36 @@ namespace Huppy.Core.Services.TimedEventsService
     {
         private readonly ILogger _logger;
         private readonly IServiceScopeFactory _scopeFactory;
-        private Timer _newsTimer;
-        private AppSettings _settings;
+        private readonly List<Timer> _timers;
+        private readonly AppSettings _settings;
         public TimedEventsService(ILogger<TimedEventsService> logger, IServiceScopeFactory scopeFactory, AppSettings settings)
         {
             _logger = logger;
             _scopeFactory = scopeFactory;
             _settings = settings;
+            _timers = new();
         }
 
         public Task StartTimers()
         {
+            _logger.LogInformation("Starting Timed Events");
             NewsEvent();
             return Task.CompletedTask;
         }
 
-        // TODO add timepsan to news config
         private Task NewsEvent()
         {
             if (_settings.NewsAPI!.IsEnabled)
             {
-                var looper = TimeSpan.FromMinutes(180);
+                double frequency = _settings.NewsAPI!.Frequency ?? 180;
+                var looper = TimeSpan.FromMinutes(frequency);
 
-                _newsTimer = new Timer(async (e) =>
+                _timers.Add(new Timer(async (e) =>
                 {
                     using var scope = _scopeFactory.CreateAsyncScope();
                     var _newsService = scope.ServiceProvider.GetRequiredService<INewsApiService>();
                     await _newsService.PostNews();
-                }, null, new TimeSpan(0), looper);
+                }, null, new TimeSpan(0), looper));
 
             }
 
