@@ -8,7 +8,7 @@ namespace Huppy.Core.Entities
         public string? Name { get; set; }
         public Func<IServiceScopeFactory, Task<Embed>>? Embed { get; set; }
         public ushort PageNumber { get; set; }
-        public IServiceScopeFactory _scopeFactory;
+        public IServiceScopeFactory? _scopeFactory = null;
 
         public PaginatorDynamicPage() { }
         public PaginatorDynamicPage(string name, Func<IServiceScopeFactory, Task<Embed>> embedCallback, ushort pageNumber, IServiceScopeFactory scopeFactory)

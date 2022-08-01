@@ -8,6 +8,10 @@ namespace Huppy.Core.Services.EventService
     public class EventService : IEventService
     {
         private readonly ILogger _logger;
+        public readonly Dictionary<ulong, List<string>> timeEvents = new();
+        public readonly Dictionary<string, Func<TimedEvent>> eventExecutables = new();
+
+        // TODO: Remove
         public readonly Dictionary<ulong, List<TimedEvent>> events = new();
         private readonly object _lockObj = new();
         private Timer? _timer;

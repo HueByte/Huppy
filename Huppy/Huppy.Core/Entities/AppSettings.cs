@@ -68,7 +68,8 @@ namespace Huppy.Core.Entities
                 NewsAPI = new()
                 {
                     BaseUrl = "",
-                    ApiKey = ""
+                    ApiKey = "",
+                    IsEnabled = false
                 }
             };
 
@@ -115,5 +116,6 @@ namespace Huppy.Core.Entities
     {
         public string? BaseUrl { get; set; }
         public string? ApiKey { get; set; }
+        public bool IsEnabled { get; set; }
     }
 }

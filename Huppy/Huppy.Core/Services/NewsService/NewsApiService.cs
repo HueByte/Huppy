@@ -41,7 +41,7 @@ namespace Huppy.Core.Services.NewsService
                 var failedResponse = await response.Content.ReadAsStringAsync();
                 _logger.LogError(failedResponse);
 
-                throw new Exception("Urban request wasn't successful");
+                throw new Exception("News request wasn't successful");
             }
         }
 
@@ -102,7 +102,7 @@ namespace Huppy.Core.Services.NewsService
                     _logger.LogWarning("No servers use News API");
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 _logger.LogError("News Error {message}\n{stack}", e.Message, e.StackTrace);
             }
