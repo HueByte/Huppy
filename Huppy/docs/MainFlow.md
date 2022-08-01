@@ -12,13 +12,13 @@
   - Other services
 - `#Creator`:  responsible for starting the bot loop<br>
 Tasks:
-    - `#Creator.CreateDatabase()`: creates database if it doesn't exist already from migrations
+    - `#Creator.CreateDatabase()`: creates/updates database if it doesn't exist already from migrations
     - `#Creator.PopulateSingletons()`: populates singleton lifescope services with data
     - `#Creator.CreateCommands()`: registers the command modules via reflection to `IServiceProvider` from `ICommandHandlerService`
     - `#Creator.CreateEvents()`: creates the events
     - `#Creator.CreateBot()`: logins the bot to discrod and starts it
-    - `#Creator.StartTimedEvents`: starts the timed events loop
-    - `#Creator.CreateSlashCommands`: submits the slash commands list to discord
+    - `#Creator.StartTimedEvents()`: starts the timed events loop
+    - `#Creator.CreateSlashCommands()`: submits the slash commands list to discord
 - `#ICommandHandlerService`: registers command modules and handles command events like:
   - *Command*: event responsible for every command type execution
   - *SlashCommandExecuted*: invoked after command gets executed
