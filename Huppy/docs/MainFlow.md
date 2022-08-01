@@ -21,6 +21,6 @@ Tasks:
     - `#Creator.CreateSlashCommands()`: submits the slash commands list to discord
 - `#ICommandHandlerService`: registers command modules and handles command events like:
   - *Command*: event responsible for every command type execution
-  - *SlashCommandExecuted*: invoked after command gets executed
-  - *ComponentCommandExecuted*: invoked after command gets executed
+  - *SlashCommandExecuted*: invoked after slash command gets executed
+  - *ComponentCommandExecuted*: invoked after component command gets executed
 - `#ITimedEventsService`: runs the timers for events execution 
