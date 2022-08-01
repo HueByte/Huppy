@@ -2,10 +2,10 @@ using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Huppy.Core.Common.Constants;
-using Huppy.Core.Entities;
 using Huppy.Core.IRepositories;
 using Huppy.Core.Services.HuppyCacheService;
-using Huppy.Core.Services.PaginatedEmbedService;
+using Huppy.Core.Services.PaginatorService;
+using Huppy.Core.Services.PaginatorService.Entities;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -18,13 +18,15 @@ namespace Huppy.App.Commands
         private readonly ICommandLogRepository _commandRepository;
         private readonly IServerRepository _serverRepository;
         private readonly CacheService _cacheService;
-        private readonly IPaginatorEmbedService _paginatorService;
-        public ServerCommands(ILogger<ServerCommands> logger, CacheService cacheService, ICommandLogRepository commandLogRepository, IServerRepository serverRepository, IPaginatorEmbedService paginatorService)
+        private readonly IServiceScopeFactory _scopeFactory;
+        private readonly IPaginatorService _paginatorService;
+        public ServerCommands(ILogger<ServerCommands> logger, CacheService cacheService, ICommandLogRepository commandLogRepository, IServerRepository serverRepository, IServiceScopeFactory scopeFactory, IPaginatorService paginatorService)
         {
             _logger = logger;
             _commandRepository = commandLogRepository;
             _cacheService = cacheService;
             _serverRepository = serverRepository;
+            _scopeFactory = scopeFactory;
             _paginatorService = paginatorService;
         }
 
@@ -32,74 +34,72 @@ namespace Huppy.App.Commands
         [RequireUserPermission(GuildPermission.ManageGuild)]
         public async Task GetServerInfo()
         {
-            PaginatorDynamicEntry entry = new()
+            DynamicPaginatorEntry entry = new(_scopeFactory)
             {
-                Name = "info",
-                DynamicPages = new()
+                CurrentPage = 0,
+                MessageId = 0,
+                Name = "Server info",
+                Pages = new(),
             };
 
-            PaginatorDynamicPage firstPage = new()
+            Func<AsyncServiceScope, Task<PaginatorPage>> page1 = async (scope) =>
             {
-                Name = "Main settings",
-                PageNumber = 0,
-                Embed = async (IServiceScopeFactory scopeFactory) =>
+                var serverRepository = scope.ServiceProvider.GetRequiredService<IServerRepository>();
+
+                var server = await serverRepository.GetOrCreateAsync(Context);
+
+                var embed = new EmbedBuilder().WithAuthor(Context.User)
+                          .WithColor(Color.DarkPurple)
+                          .WithTitle("Main settings")
+                          .WithThumbnailUrl(Context.Guild.IconUrl)
+                          .WithFooter("If you want to change server configuration use /configure");
+
+                embed.AddField("ID", server.ID, true);
+                embed.AddField("Server Name", Context.Guild.Name, true);
+                embed.AddField("User count", Context.Guild.MemberCount, true);
+                embed.AddField("News enabled", server.AreNewsEnabled, true);
+                embed.AddField("Use Greet", server.UseGreet, true);
+                embed.AddField("Greet message", string.IsNullOrEmpty(server.GreetMessage) ? "`empty`" : server.GreetMessage);
+
+                var defaultRole = Context.Guild.GetRole(server.RoleID);
+                if (defaultRole is not null)
+                    embed.AddField("Default role", defaultRole.Mention, true);
+
+                return new PaginatorPage()
                 {
-                    using var scope = scopeFactory.CreateAsyncScope();
-                    var serverRepository = scope.ServiceProvider.GetRequiredService<IServerRepository>();
-
-                    var server = await serverRepository.GetOrCreateAsync(Context);
-
-                    var embed = new EmbedBuilder().WithAuthor(Context.User)
-                              .WithColor(Color.DarkPurple)
-                              .WithTitle("Main settings")
-                              .WithThumbnailUrl(Context.Guild.IconUrl)
-                              .WithFooter("If you want to change server configuration use /configure");
-
-                    embed.AddField("ID", server.ID, true);
-                    embed.AddField("Server Name", Context.Guild.Name, true);
-                    embed.AddField("User count", Context.Guild.MemberCount, true);
-                    embed.AddField("News enabled", server.AreNewsEnabled, true);
-                    embed.AddField("Use Greet", server.UseGreet, true);
-                    embed.AddField("Greet message", string.IsNullOrEmpty(server.GreetMessage) ? "`empty`" : server.GreetMessage);
-                    
-                    var defaultRole = Context.Guild.GetRole(server.RoleID);
-                    if (defaultRole is not null)
-                        embed.AddField("Default role", defaultRole.Mention, true);
-
-                    return embed.Build();
-                }
+                    Embed = embed,
+                    Page = 0
+                };
             };
 
-            PaginatorDynamicPage secondPage = new()
+            Func<AsyncServiceScope, Task<PaginatorPage>> page2 = async (scope) =>
             {
-                Name = "Rooms Configuration",
-                PageNumber = 1,
-                Embed = async (IServiceScopeFactory scopeFactory) =>
+                var serverRepository = scope.ServiceProvider.GetRequiredService<IServerRepository>();
+
+                var server = await serverRepository.GetOrCreateAsync(Context);
+
+                var embed = new EmbedBuilder().WithAuthor(Context.User)
+                          .WithColor(Color.DarkPurple)
+                          .WithTitle("Rooms Configuration")
+                          .WithThumbnailUrl(Context.Guild.IconUrl)
+                          .WithFooter("If you want to change server configuration use /configure");
+
+                embed.AddField("Huppy output room", server.Rooms?.OutputRoom > 0 ? $"<#{server.Rooms?.OutputRoom}>" : $"<#{Context.Guild.DefaultChannel.Id}>", true);
+                embed.AddField("Greeting room", server.Rooms?.GreetingRoom > 0 ? $"<#{server.Rooms?.GreetingRoom}>" : $"<#{Context.Guild.DefaultChannel.Id}>", true);
+                embed.AddField("News room", server.Rooms?.NewsOutputRoom > 0 ? $"<#{server.Rooms?.NewsOutputRoom}>" : $"<#{Context.Guild.DefaultChannel.Id}>", true);
+                embed.AddField("Default room", $"<#{Context.Guild.DefaultChannel.Id}>");
+
+                return new PaginatorPage()
                 {
-                    using var scope = scopeFactory.CreateAsyncScope();
-                    var serverRepository = scope.ServiceProvider.GetRequiredService<IServerRepository>();
-
-                    var server = await serverRepository.GetOrCreateAsync(Context);
-
-                    var embed = new EmbedBuilder().WithAuthor(Context.User)
-                              .WithColor(Color.DarkPurple)
-                              .WithTitle("Rooms Configuration")
-                              .WithThumbnailUrl(Context.Guild.IconUrl)
-                              .WithFooter("If you want to change server configuration use /configure");
-
-                    embed.AddField("Huppy output room", server.Rooms?.OutputRoom > 0 ? $"<#{server.Rooms?.OutputRoom}>" : $"<#{Context.Guild.DefaultChannel.Id}>", true);
-                    embed.AddField("Greeting room", server.Rooms?.GreetingRoom > 0 ? $"<#{server.Rooms?.GreetingRoom}>" : $"<#{Context.Guild.DefaultChannel.Id}>", true);
-                    embed.AddField("News room", server.Rooms?.NewsOutputRoom > 0 ? $"<#{server.Rooms?.NewsOutputRoom}>" : $"<#{Context.Guild.DefaultChannel.Id}>", true);
-                    embed.AddField("Default room", $"<#{Context.Guild.DefaultChannel.Id}>");
-
-                    return embed.Build();
-                }
+                    Embed = embed,
+                    Page = 1
+                };
             };
 
-            entry.DynamicPages.Add(firstPage);
-            entry.DynamicPages.Add(secondPage);
+            entry.Pages.Add(page1);
+            entry.Pages.Add(page2);
 
-            await _paginatorService.SendDynamicPaginatedMessage(Context.Interaction, entry, 0);
+            await _paginatorService.SendPaginatedMessage(Context.Interaction, entry);
         }
 
         [SlashCommand("configure", "Configure Huppy for your server")]
