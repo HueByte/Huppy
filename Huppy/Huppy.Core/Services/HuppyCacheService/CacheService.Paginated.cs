@@ -1,4 +1,6 @@
+using System.Diagnostics;
 using Huppy.Core.Entities;
+using Huppy.Core.Services.PaginatorService.Entities;
 
 namespace Huppy.Core.Services.HuppyCacheService
 {
@@ -7,36 +9,30 @@ namespace Huppy.Core.Services.HuppyCacheService
         private int _maxCacheMessageSize;
 
         public void SetMaxMessageCacheSize(int size) => _maxCacheMessageSize = size;
-        public Task AddPaginatedMessage(ulong messageId, PaginatedMessageState message)
+        public Task AddPaginatedEntry(ulong messageId, IPaginatorEntry entry)
         {
-            if (message is null)
-                throw new Exception("Paginated message was empty");
+            if (entry is null)
+                throw new Exception("Paginator entry cannot be null");
 
-            if (PaginatedMessages.Count == _maxCacheMessageSize)
-                PaginatedMessages.RemoveAt(PaginatedMessages.Count - 1);
+            if (PaginatorEntries.Count >= _maxCacheMessageSize)
+                PaginatorEntries.RemoveAt(PaginatorEntries.Count - 1);
 
-            PaginatedMessages.Insert(0, messageId, message);
+            PaginatorEntries.Insert(0, messageId, entry);
 
             return Task.CompletedTask;
         }
 
-        public Task UpdatePaginatedMessage(ulong key, PaginatedMessageState message)
+        public Task UpdatePaginatorEntry(ulong messageId, IPaginatorEntry entry)
         {
-            if (PaginatedMessages.Contains(key))
-                PaginatedMessages[(object)key] = message;
+            if (PaginatorEntries.Contains(messageId))
+                PaginatorEntries[(object)messageId] = entry;
 
             return Task.CompletedTask;
         }
 
-        public Task<PaginatedMessageState?> GetPaginatedMessage(ulong key)
+        public Task<IPaginatorEntry> GetPaginatorEntry(ulong messageId)
         {
-            var result = (PaginatedMessageState?)PaginatedMessages[(object)key];
-            return Task.FromResult(result);
-        }
-
-        public Task<PaginatedMessageState?> GetPaginatedMessage(int index)
-        {
-            var result = PaginatedMessages[index] as PaginatedMessageState;
+            var result = (IPaginatorEntry)PaginatorEntries[(object)messageId]!;
             return Task.FromResult(result);
         }
     }

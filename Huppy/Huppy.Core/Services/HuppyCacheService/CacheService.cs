@@ -1,4 +1,3 @@
-using System.Collections.Concurrent;
 using System.Collections.Specialized;
 using Huppy.Core.Entities;
 using Huppy.Core.IRepositories;
@@ -9,13 +8,15 @@ namespace Huppy.Core.Services.HuppyCacheService
     public partial class CacheService
     {
         private readonly IServiceScopeFactory _serviceFactory;
+        private readonly AppSettings _appSettings;
         public Dictionary<ulong, string?> UserBasicData;
         public Dictionary<ulong, AiUser> UserAiUsage;
-        public OrderedDictionary PaginatedMessages;
+        public OrderedDictionary PaginatorEntries;
 
-        public CacheService(IServiceScopeFactory serviceScopeFactory)
+        public CacheService(IServiceScopeFactory serviceScopeFactory, AppSettings appSettings)
         {
             _serviceFactory = serviceScopeFactory;
+            _appSettings = appSettings;
         }
 
         public async Task Initialize()
@@ -23,11 +24,10 @@ namespace Huppy.Core.Services.HuppyCacheService
             using var scope = _serviceFactory.CreateAsyncScope();
             var _commandRepository = scope.ServiceProvider.GetRequiredService<ICommandLogRepository>();
             var _userRepository = scope.ServiceProvider.GetRequiredService<IUserRepository>();
-            var _appSettings = scope.ServiceProvider.GetRequiredService<AppSettings>();
 
             UserBasicData = new(await _userRepository.GetUsersForCacheAsync());
             UserAiUsage = new(await _commandRepository.GetAiUsage());
-            PaginatedMessages = new();
+            PaginatorEntries = new();
 
             // TODO: configurable in appsettings
             SetMaxMessageCacheSize(1000);
