@@ -1,8 +1,7 @@
-using System.Runtime.CompilerServices;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Huppy.Core.Services.HuppyCacheService;
-using Huppy.Core.Services.PaginatedEmbedService;
+using Huppy.Core.Services.PaginatorService;
 using Microsoft.Extensions.Logging;
 
 namespace Huppy.App.Commands
@@ -11,12 +10,13 @@ namespace Huppy.App.Commands
     {
         private readonly ILogger _logger;
         private readonly CacheService _cacheService;
-        private readonly IPaginatorEmbedService _paginatorService;
-        public ComponentInteractions(ILogger<ComponentInteractions> logger, CacheService cacheService, IPaginatorEmbedService paginatorService)
+        private readonly IPaginatorService _paginatorService;
+        public ComponentInteractions(ILogger<ComponentInteractions> logger, CacheService cacheService, IPaginatorService paginatorService)
         {
             _logger = logger;
             _cacheService = cacheService;
             _paginatorService = paginatorService;
+
         }
 
         [ComponentInteraction("page-left")]
@@ -35,12 +35,12 @@ namespace Huppy.App.Commands
         {
             var msg = Context.Interaction as SocketMessageComponent;
 
-            var cacheMessage = await _cacheService.GetPaginatedMessage(msg!.Message.Id);
+            var cachedPaginatedEntry = await _cacheService.GetPaginatorEntry(msg!.Message.Id);
 
-            if (cacheMessage is null)
+            if (cachedPaginatedEntry is null)
                 return;
 
-            await _paginatorService.UpdatePaginatedMessage(Context.Interaction, cacheMessage, cacheMessage.CurrentPage + value);
+            await _paginatorService.UpdatePaginatedMessage(Context.Interaction, cachedPaginatedEntry, cachedPaginatedEntry.CurrentPage + value);
         }
     }
 }

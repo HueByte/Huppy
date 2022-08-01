@@ -1,3 +1,4 @@
+using System.Net;
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
@@ -6,7 +7,7 @@ using Huppy.Core.Services.CommandService;
 using Huppy.Core.Services.EventService;
 using Huppy.Core.Services.HuppyCacheService;
 using Huppy.Core.Services.LoggerService;
-using Huppy.Core.Services.PaginatedEmbedService;
+using Huppy.Core.Services.PaginatorService;
 using Huppy.Core.Services.ServerInteractionService;
 using Huppy.Core.Services.TimedEventsService;
 using Huppy.Infrastructure;
@@ -30,7 +31,7 @@ namespace Huppy.App
         private readonly IServerInteractionService _serverInteractionService;
         private readonly ITimedEventsService _timedEventService;
         private readonly CacheService _cacheService;
-        private readonly IPaginatorEmbedService _paginatorService;
+        private readonly IPaginatorService _paginatorService;
         private readonly IEventService _eventService;
 
         public Creator(IServiceProvider serviceProvider)
@@ -46,8 +47,8 @@ namespace Huppy.App
             _serverInteractionService = _serviceProvider.GetRequiredService<IServerInteractionService>();
             _timedEventService = _serviceProvider.GetRequiredService<ITimedEventsService>();
             _cacheService = _serviceProvider.GetRequiredService<CacheService>();
-            _paginatorService = _serviceProvider.GetRequiredService<IPaginatorEmbedService>();
             _eventService = _serviceProvider.GetRequiredService<IEventService>();
+            _paginatorService = _serviceProvider.GetRequiredService<IPaginatorService>();
         }
 
         public async Task CreateDatabase()
@@ -63,7 +64,7 @@ namespace Huppy.App
         public async Task PopulateSingletons()
         {
             await _cacheService.Initialize();
-            await _paginatorService.Initialize();
+            _paginatorService.Initialize();
         }
 
         public Task CreateEvents()

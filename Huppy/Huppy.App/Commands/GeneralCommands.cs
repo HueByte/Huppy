@@ -8,7 +8,9 @@ using Huppy.Core.Entities;
 using Huppy.Core.IRepositories;
 using Huppy.Core.Services.HuppyCacheService;
 using Huppy.Core.Services.NewsService;
-using Huppy.Core.Services.PaginatedEmbedService;
+using Huppy.Core.Services.PaginatorService;
+using Huppy.Core.Services.PaginatorService.Entities;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Huppy.App.Commands
@@ -17,18 +19,20 @@ namespace Huppy.App.Commands
     {
         private readonly ILogger _logger;
         private readonly ICommandLogRepository _commandRepository;
+        private readonly IServiceScopeFactory _scopeFactory;
         private readonly CacheService _cacheService;
         private readonly INewsApiService _newsService;
         private readonly InteractionService _interactionService;
-        private readonly IPaginatorEmbedService _paginatorEmbedService;
-        public GeneralCommands(ILogger<GeneralCommands> logger, CacheService cacheService, ICommandLogRepository commandLogRepository, INewsApiService newsService, InteractionService interactionService, IPaginatorEmbedService paginatorEmbedService)
+        private readonly IPaginatorService _paginatorService;
+        public GeneralCommands(ILogger<GeneralCommands> logger, CacheService cacheService, ICommandLogRepository commandLogRepository, INewsApiService newsService, InteractionService interactionService, IPaginatorService paginatorService, IServiceScopeFactory scopeFactory)
         {
             _logger = logger;
             _commandRepository = commandLogRepository;
             _cacheService = cacheService;
             _newsService = newsService;
             _interactionService = interactionService;
-            _paginatorEmbedService = paginatorEmbedService;
+            _paginatorService = paginatorService;
+            _scopeFactory = scopeFactory;
         }
 
         [SlashCommand("ping", "return pong")]
@@ -77,16 +81,23 @@ namespace Huppy.App.Commands
         }
 
         [SlashCommand("help", "Display help information")]
-        public async Task PaginatorTestNew()
+        public async Task Help()
         {
-            // Get static paginated entry by name 
-            var help = _paginatorEmbedService.GetStaticPaginatorEntries()
-                                             .FirstOrDefault(e => e.Name == PaginatorEntriesNames.Help);
+            var pageNames = _paginatorService.GetStaticEmbedsNames(StaticEmbeds.Help.ToString());
+            if (pageNames is null)
+            {
+                throw new Exception("Couldn't find contents of help");
+            }
 
-            if (help is null)
-                throw new Exception("Didn't find contents of help");
+            StaticPaginatorEntry help = new(_scopeFactory)
+            {
+                CurrentPage = 0,
+                MessageId = 0,
+                Name = StaticEmbeds.Help.ToString(),
+                Pages = pageNames!
+            };
 
-            await _paginatorEmbedService.SendStaticPaginatedMessage(Context.Interaction, help, 0);
+            await _paginatorService.SendPaginatedMessage(Context.Interaction, help);
         }
     }
 }

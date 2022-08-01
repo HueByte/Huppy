@@ -1,33 +1,35 @@
 using Discord;
 using Discord.Interactions;
 using Huppy.Core.Common.Constants;
-using Huppy.Core.Entities;
+using Huppy.Core.Services.PaginatorService.Entities;
 
-namespace Huppy.Core.Services.PaginatedEmbedService
+namespace Huppy.Core.Services.PaginatorService
 {
-    public class StaticPaginatedEntriesBuilder
+    public enum StaticEmbeds
+    {
+        Help
+    }
+
+    public class BuildStaticEmbeds
     {
         private readonly InteractionService _interactionService;
-        public StaticPaginatedEntriesBuilder(InteractionService interactionService)
+        private readonly Dictionary<string, List<PaginatorPage>> pages = new();
+        public BuildStaticEmbeds(InteractionService interactionService)
         {
             _interactionService = interactionService;
         }
 
-        public List<PaginatorEntry> Build()
+        public Dictionary<string, List<PaginatorPage>> GetStaticEmbeds()
         {
-            List<PaginatorEntry> entries = new();
-            entries.Add(BuildHelp());
+            // add static embeds builders here
+            pages.TryAdd(StaticEmbeds.Help.ToString(), BuildHelp());
 
-            return entries;
+            return pages;
         }
 
-        private PaginatorEntry BuildHelp()
+        private List<PaginatorPage> BuildHelp()
         {
-            PaginatorEntry entry = new()
-            {
-                Name = PaginatorEntriesNames.Help,
-                Pages = new()
-            };
+            List<PaginatorPage> helpEmbeds = new();
 
             var commandGroups = _interactionService.Modules.OrderBy(e => e.SlashCommands.Count)
                                                            .ToList();
@@ -40,8 +42,7 @@ namespace Huppy.Core.Services.PaginatedEmbedService
 
                 var embed = new EmbedBuilder().WithTitle(group.SlashGroupName)
                                               .WithColor(Color.Teal)
-                                              .WithThumbnailUrl(Icons.Huppy1)
-                                              .WithFooter($"Page {pageNumber + 1}/{commandGroups.Where(e => e.SlashCommands.Count > 0).Count()}");
+                                              .WithThumbnailUrl(Icons.Huppy1);
 
                 foreach (var command in group.SlashCommands)
                 {
@@ -50,16 +51,16 @@ namespace Huppy.Core.Services.PaginatedEmbedService
 
                 PaginatorPage page = new()
                 {
-                    Name = group.Name,
-                    PageNumber = (byte)pageNumber,
-                    Embed = embed.Build()
+                    Name = $"Help{pageNumber}",
+                    Page = (byte)pageNumber,
+                    Embed = embed
                 };
 
-                entry.Pages.Add(page);
+                helpEmbeds.Add(page);
                 pageNumber++;
             }
 
-            return entry;
+            return helpEmbeds;
         }
     }
 }
