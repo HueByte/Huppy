@@ -6,7 +6,6 @@ namespace Huppy.Core.Services.PaginatorService
 {
     public interface IPaginatorService
     {
-        void Initialize();
         List<PaginatorPage>? GetStaticEmbeds(string name);
         List<string?>? GetStaticEmbedsNames(string name);
         Task RegisterStaticEmbeds(Dictionary<string, List<PaginatorPage>> embeds);

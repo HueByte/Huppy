@@ -64,7 +64,9 @@ namespace Huppy.App
         public async Task PopulateSingletons()
         {
             await _cacheService.Initialize();
-            _paginatorService.Initialize();
+
+            BuildStaticEmbeds embedsBuilder = new(_interactionService);
+            await _paginatorService.RegisterStaticEmbeds(embedsBuilder.GetStaticEmbeds());
         }
 
         public Task CreateEvents()

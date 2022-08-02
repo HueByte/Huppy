@@ -23,27 +23,21 @@ namespace Huppy.Core.Services.PaginatorService
             _interactionService = interactionService;
         }
 
-        public void Initialize()
-        {
-            BuildStaticEmbeds embedsBuilder = new(_interactionService);
-            RegisterStaticEmbeds(embedsBuilder.GetStaticEmbeds());
-        }
-
         public Task RegisterStaticEmbeds(Dictionary<string, List<PaginatorPage>> embeds)
         {
             _staticEmbeds = new(embeds);
             return Task.CompletedTask;
         }
 
-        public List<PaginatorPage>? GetStaticEmbeds(string name)
+        public List<PaginatorPage>? GetStaticEmbeds(string keyName)
         {
-            _staticEmbeds.TryGetValue(name, out List<PaginatorPage>? result);
+            _staticEmbeds.TryGetValue(keyName, out List<PaginatorPage>? result);
             return result;
         }
 
-        public List<string?>? GetStaticEmbedsNames(string name)
+        public List<string?>? GetStaticEmbedsNames(string keyName)
         {
-            _staticEmbeds.TryGetValue(name, out var result);
+            _staticEmbeds.TryGetValue(keyName, out var result);
             return result?.Select(e => e.Name).ToList();
         }
 

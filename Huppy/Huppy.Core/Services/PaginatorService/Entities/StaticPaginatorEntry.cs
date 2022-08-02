@@ -27,11 +27,14 @@ namespace Huppy.Core.Services.PaginatorService.Entities
             // Fetch page content from registered static embeds in PaginatorService
             var scope = _serviceScopeFactory.CreateAsyncScope();
             var paginatorService = scope.ServiceProvider.GetService<IPaginatorService>();
+
+            // fetch list of static embeds by key name
             var staticEmbeds = paginatorService?.GetStaticEmbeds(Name);
 
             if (staticEmbeds is null)
                 throw new Exception($"Couldn't find static embed named {Name}");
 
+            // match page name with static embed page name
             var result = staticEmbeds.FirstOrDefault(embed => embed.Name == Pages[page]);
 
             if (result is null)
