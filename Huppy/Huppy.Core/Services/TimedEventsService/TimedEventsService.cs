@@ -6,45 +6,45 @@ using Microsoft.Extensions.Logging;
 
 namespace Huppy.Core.Services.TimedEventsService
 {
-    // TODO to remove
     public class TimedEventsService : ITimedEventsService
     {
         private readonly ILogger _logger;
         private readonly IServiceScopeFactory _scopeFactory;
-        private readonly List<Timer> _timers;
+        private readonly Dictionary<Guid, Timer> _timers;
         private readonly AppSettings _settings;
+        private record TimerJob(Func<AsyncServiceScope, Task?> Job, TimeSpan DueTime, TimeSpan Period) { };
+        private readonly List<TimerJob> _workers;
         public TimedEventsService(ILogger<TimedEventsService> logger, IServiceScopeFactory scopeFactory, AppSettings settings)
         {
             _logger = logger;
             _scopeFactory = scopeFactory;
             _settings = settings;
             _timers = new();
+            _workers = new();
         }
 
         public Task StartTimers()
         {
             _logger.LogInformation("Starting Timed Events");
-            NewsEvent();
-            return Task.CompletedTask;
-        }
-
-        private Task NewsEvent()
-        {
-            if (_settings.NewsAPI!.IsEnabled)
+            foreach (var worker in _workers)
             {
-                double frequency = _settings.NewsAPI!.Frequency ?? 180;
-                var looper = TimeSpan.FromMinutes(frequency);
-
-                _timers.Add(new Timer(async (e) =>
+                var guid = Guid.NewGuid();
+                _timers.Add(guid, new Timer(async (e) =>
                 {
                     using var scope = _scopeFactory.CreateAsyncScope();
-                    var _newsService = scope.ServiceProvider.GetRequiredService<INewsApiService>();
-                    await _newsService.PostNews();
-                }, null, new TimeSpan(0), looper));
+                    await worker.Job.Invoke(scope)!;
+                }, null, worker.DueTime, worker.Period));
 
+                _logger.LogInformation("Started job: [{id}] [{dueTime}] [{period}]", guid, worker.DueTime, worker.Period);
             }
 
             return Task.CompletedTask;
+        }
+
+        public void AddJob(Func<AsyncServiceScope, Task?> task, TimeSpan dueTime, TimeSpan period)
+        {
+            TimerJob job = new(task, dueTime, period);
+            _workers.Add(job);
         }
     }
 }
