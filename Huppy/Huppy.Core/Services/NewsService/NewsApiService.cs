@@ -9,6 +9,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Huppy.Core.Services.NewsService
 {
+    /// <summary>
+    /// No Longer supported
+    /// </summary>
     public class NewsApiService : INewsApiService
     {
         private readonly ILogger _logger;
