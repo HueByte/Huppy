@@ -5,6 +5,7 @@ using Discord.WebSocket;
 using Huppy.Core.Common.Constants;
 using Huppy.Core.Dto;
 using Huppy.Core.IRepositories;
+using Huppy.Core.Models;
 using Microsoft.Extensions.Logging;
 
 namespace Huppy.Core.Services.NewsService
@@ -53,7 +54,8 @@ namespace Huppy.Core.Services.NewsService
         {
             try
             {
-                var servers = (await _serverRepository.GetAll()).Where(en => en.AreNewsEnabled);
+                // var servers = (await _serverRepository.GetAll()).Where(en => en.AreNewsEnabled);
+                List<Server> servers = new();
                 if (servers.Any())
                 {
                     var news = (await GetNews()).Articles!.Take(5);

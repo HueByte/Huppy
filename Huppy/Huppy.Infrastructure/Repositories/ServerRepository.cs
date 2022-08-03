@@ -42,7 +42,6 @@ namespace Huppy.Infrastructure.Repositories
                 UseGreet = false,
                 ServerName = DiscordContext.Guild.Name,
                 RoleID = 0,
-                AreNewsEnabled = false
             };
 
             await _context.Servers.AddAsync(server);
@@ -83,7 +82,6 @@ namespace Huppy.Infrastructure.Repositories
                 ServerName = DiscordContext.Guild.Name,
                 RoleID = 0,
                 UseGreet = false,
-                AreNewsEnabled = false,
             };
 
             await _context.Servers.AddAsync(server);

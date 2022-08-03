@@ -57,7 +57,6 @@ namespace Huppy.App.Commands
                 embed.AddField("ID", server.ID, true);
                 embed.AddField("Server Name", Context.Guild.Name, true);
                 embed.AddField("User count", Context.Guild.MemberCount, true);
-                embed.AddField("News enabled", server.AreNewsEnabled, true);
                 embed.AddField("Use Greet", server.UseGreet, true);
                 embed.AddField("Greet message", string.IsNullOrEmpty(server.GreetMessage) ? "`empty`" : server.GreetMessage);
 
@@ -108,9 +107,6 @@ namespace Huppy.App.Commands
             var server = await _serverRepository.GetOrCreateAsync(Context);
 
             server.ServerName = Context.Guild.Name;
-
-            if (EnableNews is not null)
-                server.AreNewsEnabled = (bool)EnableNews;
 
             if (UseGreet is not null)
                 server.UseGreet = (bool)UseGreet;

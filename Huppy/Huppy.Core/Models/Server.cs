@@ -10,7 +10,6 @@ namespace Huppy.Core.Models
         public string? ServerName { get; set; }
         public bool UseGreet { get; set; }
         public string? GreetMessage { get; set; }
-        public bool AreNewsEnabled { get; set; }
         public ulong RoleID { get; set; }
 
         [ForeignKey("ServerRoomsId")]
