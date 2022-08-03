@@ -1,4 +1,3 @@
-using System.Net;
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;

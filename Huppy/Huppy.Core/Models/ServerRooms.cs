@@ -10,7 +10,6 @@ namespace Huppy.Core.Models
         [Key]
         public ulong ServerRoomsID { get; set; }
         public ulong OutputRoom { get; set; }
-        public ulong NewsOutputRoom { get; set; }
         public ulong GreetingRoom { get; set; }
 
         [ForeignKey("ServerId")]

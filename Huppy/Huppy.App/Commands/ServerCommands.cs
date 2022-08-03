@@ -86,7 +86,6 @@ namespace Huppy.App.Commands
 
                 embed.AddField("Huppy output room", server.Rooms?.OutputRoom > 0 ? $"<#{server.Rooms?.OutputRoom}>" : $"<#{Context.Guild.DefaultChannel.Id}>", true);
                 embed.AddField("Greeting room", server.Rooms?.GreetingRoom > 0 ? $"<#{server.Rooms?.GreetingRoom}>" : $"<#{Context.Guild.DefaultChannel.Id}>", true);
-                embed.AddField("News room", server.Rooms?.NewsOutputRoom > 0 ? $"<#{server.Rooms?.NewsOutputRoom}>" : $"<#{Context.Guild.DefaultChannel.Id}>", true);
                 embed.AddField("Default room", $"<#{Context.Guild.DefaultChannel.Id}>");
 
                 return new PaginatorPage()
@@ -124,9 +123,6 @@ namespace Huppy.App.Commands
 
             if (server.Rooms is not null)
             {
-                if (NewsRoom is not null)
-                    server.Rooms.NewsOutputRoom = NewsRoom.Id;
-
                 if (HuppyRoom is not null)
                     server.Rooms.OutputRoom = HuppyRoom.Id;
 

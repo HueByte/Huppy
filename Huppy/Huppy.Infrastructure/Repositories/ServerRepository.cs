@@ -37,7 +37,6 @@ namespace Huppy.Infrastructure.Repositories
                 Rooms = new()
                 {
                     OutputRoom = DiscordContext.Guild.DefaultChannel.Id,
-                    NewsOutputRoom = 0,
                     GreetingRoom = 0
                 },
                 UseGreet = false,
@@ -62,7 +61,6 @@ namespace Huppy.Infrastructure.Repositories
                     server.Rooms = new()
                     {
                         OutputRoom = DiscordContext.Guild.DefaultChannel.Id,
-                        NewsOutputRoom = default,
                         GreetingRoom = default
                     };
 
@@ -80,7 +78,6 @@ namespace Huppy.Infrastructure.Repositories
                 Rooms = new()
                 {
                     OutputRoom = DiscordContext.Guild.DefaultChannel.Id,
-                    NewsOutputRoom = 0,
                     GreetingRoom = 0
                 },
                 ServerName = DiscordContext.Guild.Name,
