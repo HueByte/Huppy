@@ -23,9 +23,19 @@ namespace Huppy.Core.Services.PaginatorService
             _interactionService = interactionService;
         }
 
+        public void AddStaticEmbed(string key, List<PaginatorPage> pages)
+        {
+            _staticEmbeds.TryAdd(key, pages);
+        }
+
         public Task RegisterStaticEmbeds(Dictionary<string, List<PaginatorPage>> embeds)
         {
             _staticEmbeds = new(embeds);
+            foreach ((var key, var pages) in _staticEmbeds)
+            {
+                _logger.LogInformation("Static Embed Registered: [{key}] - [{pages}]", key, string.Join(", ", pages.Select(e => e.Name)));
+            }
+
             return Task.CompletedTask;
         }
 

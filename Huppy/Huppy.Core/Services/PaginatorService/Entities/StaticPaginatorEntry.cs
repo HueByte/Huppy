@@ -9,7 +9,7 @@ namespace Huppy.Core.Services.PaginatorService.Entities
         public ulong MessageId { get; set; }
         public string Name { get; set; }
         public ushort CurrentPage { get; set; }
-        public List<string> Pages { get; set; } = new();
+        public List<string> PageNames { get; set; } = new();
         private readonly IServiceScopeFactory _serviceScopeFactory;
         public StaticPaginatorEntry(IServiceScopeFactory scopeFactory)
         {
@@ -18,10 +18,10 @@ namespace Huppy.Core.Services.PaginatorService.Entities
 
         public Task<EmbedBuilder?>? GetPageContent(int page)
         {
-            if (page < 0 || page >= Pages.Count)
+            if (page < 0 || page >= PageNames.Count)
                 return Task.FromResult<EmbedBuilder?>(default);
 
-            if (string.IsNullOrEmpty(Pages[page]))
+            if (string.IsNullOrEmpty(PageNames[page]))
                 throw new Exception("Page selected doesn't exist");
 
             // Fetch page content from registered static embeds in PaginatorService
@@ -34,15 +34,15 @@ namespace Huppy.Core.Services.PaginatorService.Entities
             if (staticEmbeds is null)
                 throw new Exception($"Couldn't find static embed named {Name}");
 
-            // match page name with static embed page name
-            var result = staticEmbeds.FirstOrDefault(embed => embed.Name == Pages[page]);
+            // Get static embed page from store by name
+            var result = staticEmbeds.FirstOrDefault(embed => embed.Name == PageNames[page]);
 
             if (result is null)
-                throw new Exception($"Couldn't find static page named {Pages[page]}");
+                throw new Exception($"Couldn't find static page named {PageNames[page]}");
 
             return Task.FromResult(result.Embed)!;
         }
 
-        public int GetPageCount() => Pages.Count;
+        public int GetPageCount() => PageNames.Count;
     }
 }
