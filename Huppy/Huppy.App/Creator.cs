@@ -53,16 +53,19 @@ namespace Huppy.App
 
         public async Task CreateDatabase()
         {
+            _logger.LogInformation("Verifying database");
             await _dbContext.Database.MigrateAsync();
         }
 
         public async Task CreateCommands()
         {
+            _logger.LogInformation("Registering command modules");
             await _serviceProvider.GetRequiredService<ICommandHandlerService>().InitializeAsync();
         }
 
         public async Task PopulateSingletons()
         {
+            _logger.LogInformation("Populating singletons");
             await _cacheService.Initialize();
 
             BuildStaticEmbeds embedsBuilder = new(_interactionService);
@@ -107,6 +110,8 @@ namespace Huppy.App
 
         public async Task StartTimedEvents(DiscordSocketClient socketClient)
         {
+            _logger.LogInformation("Starting timed events");
+
             await _timedEventService.StartTimers();
             _eventService.Initialize();
         }

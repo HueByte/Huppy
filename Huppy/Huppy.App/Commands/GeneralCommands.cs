@@ -94,7 +94,7 @@ namespace Huppy.App.Commands
                 CurrentPage = 0,
                 MessageId = 0,
                 Name = StaticEmbeds.Help.ToString(),
-                Pages = pageNames!
+                PageNames = pageNames!
             };
 
             await _paginatorService.SendPaginatedMessage(Context.Interaction, help);
