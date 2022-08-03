@@ -67,32 +67,38 @@ namespace Huppy.Core.Services.CommandService
                 switch (result.Error)
                 {
                     case InteractionCommandError.UnmetPrecondition:
-                        embed.WithTitle($"Unmet Precondition: {result.ErrorReason}");
+                        embed.WithTitle("Unmet Precondition");
+                        embed.WithDescription(result.ErrorReason);
                         await context.Interaction.ModifyOriginalResponseAsync((msg) => msg.Embed = embed.Build());
                         break;
 
                     case InteractionCommandError.UnknownCommand:
                         embed.WithTitle("Unknown command");
+                        embed.WithDescription(result.ErrorReason);
                         await context.Interaction.ModifyOriginalResponseAsync((msg) => msg.Embed = embed.Build());
                         break;
 
                     case InteractionCommandError.BadArgs:
                         embed.WithTitle($"Invalid number or arguments");
+                        embed.WithDescription(result.ErrorReason);
                         await context.Interaction.ModifyOriginalResponseAsync((msg) => msg.Embed = embed.Build());
                         break;
 
                     case InteractionCommandError.Exception:
-                        embed.WithTitle($"Command exception:{result.ErrorReason}");
+                        embed.WithTitle("Command exception");
+                        embed.WithDescription(result.ErrorReason);
                         await context.Interaction.ModifyOriginalResponseAsync((msg) => msg.Embed = embed.Build());
                         break;
 
                     case InteractionCommandError.Unsuccessful:
                         embed.WithTitle("Command could not be executed");
+                        embed.WithDescription(result.ErrorReason);
                         await context.Interaction.ModifyOriginalResponseAsync((msg) => msg.Embed = embed.Build());
                         break;
 
                     default:
                         embed.WithTitle("Something went wrong");
+                        embed.WithDescription(result.ErrorReason);
                         await context.Interaction.ModifyOriginalResponseAsync((msg) => msg.Embed = embed.Build());
                         break;
                 }
