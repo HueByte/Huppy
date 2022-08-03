@@ -88,7 +88,7 @@ namespace Huppy.App
             // command events
             _client.InteractionCreated += _commandHandler.HandleCommandAsync;
             _interactionService.SlashCommandExecuted += _commandHandler.SlashCommandExecuted;
-            _client.ButtonExecuted += _commandHandler.ComponentHandler;
+            _client.ButtonExecuted += _commandHandler.ComponentExecuted;
 
             // logger events
             _client.Log += _loggingService.OnLogAsync;

@@ -107,6 +107,7 @@ namespace Huppy.Core.Services.CommandService
 
             await command.DeferAsync();
 
+            // cache keeps all user IDs existing in database, if user is not present, he shall be added
             if (!_cacheService.UserBasicData.ContainsKey(command.User.Id))
             {
                 _logger.LogInformation("Adding new user [{Username}] to database", command.User.Username);
@@ -134,12 +135,12 @@ namespace Huppy.Core.Services.CommandService
             }
         }
 
-        public async Task ComponentHandler(SocketMessageComponent component)
+        public async Task ComponentExecuted(SocketMessageComponent component)
         {
             using var scope = _serviceFactory.CreateAsyncScope();
             var _commandRepository = scope.ServiceProvider.GetRequiredService<ICommandLogRepository>();
 
-            _logger.LogInformation("component [{dataid}] used by [{username}]}", component.Data.CustomId, component.User.Username);
+            _logger.LogInformation("component [{dataid}] used by [{username}]", component.Data.CustomId, component.User.Username);
             CommandLog log = new()
             {
                 CommandName = component.Data.CustomId,
