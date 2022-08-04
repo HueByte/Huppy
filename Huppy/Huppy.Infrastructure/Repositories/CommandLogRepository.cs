@@ -40,7 +40,6 @@ namespace Huppy.Infrastructure.Repositories
             Dictionary<ulong, AiUser> result = new();
 
             var commandLogs = await _context.CommandLogs?.Include(e => e.User)
-                                                         .Where(x => x.Date!.Value.Month == DateTime.UtcNow.Month && x.CommandName == "chat")
                                                          .ToListAsync()!;
 
             var uniqueUsers = commandLogs.GroupBy(e => e.UserId)
@@ -52,7 +51,8 @@ namespace Huppy.Infrastructure.Repositories
                 result.TryAdd(user.UserId, new AiUser
                 {
                     Username = user.User!.Username,
-                    Count = commandLogs.Where(x => x.UserId == user.UserId).Count()
+                    Count = commandLogs.Where(x => x.UserId == user.UserId)
+                                       .Count()
                 });
             }
 

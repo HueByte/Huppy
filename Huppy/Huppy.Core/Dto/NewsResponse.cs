@@ -2,7 +2,9 @@ using System.Text.Json.Serialization;
 
 namespace Huppy.Core.Dto
 {
-    // Root myDeserializedClass = JsonSerializer.Deserialize<Root>(myJsonResponse);
+    /// <summary>
+    /// No longer supported
+    /// </summary>
     public class Source
     {
         [JsonPropertyName("id")]
