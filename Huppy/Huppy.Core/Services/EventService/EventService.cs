@@ -8,8 +8,6 @@ namespace Huppy.Core.Services.EventService
     public class EventService : IEventService
     {
         private readonly ILogger _logger;
-        public readonly Dictionary<ulong, List<string>> timeEvents = new();
-        public readonly Dictionary<string, Func<TimedEvent>> eventExecutables = new();
 
         // TODO: Remove
         public readonly Dictionary<ulong, List<TimedEvent>> events = new();
@@ -81,7 +79,7 @@ namespace Huppy.Core.Services.EventService
 
                 if (events.TryAdd(targetTime, actions))
                 {
-                    _logger.LogDebug("Added {count} events {date}", actions.Count, time);
+                    _logger.LogDebug("Added {count} events {date} UTC", actions.Count, time);
                 }
             }
         }
@@ -163,7 +161,7 @@ namespace Huppy.Core.Services.EventService
         {
             try
             {
-                var targetTime = GetTargetTime(DateTime.Now);
+                var targetTime = GetTargetTime(DateTime.UtcNow);
 
                 // TODO: find better solution
                 var executionEvents = events.Where(e => e.Key < targetTime);
@@ -196,9 +194,9 @@ namespace Huppy.Core.Services.EventService
             return Task.CompletedTask;
         }
 
-        private ulong GetTargetTime(DateTime time)
+        private static ulong GetTargetTime(DateTime time)
         {
-            return (ulong)(DateTime.Now.Ticks / TICKS_PER_SECOND);
+            return (ulong)(time.Ticks / TICKS_PER_SECOND);
         }
     }
 }
