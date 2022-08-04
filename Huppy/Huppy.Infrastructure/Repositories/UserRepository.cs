@@ -14,6 +14,9 @@ namespace Huppy.Infrastructure.Repositories
 
         public async Task AddAsync(User user)
         {
+            var doesExist = await _context.Users.AnyAsync(e => e.Id == user.Id);
+            if (doesExist) return;
+
             await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
         }
