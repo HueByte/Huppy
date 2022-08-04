@@ -11,6 +11,7 @@ using Huppy.Core.Services.HuppyCacheService;
 using Huppy.Core.Services.LoggerService;
 using Huppy.Core.Services.NewsService;
 using Huppy.Core.Services.PaginatorService;
+using Huppy.Core.Services.ReminderService;
 using Huppy.Core.Services.ServerInteractionService;
 using Huppy.Core.Services.TimedEventsService;
 using Huppy.Core.Services.UrbanService;
@@ -91,6 +92,7 @@ namespace Huppy.App.Configuration
             _services.AddScoped<IUserRepository, UserRepository>();
             _services.AddScoped<IServerRepository, ServerRepository>();
             _services.AddScoped<ICommandLogRepository, CommandLogRepository>();
+            _services.AddScoped<IReminderService, ReminderService>();
 
             return this;
         }
