@@ -21,7 +21,7 @@ namespace Huppy.App.Commands
         [Ephemeral]
         public async Task RemindMe(DateTime date, string message)
         {
-            _reminderService.AddReminder(date, Context.User, message);
+            await _reminderService.AddReminder(date, Context.User, message);
             var embed = new EmbedBuilder().WithTitle("RemindMe result")
                                           .WithDescription($"Successfully created reminder at {TimestampTag.FromDateTime(date)}")
                                           .WithColor(Color.Teal)
@@ -38,7 +38,7 @@ namespace Huppy.App.Commands
         public async Task RemindMe(TimeSpan time, string message)
         {
             DateTime date = DateTime.UtcNow + time;
-            _reminderService.AddReminder(date, Context.User, message);
+            await _reminderService.AddReminder(date, Context.User, message);
 
             var embed = new EmbedBuilder().WithTitle("RemindMe result")
                                           .WithDescription($"Successfully created reminder at {TimestampTag.FromDateTime(date)}")

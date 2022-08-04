@@ -7,6 +7,7 @@ using Huppy.Core.Services.EventService;
 using Huppy.Core.Services.HuppyCacheService;
 using Huppy.Core.Services.LoggerService;
 using Huppy.Core.Services.PaginatorService;
+using Huppy.Core.Services.ReminderService;
 using Huppy.Core.Services.ServerInteractionService;
 using Huppy.Core.Services.TimedEventsService;
 using Huppy.Infrastructure;
@@ -32,6 +33,7 @@ namespace Huppy.App
         private readonly CacheService _cacheService;
         private readonly IPaginatorService _paginatorService;
         private readonly IEventService _eventService;
+        private readonly IReminderService _reminderService;
 
         public Creator(IServiceProvider serviceProvider)
         {
@@ -48,6 +50,7 @@ namespace Huppy.App
             _cacheService = _serviceProvider.GetRequiredService<CacheService>();
             _eventService = _serviceProvider.GetRequiredService<IEventService>();
             _paginatorService = _serviceProvider.GetRequiredService<IPaginatorService>();
+            _reminderService = _serviceProvider.GetRequiredService<IReminderService>();
         }
 
         public async Task CreateDatabase()
@@ -113,6 +116,11 @@ namespace Huppy.App
 
             await _timedEventService.StartTimers();
             _eventService.Initialize();
+        }
+
+        public async Task CreateReminders()
+        {
+            await _reminderService.Initialize();
         }
 
         private async Task CreateSlashCommands(DiscordSocketClient socketClient)

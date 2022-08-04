@@ -34,6 +34,9 @@ await bot.PopulateSingletons();
 
 await bot.CreateEvents();
 
+// to fix
+// await bot.CreateReminders();
+
 await bot.CreateBot();
 
 await Task.Delay(-1);
