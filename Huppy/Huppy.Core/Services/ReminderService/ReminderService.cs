@@ -76,6 +76,7 @@ namespace Huppy.Core.Services.ReminderService
 
             ReminderInput reminderInput = new(user, message);
 
+            _logger.LogInformation("Added reminder for [{user}] at [{date}] UTC", user.Username, reminder.RemindDate);
             await _eventService.AddEvent(date, resultId.ToString()!, reminderInput, async (input) =>
             {
                 if (input is ReminderInput data)

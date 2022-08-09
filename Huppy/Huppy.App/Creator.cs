@@ -33,7 +33,7 @@ namespace Huppy.App
         private readonly IPaginatorService _paginatorService;
         private readonly IEventService _eventService;
         private readonly IReminderService _reminderService;
-        private bool isInitialized = false;
+        private bool isBotInitialized = false;
 
         public Creator(IServiceProvider serviceProvider)
         {
@@ -67,7 +67,7 @@ namespace Huppy.App
 
         public async Task PopulateSingletons()
         {
-            if (isInitialized) return;
+            if (isBotInitialized) return;
 
             _logger.LogInformation("Populating singletons");
             await _cacheService.Initialize();
@@ -82,9 +82,8 @@ namespace Huppy.App
 
             // shard events
             _client.ShardReady += CreateSlashCommands;
-            _client.ShardReady += StartTimedEvents;
             _client.ShardReady += _loggingService.OnReadyAsync;
-            _client.ShardReady += CreateReminders;
+            _client.ShardReady += OnShardFirstReady;
 
             // interaction event
             _client.UserJoined += _serverInteractionService.OnUserJoined;
@@ -105,6 +104,16 @@ namespace Huppy.App
             return Task.CompletedTask;
         }
 
+        public async Task OnShardFirstReady(DiscordSocketClient client)
+        {
+            if (isBotInitialized) return;
+
+            await StartTimedEvents();
+            await CreateReminders();
+
+            isBotInitialized = true;
+        }
+
         public async Task CreateBot()
         {
             _logger.LogInformation("Starting the bot");
@@ -114,13 +123,11 @@ namespace Huppy.App
             await _client.StartAsync();
 
             await _client.SetGameAsync("Hello World!", null, Discord.ActivityType.Playing);
-
-            isInitialized = true;
         }
 
-        public async Task StartTimedEvents(DiscordSocketClient socketClient)
+        public async Task StartTimedEvents()
         {
-            if (isInitialized) return;
+            if (isBotInitialized) return;
 
             _logger.LogInformation("Starting timed events");
 
@@ -128,9 +135,9 @@ namespace Huppy.App
             _eventService.Initialize();
         }
 
-        public async Task CreateReminders(DiscordSocketClient client)
+        public async Task CreateReminders()
         {
-            if (isInitialized) return;
+            if (isBotInitialized) return;
 
             _logger.LogInformation("Initializing reminder service");
 
