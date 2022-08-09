@@ -6,9 +6,9 @@ namespace Huppy.Core.Services.EventService
     public record Event(object? Data, string Name, Func<object?, Task> Task);
     public class EventService : IEventService
     {
+        public event Func<string[], Task> OnEventsRemoved;
         private readonly ILogger _logger;
         public readonly ConcurrentDictionary<ulong, List<Event>> jobs = new();
-        public event Func<string[], Task> OnEventsRemoved;
         private readonly SemaphoreSlim _semiphore = new(4);
         private Timer? _timer;
         private DateTime _startDate;
