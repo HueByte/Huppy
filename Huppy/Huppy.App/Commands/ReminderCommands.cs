@@ -68,8 +68,10 @@ namespace Huppy.App.Commands
                 MessageId = 0,
                 CurrentPage = 0,
                 Name = "User reminders",
-                Pages = new()
+                Pages = new(),
+                Data = null
             };
+
             List<Func<AsyncServiceScope, Task<PaginatorPage>>> PageHandlerSelectedContext = new();
 
             var reminders = await _reminderService.GetUserRemindersAsync(Context.User.Id);
