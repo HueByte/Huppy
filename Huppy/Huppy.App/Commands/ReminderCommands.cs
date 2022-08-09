@@ -35,16 +35,7 @@ namespace Huppy.App.Commands
         [Ephemeral]
         public async Task RemindMe(DateTime date, string message)
         {
-            await _reminderService.AddReminder(date, Context.User, message);
-            var embed = new EmbedBuilder().WithTitle("RemindMe result")
-                                          .WithDescription($"Successfully created reminder at {TimestampTag.FromDateTime(date)}")
-                                          .WithColor(Color.Teal)
-                                          .Build();
-
-            await ModifyOriginalResponseAsync((msg) =>
-            {
-                msg.Embed = embed;
-            });
+            await AddRemindMe(date.ToUniversalTime(), message);
         }
 
         [SlashCommand("time", "Add reminder by time")]
@@ -52,12 +43,31 @@ namespace Huppy.App.Commands
         public async Task RemindMe(TimeSpan time, string message)
         {
             DateTime date = DateTime.UtcNow + time;
-            await _reminderService.AddReminder(date, Context.User, message);
+            await AddRemindMe(date, message);
+        }
 
-            var embed = new EmbedBuilder().WithTitle("RemindMe result")
-                                          .WithDescription($"Successfully created reminder at {TimestampTag.FromDateTime(date)}")
-                                          .WithColor(Color.Teal)
-                                          .Build();
+        public async Task AddRemindMe(DateTime date, string message)
+        {
+            Embed embed;
+
+            if (date > DateTime.UtcNow.AddYears(1))
+            {
+                embed = new EmbedBuilder()
+                .WithTitle("Add reminder result")
+                    .WithDescription("Reminder cannot be more than 1 year ahead ")
+                    .WithColor(Color.Red)
+                    .Build();
+            }
+            else
+            {
+                await _reminderService.AddReminder(date, Context.User, message);
+
+                embed = new EmbedBuilder()
+                    .WithTitle("RemindMe result")
+                    .WithDescription($"Successfully created reminder at {TimestampTag.FromDateTime(date)}")
+                    .WithColor(Color.Teal)
+                    .Build();
+            }
 
             await ModifyOriginalResponseAsync((msg) =>
             {
