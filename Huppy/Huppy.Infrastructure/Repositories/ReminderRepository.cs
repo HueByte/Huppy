@@ -1,7 +1,6 @@
 using Huppy.Core.IRepositories;
 using Huppy.Core.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Huppy.Infrastructure.Repositories
 {
@@ -16,6 +15,11 @@ namespace Huppy.Infrastructure.Repositories
         public async Task<IEnumerable<Reminder>> GetAllAsync()
         {
             return await _context.Reminders.ToListAsync();
+        }
+
+        public IQueryable<Reminder> GetRange(ulong userId)
+        {
+            return _context.Reminders.Where(reminder => reminder.UserId == userId);
         }
 
         public async Task<Reminder?> GetAsync(int id)
@@ -60,6 +64,18 @@ namespace Huppy.Infrastructure.Repositories
             if (reminders is null) return;
 
             _context.Reminders.RemoveRange(reminders!);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task RemoveRange(ICollection<int> reminderIds)
+        {
+            if (reminderIds is null) return;
+
+            var reminders = await _context.Reminders
+                .Where(reminder => reminderIds.Contains(reminder.Id))
+                .ToListAsync();
+
+            _context.Reminders.RemoveRange(reminders);
             await _context.SaveChangesAsync();
         }
     }

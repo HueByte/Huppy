@@ -1,16 +1,16 @@
 using System.Collections.Concurrent;
-using System.Reflection;
-using System.Reflection.Metadata.Ecma335;
 using Microsoft.Extensions.Logging;
 
 namespace Huppy.Core.Services.EventService
 {
+    public record Event(object? Data, string Name, Func<object?, Task> Task);
     public class EventService : IEventService
     {
         private readonly ILogger _logger;
-
-        // TODO: Remove
         public readonly Dictionary<ulong, List<TimedEvent>> events = new();
+        public readonly ConcurrentDictionary<ulong, List<Event>> jobs = new();
+        public event Func<string[], Task> OnEventsRemoved;
+        private readonly SemaphoreSlim _semiphore = new(4);
         private readonly object _lockObj = new();
         private Timer? _timer;
         private DateTime _startDate;
@@ -30,6 +30,37 @@ namespace Huppy.Core.Services.EventService
             _logger.LogInformation("Started event loop");
         }
 
+        public async Task AddEvent(DateTime time, string Name, object? data, Func<object?, Task> job)
+        {
+            Event evn = new(data, Name, job);
+            await AddEvent(time, evn);
+        }
+
+        public async Task AddEvent(DateTime time, Event job)
+        {
+            await AddRange(time, new List<Event>() { job });
+        }
+
+        public async Task AddRange(DateTime time, ICollection<Event> eventJobs)
+        {
+            var targetTime = GetTargetTime(time);
+            await _semiphore.WaitAsync();
+
+            if (jobs.ContainsKey(targetTime))
+            {
+                jobs.TryGetValue(targetTime, out var value);
+                value ??= new();
+                value.AddRange(eventJobs);
+            }
+            else
+            {
+                jobs.TryAdd(targetTime, eventJobs.ToList());
+            }
+
+            _semiphore.Release();
+        }
+
+        // OLD
         public void AddEvent(DateTime time, TimedEvent action)
         {
             AddRange(time, new List<TimedEvent> { action });
@@ -151,7 +182,7 @@ namespace Huppy.Core.Services.EventService
         {
             var timer = new Timer(async (e) =>
             {
-                await ExecuteEvents();
+                await Execute();
             }, null, new TimeSpan(0), _ticker);
 
             return timer;
@@ -192,6 +223,40 @@ namespace Huppy.Core.Services.EventService
             }
 
             return Task.CompletedTask;
+        }
+
+        private async Task Execute()
+        {
+            try
+            {
+                ConcurrentBag<string> removedNames = new();
+
+                var targetTime = GetTargetTime(DateTime.UtcNow);
+                var executionJobs = jobs.Where(job => job.Key < targetTime);
+                if (!executionJobs.Any()) return;
+
+                ParallelOptions parallelOptions = new()
+                {
+                    MaxDegreeOfParallelism = 4
+                };
+
+                await Parallel.ForEachAsync(executionJobs, parallelOptions, async (exeJobs, token) =>
+                {
+                    var tasks = exeJobs.Value
+                        .Select(task => Task.Run(async () => await task.Task(task.Data)))
+                        .ToList();
+
+                    await Task.WhenAll(tasks);
+
+                    jobs.TryRemove(exeJobs.Key, out var removed);
+
+                    if (removed is null) return;
+                    foreach (var name in removed.Select(e => e.Name)) removedNames.Add(name);
+                });
+
+                OnEventsRemoved?.Invoke(removedNames.ToArray());
+            }
+            catch (Exception) { }
         }
 
         private static ulong GetTargetTime(DateTime time)

@@ -1,3 +1,4 @@
+using System.Net;
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
@@ -57,7 +58,7 @@ namespace Huppy.App.Configuration
             {
                 LogLevel = LogSeverity.Info,
                 MessageCacheSize = 1000,
-                GatewayIntents = GatewayIntents.AllUnprivileged | GatewayIntents.GuildMembers | GatewayIntents.GuildBans
+                GatewayIntents = GatewayIntents.AllUnprivileged | GatewayIntents.GuildMembers | GatewayIntents.GuildBans | GatewayIntents.DirectMessages
             });
 
             InteractionService interactionService = new(client);
@@ -98,7 +99,7 @@ namespace Huppy.App.Configuration
             return this;
         }
 
-        public ModuleConfigurator AddHttpClient()
+        public ModuleConfigurator AddHttpClients()
         {
             _services.AddHttpClient("GPT", httpclient =>
             {

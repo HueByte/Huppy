@@ -20,7 +20,7 @@ IServiceProvider _serviceProvider = new ModuleConfigurator().AddAppSettings(appS
                                                             .AddDiscord()
                                                             .AddServices()
                                                             .AddDatabase()
-                                                            .AddHttpClient()
+                                                            .AddHttpClients()
                                                             .Build();
 
 // Start bot
@@ -33,9 +33,6 @@ await bot.CreateCommands();
 await bot.PopulateSingletons();
 
 await bot.CreateEvents();
-
-// to fix
-// await bot.CreateReminders();
 
 await bot.CreateBot();
 

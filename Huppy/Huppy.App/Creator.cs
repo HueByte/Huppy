@@ -82,6 +82,7 @@ namespace Huppy.App
             _client.ShardReady += CreateSlashCommands;
             _client.ShardReady += StartTimedEvents;
             _client.ShardReady += _loggingService.OnReadyAsync;
+            _client.ShardConnected += CreateReminders;
 
             // interaction event
             _client.UserJoined += _serverInteractionService.OnUserJoined;
@@ -95,6 +96,9 @@ namespace Huppy.App
             // logger events
             _client.Log += _loggingService.OnLogAsync;
             _interactionService.Log += _loggingService.OnLogAsync;
+
+            // others
+            _eventService.OnEventsRemoved += _reminderService.RemoveReminderRange;
 
             return Task.CompletedTask;
         }
@@ -118,7 +122,7 @@ namespace Huppy.App
             _eventService.Initialize();
         }
 
-        public async Task CreateReminders()
+        public async Task CreateReminders(DiscordSocketClient client)
         {
             await _reminderService.Initialize();
         }
