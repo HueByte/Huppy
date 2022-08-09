@@ -129,8 +129,6 @@ namespace Huppy.App
         {
             if (isBotInitialized) return;
 
-            _logger.LogInformation("Starting timed events");
-
             await _timedEventService.StartTimers();
             _eventService.Initialize();
         }

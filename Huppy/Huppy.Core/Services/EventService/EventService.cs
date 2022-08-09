@@ -22,10 +22,10 @@ namespace Huppy.Core.Services.EventService
 
         public void Initialize()
         {
+            _logger.LogInformation("Starting Event Loop Service");
+
             _startDate = DateTime.Now;
             _timer = InitTimer();
-
-            _logger.LogInformation("Started event loop");
         }
 
         public async Task AddEvent(DateTime time, string Name, object? data, Func<object?, Task> job)

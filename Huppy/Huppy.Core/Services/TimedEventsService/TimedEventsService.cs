@@ -25,7 +25,8 @@ namespace Huppy.Core.Services.TimedEventsService
 
         public Task StartTimers()
         {
-            _logger.LogInformation("Starting Timed Events");
+            _logger.LogInformation("Starting Timed Events Service");
+
             foreach (var worker in _workers)
             {
                 var guid = Guid.NewGuid();
