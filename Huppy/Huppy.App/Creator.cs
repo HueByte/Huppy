@@ -1,7 +1,6 @@
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
-using Huppy.Core.Entities;
 using Huppy.Core.Services.CommandService;
 using Huppy.Core.Services.EventService;
 using Huppy.Core.Services.HuppyCacheService;
