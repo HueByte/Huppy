@@ -105,7 +105,9 @@ namespace Huppy.App.Configuration
             {
                 httpclient.BaseAddress = new Uri(_appSettings?.GPT!.BaseUrl!);
                 httpclient.DefaultRequestHeaders.Add("Authorization", $"Bearer {_appSettings?.GPT!.ApiKey}");
-                httpclient.DefaultRequestHeaders.Add("OpenAI-Organization", _appSettings?.GPT!.Orgranization);
+
+                if (!string.IsNullOrEmpty(_appSettings?.GPT?.Orgranization))
+                    httpclient.DefaultRequestHeaders.Add("OpenAI-Organization", _appSettings?.GPT!.Orgranization);
             });
 
             _services.AddHttpClient("Urban", httpClient =>
