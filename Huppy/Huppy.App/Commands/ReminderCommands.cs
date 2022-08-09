@@ -46,7 +46,7 @@ namespace Huppy.App.Commands
             await AddRemindMe(date, message);
         }
 
-        public async Task AddRemindMe(DateTime date, string message)
+        private async Task AddRemindMe(DateTime date, string message)
         {
             Embed embed;
 
