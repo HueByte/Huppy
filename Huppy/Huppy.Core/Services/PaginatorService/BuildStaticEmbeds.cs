@@ -32,7 +32,8 @@ namespace Huppy.Core.Services.PaginatorService
             List<PaginatorPage> helpEmbeds = new();
 
             var commandGroups = _interactionService.Modules.OrderBy(e => e.SlashCommands.Count)
-                                                           .ToList();
+                .Where(group => group.SlashGroupName != "debug")
+                .ToList();
 
             int pageNumber = 0;
             foreach (var group in commandGroups)
