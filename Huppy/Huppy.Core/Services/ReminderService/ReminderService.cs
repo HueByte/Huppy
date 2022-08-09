@@ -1,12 +1,11 @@
-using System.Net;
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Huppy.Core.IRepositories;
 using Huppy.Core.Models;
 using Huppy.Core.Services.EventService;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Microsoft.VisualBasic;
 
 namespace Huppy.Core.Services.ReminderService
 {
@@ -54,7 +53,7 @@ namespace Huppy.Core.Services.ReminderService
 
         public async Task<List<Reminder>> GetUserRemindersAsync(ulong userId)
         {
-            return (await _reminderRepository.GetAllAsync(userId)).ToList();
+            return await _reminderRepository.GetQueryable(userId).ToListAsync();
         }
 
         public async Task AddReminder(DateTime date, ulong userId, string message)
@@ -101,7 +100,7 @@ namespace Huppy.Core.Services.ReminderService
         {
             if (!(ids.Length > 0)) return;
 
-            await _reminderRepository.RemoveRange(ids);
+            await _reminderRepository.RemoveRangeAsync(ids);
         }
 
         private async Task StandardReminder(IUser user, string message)

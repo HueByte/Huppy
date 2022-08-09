@@ -17,9 +17,9 @@ namespace Huppy.Infrastructure.Repositories
             return await _context.Reminders.ToListAsync();
         }
 
-        public IQueryable<Reminder> GetRange(ulong userId)
+        public IQueryable<Reminder> GetQueryable(ulong userId)
         {
-            return _context.Reminders.Where(reminder => reminder.UserId == userId);
+            return _context.Reminders.Where(reminder => reminder.UserId == userId).AsQueryable();
         }
 
         public async Task<Reminder?> GetAsync(int id)
@@ -59,7 +59,7 @@ namespace Huppy.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task RemoveRange(IList<Reminder?> reminders)
+        public async Task RemoveRangeAsync(IList<Reminder?> reminders)
         {
             if (reminders is null) return;
 
@@ -67,7 +67,7 @@ namespace Huppy.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task RemoveRange(ICollection<int> reminderIds)
+        public async Task RemoveRangeAsync(ICollection<int> reminderIds)
         {
             if (reminderIds is null) return;
 
