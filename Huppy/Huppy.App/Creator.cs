@@ -33,6 +33,7 @@ namespace Huppy.App
         private readonly IPaginatorService _paginatorService;
         private readonly IEventService _eventService;
         private readonly IReminderService _reminderService;
+        private bool isInitialized = false;
 
         public Creator(IServiceProvider serviceProvider)
         {
@@ -66,6 +67,8 @@ namespace Huppy.App
 
         public async Task PopulateSingletons()
         {
+            if (isInitialized) return;
+
             _logger.LogInformation("Populating singletons");
             await _cacheService.Initialize();
 
@@ -81,7 +84,7 @@ namespace Huppy.App
             _client.ShardReady += CreateSlashCommands;
             _client.ShardReady += StartTimedEvents;
             _client.ShardReady += _loggingService.OnReadyAsync;
-            _client.ShardConnected += CreateReminders;
+            _client.ShardReady += CreateReminders;
 
             // interaction event
             _client.UserJoined += _serverInteractionService.OnUserJoined;
@@ -111,10 +114,14 @@ namespace Huppy.App
             await _client.StartAsync();
 
             await _client.SetGameAsync("Hello World!", null, Discord.ActivityType.Playing);
+
+            isInitialized = true;
         }
 
         public async Task StartTimedEvents(DiscordSocketClient socketClient)
         {
+            if (isInitialized) return;
+
             _logger.LogInformation("Starting timed events");
 
             await _timedEventService.StartTimers();
@@ -123,6 +130,10 @@ namespace Huppy.App
 
         public async Task CreateReminders(DiscordSocketClient client)
         {
+            if (isInitialized) return;
+
+            _logger.LogInformation("Initializing reminder service");
+
             await _reminderService.Initialize();
         }
 
