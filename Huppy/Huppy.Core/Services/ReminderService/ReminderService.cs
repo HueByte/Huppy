@@ -63,6 +63,7 @@ namespace Huppy.Core.Services.ReminderService
 
         public async Task AddReminder(DateTime date, IUser user, string message)
         {
+            date = date.ToUniversalTime();
             Reminder reminder = new()
             {
                 Message = message,
