@@ -25,8 +25,11 @@ namespace Huppy.Core.Services.ReminderService
             _reminderRepository = reminderRepository;
             _interactionService = interactionService;
         }
-        // guild.DownloadUsersAsync, and within DiscordSocketConfig there's alwaysdownloadusers 
 
+        // TODO
+        // no need to get all reminders - take them daily, old ones are removed new ones will be added 
+        // guild.DownloadUsersAsync, and within DiscordSocketConfig there's alwaysdownloadusers 
+        // Will use bulk download method 
         public async Task Initialize()
         {
             var reminders = await _reminderRepository.GetAllAsync();
