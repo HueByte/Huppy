@@ -43,8 +43,6 @@ namespace Huppy.Core.Services.EventService
         public async Task AddRange(DateTime time, ICollection<Event> eventJobs)
         {
             var targetTime = GetTargetTime(time);
-            // await _semiphore.WaitAsync();
-
             try
             {
                 if (jobs.ContainsKey(targetTime))
@@ -58,10 +56,7 @@ namespace Huppy.Core.Services.EventService
                     jobs.TryAdd(targetTime, eventJobs.ToList());
                 }
             }
-            finally
-            {
-                // _semiphore.Release();
-            }
+            catch (Exception ex) { _logger.LogError("Event loop adding event error", ex); }
         }
 
         // To remake
@@ -143,18 +138,17 @@ namespace Huppy.Core.Services.EventService
             _logger.LogDebug("Starting event loop execution");
 
             await _semiphore.WaitAsync();
-            bool isReleased = false;
+            bool isSemiphoreReleased = false;
+            ConcurrentBag<string> removedNames = new();
+            var targetTime = GetTargetTime(DateTime.UtcNow);
 
             try
             {
-                ConcurrentBag<string> removedNames = new();
-
-                var targetTime = GetTargetTime(DateTime.UtcNow);
-                var executionJobs = jobs.Where(job => job.Key < targetTime);
-                if (!executionJobs.Any())
+                var queuedJobs = jobs.Where(job => job.Key < targetTime);
+                if (!queuedJobs.Any())
                 {
                     _semiphore.Release();
-                    isReleased = true;
+                    isSemiphoreReleased = true;
                     return;
                 }
 
@@ -163,30 +157,31 @@ namespace Huppy.Core.Services.EventService
                     MaxDegreeOfParallelism = _maxDegreeOfParallelism
                 };
 
-                // iterate in async parallel each jobs that met the condition 
-                await Parallel.ForEachAsync(executionJobs, parallelOptions, async (exeJobs, token) =>
+                // iterate in async parallel each queued jobs that met the condition 
+                await Parallel.ForEachAsync(queuedJobs, parallelOptions, async (queue, token) =>
                 {
                     // start all events that job contains and await it
-                    var tasks = exeJobs.Value
-                        .Select(task => Task.Run(async () => await task.Task(task.Data)))
+                    var tasks = queue.Value
+                        .Select(job => Task.Run(async () => await job.Task(job.Data)))
                         .ToList();
 
                     await Task.WhenAll(tasks);
 
-                    jobs.TryRemove(exeJobs.Key, out var removed);
+                    jobs.TryRemove(queue.Key, out var removed);
 
                     if (removed is null) return;
                     foreach (var name in removed.Select(e => e.Name)) removedNames.Add(name);
                 });
 
                 OnEventsRemoved?.Invoke(removedNames.ToArray());
+
                 _logger.LogInformation("Executed {noEvents} events", removedNames.Count);
             }
-            catch (Exception) { }
+            catch (Exception ex) { _logger.LogError("Event loop error", ex); }
             finally
             {
                 _logger.LogDebug("Finished event loop execution");
-                if (!isReleased) _semiphore.Release(1);
+                if (!isSemiphoreReleased) _semiphore.Release(1);
             }
         }
 
