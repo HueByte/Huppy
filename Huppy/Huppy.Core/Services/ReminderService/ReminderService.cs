@@ -21,7 +21,7 @@ namespace Huppy.Core.Services.ReminderService
         private readonly DiscordShardedClient _discord;
         private readonly InteractionService _interactionService;
         private readonly ITimedEventsService _timedEventsService;
-        private readonly TimeSpan fetchPeriod = new(0, 1, 0);
+        private readonly TimeSpan fetchPeriod = new(1, 0, 0);
         private DateTime FetchingDate => DateTime.UtcNow + fetchPeriod;
         public ReminderService(IEventService eventService, ILogger<ReminderService> logger, DiscordShardedClient discord, IReminderRepository reminderRepository, InteractionService interactionService, ITimedEventsService timedEventsService)
         {
@@ -38,7 +38,7 @@ namespace Huppy.Core.Services.ReminderService
         // Will use bulk download method 
         public Task Initialize()
         {
-            // every {fetchingPeriod} 
+            // every {fetchingPeriod} register fresh bulk of reminders to save memory
             _logger.LogInformation("Starting Reminder Service");
             _timedEventsService.AddJob(
                 Guid.NewGuid(),

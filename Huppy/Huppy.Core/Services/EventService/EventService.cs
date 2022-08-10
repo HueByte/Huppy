@@ -141,8 +141,10 @@ namespace Huppy.Core.Services.EventService
         private async Task Execute()
         {
             _logger.LogDebug("Starting event loop execution");
+
             await _semiphore.WaitAsync();
             bool isReleased = false;
+
             try
             {
                 ConcurrentBag<string> removedNames = new();
@@ -161,8 +163,10 @@ namespace Huppy.Core.Services.EventService
                     MaxDegreeOfParallelism = _maxDegreeOfParallelism
                 };
 
+                // iterate in async parallel each jobs that met the condition 
                 await Parallel.ForEachAsync(executionJobs, parallelOptions, async (exeJobs, token) =>
                 {
+                    // start all events that job contains and await it
                     var tasks = exeJobs.Value
                         .Select(task => Task.Run(async () => await task.Task(task.Data)))
                         .ToList();
