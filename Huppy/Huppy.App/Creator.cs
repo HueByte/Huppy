@@ -137,8 +137,6 @@ namespace Huppy.App
         {
             if (isBotInitialized) return;
 
-            _logger.LogInformation("Initializing reminder service");
-
             await _reminderService.Initialize();
         }
 

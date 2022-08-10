@@ -15,7 +15,6 @@ namespace Huppy.Core.Services.EventService
         private readonly TimeSpan _ticker = TimeSpan.FromSeconds(5); // ticks
         private const int TICKS_PER_SECOND = 10000000;
         private const int _maxDegreeOfParallelism = 4;
-        private ulong lastExecutionTime = 0;
 
         public EventService(ILogger<EventService> logger)
         {

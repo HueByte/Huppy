@@ -1,10 +1,13 @@
+using System.Net;
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Huppy.Core.IRepositories;
 using Huppy.Core.Models;
 using Huppy.Core.Services.EventService;
+using Huppy.Core.Services.TimedEventsService;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Huppy.Core.Services.ReminderService
@@ -17,22 +20,52 @@ namespace Huppy.Core.Services.ReminderService
         private readonly IReminderRepository _reminderRepository;
         private readonly DiscordShardedClient _discord;
         private readonly InteractionService _interactionService;
-        public ReminderService(IEventService eventService, ILogger<ReminderService> logger, DiscordShardedClient discord, IReminderRepository reminderRepository, InteractionService interactionService)
+        private readonly ITimedEventsService _timedEventsService;
+        private readonly TimeSpan fetchPeriod = new(0, 1, 0);
+        private DateTime FetchingDate => DateTime.UtcNow + fetchPeriod;
+        public ReminderService(IEventService eventService, ILogger<ReminderService> logger, DiscordShardedClient discord, IReminderRepository reminderRepository, InteractionService interactionService, ITimedEventsService timedEventsService)
         {
             _eventService = eventService;
             _logger = logger;
             _discord = discord;
             _reminderRepository = reminderRepository;
             _interactionService = interactionService;
+            _timedEventsService = timedEventsService;
         }
 
         // TODO
-        // no need to get all reminders - take them daily, old ones are removed new ones will be added 
         // guild.DownloadUsersAsync, and within DiscordSocketConfig there's alwaysdownloadusers 
         // Will use bulk download method 
-        public async Task Initialize()
+        public Task Initialize()
         {
-            var reminders = await _reminderRepository.GetAllAsync();
+            // every {fetchingPeriod} 
+            _logger.LogInformation("Starting Reminder Service");
+            _timedEventsService.AddJob(
+                Guid.NewGuid(),
+                null,
+                new TimeSpan(0),
+                fetchPeriod,
+                async (scope, data) =>
+                {
+                    var reminderService = scope.ServiceProvider.GetRequiredService<IReminderService>();
+                    await reminderService.RegisterFreshReminders();
+                }
+            );
+
+            return Task.CompletedTask;
+        }
+
+        public async Task RegisterFreshReminders()
+        {
+            _logger.LogInformation("Registering fresh bulk of reminders");
+
+            // fetch reminders before fetchPeriod date
+            var reminders = await _reminderRepository
+                .GetQueryable()
+                .Where(reminder => reminder.RemindDate < FetchingDate)
+                .ToListAsync();
+
+            if (!reminders.Any()) return;
 
             // start adding reminder in async parallel manner
             var jobs = reminders.Select(reminder => Task.Run(async () =>
@@ -52,6 +85,7 @@ namespace Huppy.Core.Services.ReminderService
             })).ToList();
 
             await Task.WhenAll(jobs);
+            _logger.LogInformation("Enqueued {count} of reminders to execute until {time}", reminders.Count, FetchingDate);
         }
 
         public async Task<List<Reminder>> GetUserRemindersAsync(ulong userId)
@@ -78,15 +112,18 @@ namespace Huppy.Core.Services.ReminderService
             if (resultId is null) throw new Exception("Failed to create reminder");
 
             ReminderInput reminderInput = new(user, message);
-
             _logger.LogInformation("Added reminder for [{user}] at [{date}] UTC", user.Username, reminder.RemindDate);
-            await _eventService.AddEvent(date, resultId.ToString()!, reminderInput, async (input) =>
+
+            if (date < FetchingDate)
             {
-                if (input is ReminderInput data)
+                await _eventService.AddEvent(date, resultId.ToString()!, reminderInput, async (input) =>
                 {
-                    await StandardReminder(data.User, data.Message);
-                }
-            });
+                    if (input is ReminderInput data)
+                    {
+                        await StandardReminder(data.User, data.Message);
+                    }
+                });
+            }
         }
 
         public async Task RemoveReminder(int id)

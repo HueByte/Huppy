@@ -17,6 +17,11 @@ namespace Huppy.Infrastructure.Repositories
             return await _context.Reminders.ToListAsync();
         }
 
+        public IQueryable<Reminder> GetQueryable()
+        {
+            return _context.Reminders.AsQueryable();
+        }
+
         public IQueryable<Reminder> GetQueryable(ulong userId)
         {
             return _context.Reminders.Where(reminder => reminder.UserId == userId).AsQueryable();

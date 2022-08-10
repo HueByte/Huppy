@@ -8,44 +8,57 @@ namespace Huppy.Core.Services.TimedEventsService
 {
     public class TimedEventsService : ITimedEventsService
     {
+        public event Func<Task?> OnJobAdded;
         private readonly ILogger _logger;
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly Dictionary<Guid, Timer> _timers;
         private readonly AppSettings _settings;
-        private record TimerJob(Func<AsyncServiceScope, Task?> Job, TimeSpan DueTime, TimeSpan Period) { };
-        private readonly List<TimerJob> _workers;
+        private readonly List<Job> _jobs;
+        private record Job(Guid Id, Func<AsyncServiceScope, object?, Task?> Function, object? Data, TimeSpan DueTime, TimeSpan Period) { };
         public TimedEventsService(ILogger<TimedEventsService> logger, IServiceScopeFactory scopeFactory, AppSettings settings)
         {
             _logger = logger;
             _scopeFactory = scopeFactory;
             _settings = settings;
             _timers = new();
-            _workers = new();
+            _jobs = new();
+            OnJobAdded += OnJobAddedInternal;
         }
 
         public Task StartTimers()
         {
             _logger.LogInformation("Starting Timed Events Service");
 
-            foreach (var worker in _workers)
-            {
-                var guid = Guid.NewGuid();
-                _timers.Add(guid, new Timer(async (e) =>
-                {
-                    using var scope = _scopeFactory.CreateAsyncScope();
-                    await worker.Job.Invoke(scope)!;
-                }, null, worker.DueTime, worker.Period));
-
-                _logger.LogInformation("Started job: [{id}] [{dueTime}] [{period}]", guid, worker.DueTime, worker.Period);
-            }
+            foreach (var job in _jobs) AddTimer(job);
 
             return Task.CompletedTask;
         }
 
-        public void AddJob(Func<AsyncServiceScope, Task?> task, TimeSpan dueTime, TimeSpan period)
+        public void AddJob(Guid jobGuid, object? data, TimeSpan dueTime, TimeSpan period, Func<AsyncServiceScope, object?, Task?> task)
         {
-            TimerJob job = new(task, dueTime, period);
-            _workers.Add(job);
+            Job job = new(jobGuid, task, data, dueTime, period);
+            _jobs.Add(job);
+            OnJobAdded?.Invoke();
+        }
+
+        private Task OnJobAddedInternal()
+        {
+            foreach (var job in _jobs) AddTimer(job);
+
+            return Task.CompletedTask;
+        }
+
+        private void AddTimer(Job job)
+        {
+            if (_timers.TryGetValue(job.Id, out _)) return;
+
+            _timers.Add(job.Id, new Timer(async (e) =>
+            {
+                using var scope = _scopeFactory.CreateAsyncScope();
+                await job.Function.Invoke(scope, job.Data)!;
+            }, null, job.DueTime, job.Period));
+
+            _logger.LogInformation("Started job: [ID: {id}] [DueTime: {dueTime}] [Period: {period}]", job.Id, job.DueTime, job.Period);
         }
     }
 }
