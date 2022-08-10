@@ -69,7 +69,7 @@ namespace Huppy.App.Commands
             // objects.Add("Cache service size", _cacheService);
             objects.Add("Cache service paginator size", _cacheService.PaginatorEntries);
             // objects.Add("Cache service user AI usage size", _cacheService.UserAiUsage);
-            objects.Add("Cache service user basic data size", _cacheService.UserBasicData);
+            objects.Add("Cache service user basic data size", _cacheService.CacheUsers);
 
             return objects;
         }

@@ -9,7 +9,7 @@ namespace Huppy.Core.Services.HuppyCacheService
     {
         private readonly IServiceScopeFactory _serviceFactory;
         private readonly AppSettings _appSettings;
-        public Dictionary<ulong, string?> UserBasicData;
+        public Dictionary<ulong, string?> CacheUsers;
         public Dictionary<ulong, AiUser> UserAiUsage;
         public OrderedDictionary PaginatorEntries;
 
@@ -25,7 +25,7 @@ namespace Huppy.Core.Services.HuppyCacheService
             var _commandRepository = scope.ServiceProvider.GetRequiredService<ICommandLogRepository>();
             var _userRepository = scope.ServiceProvider.GetRequiredService<IUserRepository>();
 
-            UserBasicData = new(await _userRepository.GetUsersForCacheAsync());
+            CacheUsers = new(await _userRepository.GetUsersForCacheAsync());
             UserAiUsage = new(await _commandRepository.GetAiUsage());
             PaginatorEntries = new();
 

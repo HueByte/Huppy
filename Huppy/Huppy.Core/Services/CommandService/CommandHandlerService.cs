@@ -1,6 +1,4 @@
-using System.Diagnostics;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
@@ -70,16 +68,16 @@ namespace Huppy.Core.Services.CommandService
 
         private bool CheckIfEphemeral(SocketSlashCommand command)
         {
-            if (command is null) return false;
+            if (command is null || command.Data is null) return false;
 
-            if (!(command.Data?.Options.Count > 0))
+            if (!(command.Data.Options.Count > 0))
                 return _ephemeralCommands.Contains(command.CommandName);
 
-            var subCommand = command.Data?.Options.First();
+            var subCommand = command.Data.Options.First();
 
-            var name = subCommand?.Type == ApplicationCommandOptionType.SubCommand
+            var name = subCommand.Type == ApplicationCommandOptionType.SubCommand
                 ? subCommand.Name
-                : command.Data?.Name;
+                : command.Data.Name;
 
             if (!string.IsNullOrEmpty(name))
                 return _ephemeralCommands.Contains(name);
@@ -90,8 +88,8 @@ namespace Huppy.Core.Services.CommandService
         public async Task HandleCommandAsync(SocketInteraction command)
         {
             using var scope = _serviceFactory.CreateAsyncScope();
-            var _commandRepository = scope.ServiceProvider.GetRequiredService<ICommandLogRepository>();
-            var _userRepository = scope.ServiceProvider.GetRequiredService<IUserRepository>();
+            var commandRepository = scope.ServiceProvider.GetRequiredService<ICommandLogRepository>();
+            var userRepository = scope.ServiceProvider.GetRequiredService<IUserRepository>();
 
             try
             {
@@ -99,9 +97,10 @@ namespace Huppy.Core.Services.CommandService
                 await command.DeferAsync(useEphemeral);
 
                 // cache keeps all user IDs existing in database, if user is not present, he shall be added
-                if (!_cacheService.UserBasicData.ContainsKey(command.User.Id))
+                if (!_cacheService.CacheUsers.ContainsKey(command.User.Id))
                 {
                     _logger.LogInformation("Adding new user [{Username}] to database", command.User.Username);
+
                     User user = new()
                     {
                         Id = command.User.Id,
@@ -109,8 +108,8 @@ namespace Huppy.Core.Services.CommandService
                         JoinDate = DateTime.UtcNow,
                     };
 
-                    await _userRepository.AddAsync(user);
-                    await _cacheService.AddBasicUserData(command.User.Id, command.User.Username);
+                    await userRepository.AddAsync(user);
+                    await _cacheService.AddCacheUser(command.User.Id, command.User.Username);
                 }
 
                 var ctx = new ShardedInteractionContext(_client, command);
@@ -118,7 +117,8 @@ namespace Huppy.Core.Services.CommandService
             }
             catch (Exception ex)
             {
-                Log.Error(ex.Message);
+                _logger.LogError("Command execution error", ex);
+
                 await command.ModifyOriginalResponseAsync((msg) => msg.Content = "Something went wrong");
                 throw;
             }
@@ -127,21 +127,11 @@ namespace Huppy.Core.Services.CommandService
         public async Task SlashCommandExecuted(SlashCommandInfo commandInfo, IInteractionContext context, IResult result)
         {
             using var scope = _serviceFactory.CreateAsyncScope();
-            var _commandRepository = scope.ServiceProvider.GetRequiredService<ICommandLogRepository>();
-
-            CommandLog log = new()
-            {
-                CommandName = commandInfo.Name,
-                Date = DateTime.UtcNow,
-                IsSuccess = result.IsSuccess,
-                UserId = context.User.Id
-            };
-
-            await _commandRepository.AddAsync(log);
+            var commandRepository = scope.ServiceProvider.GetRequiredService<ICommandLogRepository>();
 
             if (result.IsSuccess)
             {
-                _logger.LogInformation("Command [{CommandName}] executed for [{Username}] on [{GuildName}]", commandInfo.Name, context.User.Username, context.Guild.Name);
+                _logger.LogInformation("Command [{CommandName}] executed for [{Username}] in [{GuildName}]", commandInfo.Name, context.User.Username, context.Guild.Name);
                 return;
             }
             else
@@ -191,14 +181,25 @@ namespace Huppy.Core.Services.CommandService
                         break;
                 }
             }
+
+            CommandLog log = new()
+            {
+                CommandName = commandInfo.Name,
+                Date = DateTime.UtcNow,
+                IsSuccess = result.IsSuccess,
+                UserId = context.User.Id
+            };
+
+            await commandRepository.AddAsync(log);
         }
 
         public async Task ComponentExecuted(SocketMessageComponent component)
         {
             using var scope = _serviceFactory.CreateAsyncScope();
-            var _commandRepository = scope.ServiceProvider.GetRequiredService<ICommandLogRepository>();
+            var commandRepository = scope.ServiceProvider.GetRequiredService<ICommandLogRepository>();
 
-            _logger.LogInformation("component [{dataid}] used by [{username}]", component.Data.CustomId, component.User.Username);
+            _logger.LogInformation("Component [{dataid}] used by [{username}]", component.Data.CustomId, component.User.Username);
+
             CommandLog log = new()
             {
                 CommandName = component.Data.CustomId,
@@ -207,7 +208,7 @@ namespace Huppy.Core.Services.CommandService
                 UserId = component.User.Id
             };
 
-            await _commandRepository.AddAsync(log);
+            await commandRepository.AddAsync(log);
         }
     }
 }

@@ -2,12 +2,12 @@ namespace Huppy.Core.Services.HuppyCacheService
 {
     public partial class CacheService
     {
-        public Task AddBasicUserData(ulong UserId, string? Username)
+        public Task AddCacheUser(ulong UserId, string? Username)
         {
-            UserBasicData.Add(UserId, Username);
+            CacheUsers.Add(UserId, Username);
             return Task.CompletedTask;
         }
 
-        public List<string> GetUserNames() => UserBasicData.Values.ToList()!;
+        public List<string> GetUserNames() => CacheUsers.Values.ToList()!;
     }
 }
