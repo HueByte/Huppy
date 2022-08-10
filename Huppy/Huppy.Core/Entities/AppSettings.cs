@@ -103,6 +103,7 @@ namespace Huppy.Core.Entities
         public string? ApiKey { get; set; }
         public string? Orgranization { get; set; }
         public int FreeMessageQuota { get; set; }
+        public string? AiContextMessage { get; set; }
         public bool IsEnabled { get; set; }
     }
 

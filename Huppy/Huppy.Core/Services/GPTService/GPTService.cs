@@ -1,6 +1,7 @@
 using System.Net.Http.Json;
 using Huppy.Core.Common.Constants;
 using Huppy.Core.Dto;
+using Huppy.Core.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
@@ -10,10 +11,12 @@ namespace Huppy.Core.Services.GPTService
     {
         private readonly IHttpClientFactory _clientFactory;
         private readonly ILogger _logger;
-        public GPTService(IHttpClientFactory clientFactory, ILogger<GPTService> logger)
+        private readonly AppSettings _settings;
+        public GPTService(IHttpClientFactory clientFactory, ILogger<GPTService> logger, AppSettings settings)
         {
             _clientFactory = clientFactory;
             _logger = logger;
+            _settings = settings;
         }
 
         public async Task GetEngines()
@@ -21,7 +24,7 @@ namespace Huppy.Core.Services.GPTService
             var client = _clientFactory.CreateClient("GPT");
             var result = await client.GetAsync("https://api.openai.com/v1/engines");
 
-            _logger.LogInformation(await result.Content.ReadAsStringAsync());
+            _logger.LogInformation("{response}", await result.Content.ReadAsStringAsync());
         }
 
         public async Task<string> DavinciCompletion(string prompt)
@@ -29,15 +32,17 @@ namespace Huppy.Core.Services.GPTService
             if (String.IsNullOrEmpty(prompt))
                 throw new Exception("Prompt for GPT was empty");
 
-            var aiContext = "You are Huppy, genderless bot and your creator is Hue.\n\n";
+            var aiContext = _settings?.GPT?.AiContextMessage;
+
+            if (string.IsNullOrEmpty(aiContext)) aiContext = "";
 
             aiContext += prompt;
 
             GPTDto model = new()
             {
-                MaxTokens = 100,
+                MaxTokens = 150,
                 Prompt = aiContext,
-                Temperature = 0.6,
+                Temperature = 0.7,
                 N = 1
             };
 
@@ -53,7 +58,7 @@ namespace Huppy.Core.Services.GPTService
             else
             {
                 var failedResponse = await response.Content.ReadAsStringAsync();
-                _logger.LogError(failedResponse);
+                _logger.LogError("{response}", failedResponse);
 
                 throw new Exception("GPT request wasn't successful");
             }
