@@ -53,7 +53,7 @@ namespace Huppy.App.Commands
         {
             content = content.Replace("\\n", "\n");
 
-            EmbedBuilder embed = new EmbedBuilder().WithTitle(title)
+            var embed = new EmbedBuilder().WithTitle(title)
                 .WithCurrentTimestamp()
                 .WithThumbnailUrl(thumbnail ?? "")
                 .WithDescription(content)
@@ -62,7 +62,9 @@ namespace Huppy.App.Commands
             if (withAuthor)
                 embed.WithAuthor(Context.User);
 
-            await ModifyOriginalResponseAsync((msg) => msg.Embed = embed.Build());
+            var orginalMessage = await FollowupAsync(embed: new EmbedBuilder().WithTitle("Sending embed...").Build());
+            await orginalMessage.DeleteAsync();
+            await Context.Channel.SendMessageAsync(embed: embed.Build());
         }
 
         [SlashCommand("whoami", "Hi I'm Huppy!")]
