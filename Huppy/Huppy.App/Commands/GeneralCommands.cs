@@ -35,7 +35,7 @@ namespace Huppy.App.Commands
             _scopeFactory = scopeFactory;
         }
 
-        [SlashCommand("ping", "return pong")]
+        [SlashCommand("ping", "🏓 pong")]
         public async Task PingCommand()
         {
             await ModifyOriginalResponseAsync((msg) => msg.Content = "Pong");
@@ -44,11 +44,13 @@ namespace Huppy.App.Commands
         [SlashCommand("say", "Says the input message")]
         public async Task SayCommand(string message)
         {
-            await ModifyOriginalResponseAsync((msg) => msg.Content = message);
+            var orginalMessage = await FollowupAsync(embed: new EmbedBuilder().WithTitle("Sending message...").Build());
+            await orginalMessage.DeleteAsync();
+            await Context.Channel.SendMessageAsync(text: message);
         }
 
         [SlashCommand("embed", "Send embed message")]
-        [RequireUserPermission(GuildPermission.ManageRoles)]
+        [RequireUserPermission(GuildPermission.ManageMessages)]
         public async Task SendEmbed(string title, string content, bool withAuthor = true, string? thumbnail = null)
         {
             content = content.Replace("\\n", "\n");
@@ -59,8 +61,7 @@ namespace Huppy.App.Commands
                 .WithDescription(content)
                 .WithColor(Color.Teal);
 
-            if (withAuthor)
-                embed.WithAuthor(Context.User);
+            if (withAuthor) embed.WithAuthor(Context.User);
 
             var orginalMessage = await FollowupAsync(embed: new EmbedBuilder().WithTitle("Sending embed...").Build());
             await orginalMessage.DeleteAsync();

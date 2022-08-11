@@ -1,6 +1,5 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
-using System.Net;
 using System.Reflection;
 using Discord;
 using Discord.Interactions;
@@ -12,7 +11,6 @@ using Huppy.Core.Models;
 using Huppy.Core.Services.HuppyCacheService;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Serilog;
 
 namespace Huppy.Core.Services.CommandService
 {
