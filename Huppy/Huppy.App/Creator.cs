@@ -174,7 +174,7 @@ namespace Huppy.App
                 _logger.LogInformation("Registering debug commands");
                 foreach (var guild in debugGuilds)
                 {
-                    await _interactionService.AddModulesToGuildAsync(guild, true, notAutoRegisteredCommandGroups.ToArray());
+                    await _interactionService.AddModulesToGuildAsync(guild, false, notAutoRegisteredCommandGroups.ToArray());
                 }
             }
             catch (Exception exp)
