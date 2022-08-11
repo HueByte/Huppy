@@ -24,7 +24,7 @@ namespace Huppy.Core.Services.CommandService
         private readonly CacheService _cacheService;
         private readonly IServiceScopeFactory _serviceFactory;
         private HashSet<string> _ephemeralCommands;
-        private readonly ConcurrentDictionary<ulong, ulong> _executionTimes = new();
+        private readonly ConcurrentDictionary<ulong, long> _executionTimes = new();
         public CommandHandlerService(DiscordShardedClient client, InteractionService interactionService, IServiceProvider serviceProvider, ILogger<CommandHandlerService> logger, CacheService cacheService, IServiceScopeFactory serviceFactory)
         {
             _client = client;
@@ -90,7 +90,8 @@ namespace Huppy.Core.Services.CommandService
 
         public async Task HandleCommandAsync(SocketInteraction command)
         {
-            long startTime = Stopwatch.GetTimestamp();
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
             using var scope = _serviceFactory.CreateAsyncScope();
             var commandRepository = scope.ServiceProvider.GetRequiredService<ICommandLogRepository>();
             var userRepository = scope.ServiceProvider.GetRequiredService<IUserRepository>();
@@ -127,8 +128,8 @@ namespace Huppy.Core.Services.CommandService
                 throw;
             }
 
-            long endTime = Stopwatch.GetTimestamp();
-            _executionTimes.TryAdd(command.Id, (ulong)((endTime - startTime) / 10_000));
+            stopwatch.Stop();
+            _executionTimes.TryAdd(command.Id, stopwatch.ElapsedMilliseconds);
         }
 
         public async Task SlashCommandExecuted(SlashCommandInfo commandInfo, IInteractionContext context, IResult result)
@@ -139,7 +140,7 @@ namespace Huppy.Core.Services.CommandService
 
             if (result.IsSuccess)
             {
-                _logger.LogInformation("Command [{CommandName}] executed for [{Username}] in [{GuildName}] [{time} ms]", commandInfo.Name, context.User.Username, context.Guild.Name, miliseconds);
+                _logger.LogInformation("Command [{CommandName}] executed for [{Username}] in [{GuildName}] [{time} ms]", commandInfo.Name, context.User.Username, context.Guild.Name, string.Format("{0:n0}", miliseconds));
                 return;
             }
             else
@@ -207,7 +208,7 @@ namespace Huppy.Core.Services.CommandService
             var commandRepository = scope.ServiceProvider.GetRequiredService<ICommandLogRepository>();
             _executionTimes.Remove(component.Id, out var miliseconds);
 
-            _logger.LogInformation("Component [{dataid}] used by [{username}] [{time} ms]", component.Data.CustomId, component.User.Username, miliseconds);
+            _logger.LogInformation("Component [{dataid}] used by [{username}] [{time} ms]", component.Data.CustomId, component.User.Username, string.Format("{0:n0}", miliseconds));
 
             CommandLog log = new()
             {

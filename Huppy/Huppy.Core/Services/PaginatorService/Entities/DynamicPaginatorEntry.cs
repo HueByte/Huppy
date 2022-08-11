@@ -22,6 +22,8 @@ namespace Huppy.Core.Services.PaginatorService.Entities
                 return null;
 
             var asyncScope = _serviceScopeFactory.CreateAsyncScope();
+
+            // get embed from Task<PaginatorPage> result 
             EmbedBuilder? embed = (await Pages[page]?.Invoke(asyncScope, Data)!).Embed;
 
             if (embed is null)
