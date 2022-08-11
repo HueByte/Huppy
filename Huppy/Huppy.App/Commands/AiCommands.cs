@@ -1,7 +1,6 @@
 using System.Text;
 using Discord;
 using Discord.Interactions;
-using Huppy.Core.Common.Constants;
 using Huppy.Core.Common.HuppyMessages;
 using Huppy.Core.Services.GPTService;
 using Huppy.Core.Services.HuppyCacheService;
