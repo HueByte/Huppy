@@ -1,5 +1,6 @@
 using Discord;
 using Discord.Interactions;
+using Huppy.Core.Attributes;
 using Huppy.Core.Common.Constants;
 using Huppy.Core.Services.PaginatorService.Entities;
 
@@ -31,8 +32,9 @@ namespace Huppy.Core.Services.PaginatorService
         {
             List<PaginatorPage> helpEmbeds = new();
 
-            var commandGroups = _interactionService.Modules.OrderBy(e => e.SlashCommands.Count)
-                .Where(group => group.SlashGroupName != "debug")
+            var commandGroups = _interactionService.Modules
+                .OrderByDescending(e => e.SlashCommands.Count)
+                .Where(e => !e.Attributes.Any(e => e is DebugGroupAttribute))
                 .ToList();
 
             int pageNumber = 0;
@@ -41,13 +43,18 @@ namespace Huppy.Core.Services.PaginatorService
                 if (group.SlashCommands.Count == 0)
                     continue;
 
-                var embed = new EmbedBuilder().WithTitle(group.SlashGroupName)
-                                              .WithColor(Color.Teal)
-                                              .WithThumbnailUrl(Icons.Huppy1);
+                string title = string.IsNullOrEmpty(group.SlashGroupName) ? "⚗ General Commands" : $"⚗ /{group.SlashGroupName}";
+                string description = string.IsNullOrEmpty(group.Description) ? "" : $"*{group.Description}*";
+
+                var embed = new EmbedBuilder()
+                    .WithTitle(title)
+                    .WithDescription(description)
+                    .WithColor(Color.LightOrange)
+                    .WithThumbnailUrl(Icons.Huppy1);
 
                 foreach (var command in group.SlashCommands)
                 {
-                    embed.AddField($"🔰 {command.Name}", command.Description);
+                    embed.AddField($"`{command.Name}`", command.Description, false);
                 }
 
                 PaginatorPage page = new()
