@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Net;
 using System.Reflection;
 using Discord;
 using Discord.Interactions;
@@ -90,8 +91,7 @@ namespace Huppy.Core.Services.CommandService
 
         public async Task HandleCommandAsync(SocketInteraction command)
         {
-            var stopwatch = new Stopwatch();
-            stopwatch.Start();
+            StartExecutionTimeMeasurement(command.Id);
 
             using var scope = _serviceFactory.CreateAsyncScope();
             var commandRepository = scope.ServiceProvider.GetRequiredService<ICommandLogRepository>();
@@ -128,8 +128,6 @@ namespace Huppy.Core.Services.CommandService
                 await command.ModifyOriginalResponseAsync((msg) => msg.Content = "Something went wrong");
                 throw;
             }
-
-            _executionTimes.TryAdd(command.Id, stopwatch);
         }
 
         public async Task SlashCommandExecuted(SlashCommandInfo commandInfo, IInteractionContext context, IResult result)
@@ -137,12 +135,11 @@ namespace Huppy.Core.Services.CommandService
             using var scope = _serviceFactory.CreateAsyncScope();
             var commandRepository = scope.ServiceProvider.GetRequiredService<ICommandLogRepository>();
 
-            _executionTimes.Remove(context.Interaction.Id, out var timer);
-            timer?.Stop();
+            var executionTime = StopExecutionMeasurement(context.Interaction.Id);
 
             if (result.IsSuccess)
             {
-                _logger.LogInformation("Command [{CommandName}] executed for [{Username}] in [{GuildName}] [{time} ms]", commandInfo.Name, context.User.Username, context.Guild.Name, string.Format("{0:n0}", timer?.ElapsedMilliseconds));
+                _logger.LogInformation("Command [{CommandName}] executed for [{Username}] in [{GuildName}] [{time} ms]", commandInfo.Name, context.User.Username, context.Guild.Name, string.Format("{0:n0}", executionTime));
                 return;
             }
             else
@@ -209,10 +206,9 @@ namespace Huppy.Core.Services.CommandService
             using var scope = _serviceFactory.CreateAsyncScope();
             var commandRepository = scope.ServiceProvider.GetRequiredService<ICommandLogRepository>();
 
-            _executionTimes.Remove(component.Id, out var timer);
-            timer?.Stop();
+            var executionTime = StopExecutionMeasurement(component.Id);
 
-            _logger.LogInformation("Component [{dataid}] used by [{username}] [{time} ms]", component.Data.CustomId, component.User.Username, string.Format("{0:n0}", timer?.ElapsedMilliseconds));
+            _logger.LogInformation("Component [{dataid}] used by [{username}] [{time} ms]", component.Data.CustomId, component.User.Username, string.Format("{0:n0}", executionTime));
 
             CommandLog log = new()
             {
@@ -223,6 +219,24 @@ namespace Huppy.Core.Services.CommandService
             };
 
             await commandRepository.AddAsync(log);
+        }
+
+        private Stopwatch StartExecutionTimeMeasurement(ulong commandId)
+        {
+            var watch = new Stopwatch();
+            watch.Start();
+            _executionTimes.TryAdd(commandId, watch);
+            return watch;
+        }
+
+        private long StopExecutionMeasurement(ulong commandId)
+        {
+            _executionTimes.Remove(commandId, out var timer);
+
+            if (timer is null) return 0;
+
+            timer.Stop();
+            return timer.ElapsedMilliseconds;
         }
     }
 }
