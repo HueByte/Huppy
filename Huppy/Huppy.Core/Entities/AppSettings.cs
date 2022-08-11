@@ -6,12 +6,12 @@ namespace Huppy.Core.Entities
     public class AppSettings
     {
         public string? BotToken { get; set; }
-        public string? HomeGuilds { get; set; }
+        public string? DebugGuilds { get; set; }
+        public string? BetaTestingGuilds { get; set; }
         public string? ConnectionString { get; set; }
         public Logger? Logger { get; set; }
         public GPT? GPT { get; set; }
         public UrbanApi? UrbanApi { get; set; }
-        public NewsAPI? NewsAPI { get; set; }
 
         [JsonIgnore]
         private readonly static string FILE_NAME = AppContext.BaseDirectory + "appsettings.json";
@@ -44,7 +44,8 @@ namespace Huppy.Core.Entities
             var config = new AppSettings()
             {
                 BotToken = "",
-                HomeGuilds = "",
+                DebugGuilds = "",
+                BetaTestingGuilds = "",
                 ConnectionString = $"Data Source={SavePath}",
                 Logger = new()
                 {
@@ -64,13 +65,6 @@ namespace Huppy.Core.Entities
                     BaseUrl = "https://mashape-community-urban-dictionary.p.rapidapi.com/define",
                     Host = "mashape-community-urban-dictionary.p.rapidapi.com",
                     Key = ""
-                },
-                NewsAPI = new()
-                {
-                    BaseUrl = "",
-                    ApiKey = "",
-                    IsEnabled = false,
-                    Frequency = 180,
                 }
             };
 
@@ -112,13 +106,5 @@ namespace Huppy.Core.Entities
         public string? BaseUrl { get; set; }
         public string? Host { get; set; }
         public string? Key { get; set; }
-    }
-
-    public class NewsAPI
-    {
-        public string? BaseUrl { get; set; }
-        public string? ApiKey { get; set; }
-        public double? Frequency { get; set; }
-        public bool IsEnabled { get; set; }
     }
 }

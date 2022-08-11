@@ -117,12 +117,6 @@ namespace Huppy.App.Configuration
                 httpClient.DefaultRequestHeaders.Add("x-rapidapi-key", _appSettings?.UrbanApi!.Key);
             });
 
-            _services.AddHttpClient("News", httpClient =>
-            {
-                httpClient.BaseAddress = new Uri(_appSettings?.NewsAPI!.BaseUrl!);
-                httpClient.DefaultRequestHeaders.Add("X-Api-Key", _appSettings?.NewsAPI!.ApiKey);
-            });
-
             return this;
         }
 
