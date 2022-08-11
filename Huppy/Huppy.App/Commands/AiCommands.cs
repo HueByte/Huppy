@@ -19,7 +19,7 @@ namespace Huppy.App.Commands
             _cacheService = cacheService;
         }
 
-        [SlashCommand("chat", "Talk with Huppy!")]
+        [SlashCommand("chat", "☄ Talk with Huppy!")]
         public async Task GptCompletion(string message)
         {
             // var messageCount = await _stabilizerService.GetCurrentMessageCount();
@@ -43,7 +43,7 @@ namespace Huppy.App.Commands
             await _cacheService.LogUsageAsync(Context.User.Username, Context.User.Id);
         }
 
-        [SlashCommand("how-works", "Explanation how Huppy works")]
+        [SlashCommand("explanation", "Explanation how Huppy works")]
         public async Task HowItWorks()
         {
             var embed = new EmbedBuilder().WithDescription(HuppyBasicMessages.HowAiWorks)
@@ -55,7 +55,7 @@ namespace Huppy.App.Commands
             await ModifyOriginalResponseAsync((msg) => msg.Embed = embed.Build());
         }
 
-        [SlashCommand("ai-stats", "Get AI statistics of the bot")]
+        [SlashCommand("stats", "Get chat statistics of Huppy")]
         public async Task GetAiStats()
         {
             var stats = await _cacheService.GetAiStatistics();
@@ -63,7 +63,7 @@ namespace Huppy.App.Commands
 
             StringBuilder sb = new();
             sb.AppendLine("✨ Top Huppy friends ✨\n");
-            
+
             foreach (var item in topStats)
             {
                 sb.AppendLine($"> **{item.Value.Username}** : `{item.Value.Count}`\n");
