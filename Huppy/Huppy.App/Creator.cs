@@ -1,6 +1,7 @@
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
+using Huppy.Core.Attributes;
 using Huppy.Core.Services.CommandService;
 using Huppy.Core.Services.EventService;
 using Huppy.Core.Services.HuppyCacheService;
@@ -146,20 +147,49 @@ namespace Huppy.App
 
             try
             {
-                string[] guilds = _appSettings.HomeGuilds!.Split(';').ToArray();
-                ulong[] homeGuilds = Array.ConvertAll(guilds, UInt64.Parse);
+                string[]? betaTestingGuildsTemp = _appSettings.BetaTestingGuilds?.Split(';').ToArray();
+                ulong[] betaTestingGuilds = betaTestingGuildsTemp?.Length > 0 ? Array.ConvertAll(betaTestingGuildsTemp, UInt64.Parse) : Array.Empty<ulong>();
 
-                foreach (var guild in homeGuilds)
+                string[]? debugGuildsTemp = _appSettings.DebugGuilds?.Split(';').ToArray()!;
+                ulong[] debugGuilds = debugGuildsTemp?.Length > 0 ? Array.ConvertAll(debugGuildsTemp, UInt64.Parse) : Array.Empty<ulong>();
+
+                var notAutoRegisteredCommandGroups = _interactionService.Modules
+                    .Where(e => e.Attributes.Any(e => e is DebugGroupAttribute))
+                    .ToList();
+
+                _logger.LogInformation("Registering beta commands");
+                foreach (var guild in betaTestingGuilds)
                 {
-                    _logger.LogInformation("Registering commands to [ {guild} ]", guild);
+                    _logger.LogInformation("Registering beta commands to [{guild}]", guild);
                     await _interactionService.RegisterCommandsToGuildAsync(guild);
-                    await Task.Delay(1000);
+                }
+
+                // register commands to the global flow
+                if (IsProd())
+                {
+                    _logger.LogInformation("Registering commands globally...");
+                    if (!isBotInitialized) await _interactionService.RegisterCommandsGloballyAsync();
+                }
+
+                _logger.LogInformation("Registering debug commands");
+                foreach (var guild in debugGuilds)
+                {
+                    await _interactionService.AddModulesToGuildAsync(guild, true, notAutoRegisteredCommandGroups.ToArray());
                 }
             }
             catch (Exception exp)
             {
                 Log.Error($"{exp.Message}\n{exp.StackTrace}");
             }
+        }
+
+        private static bool IsProd()
+        {
+#if DEBUG
+            return false;
+#else
+            return true;
+#endif
         }
     }
 }

@@ -2,12 +2,15 @@ using System.Diagnostics;
 using System.Text;
 using Discord;
 using Discord.Interactions;
+using Huppy.Core.Attributes;
 using Huppy.Core.Services.HuppyCacheService;
 using Microsoft.Extensions.Logging;
 
 namespace Huppy.App.Commands
 {
     [Group("debug", "debug commands")]
+    [DontAutoRegister]
+    [DebugGroup]
     public class DebugCommands : InteractionModuleBase<ShardedInteractionContext>
     {
         private readonly ILogger<DebugCommands> _logger;
@@ -25,7 +28,6 @@ namespace Huppy.App.Commands
             StringBuilder description = new();
             Process currentProcess = Process.GetCurrentProcess();
             long totalBytesOfMemoryUsed = currentProcess.WorkingSet64;
-            // var objects = GetObjects();
             Dictionary<string, string> objectSizes = new();
             double cpuUsage = currentProcess.TotalProcessorTime.TotalMilliseconds / 1000;
 
