@@ -138,7 +138,6 @@ namespace Huppy.Core.Services.CommandService
             if (result.IsSuccess)
             {
                 _logger.LogInformation("Command [{CommandName}] executed for [{Username}] in [{GuildName}] [{time} ms]", commandInfo.Name, context.User.Username, context.Guild.Name, string.Format("{0:n0}", executionTime));
-                return;
             }
             else
             {
@@ -193,7 +192,8 @@ namespace Huppy.Core.Services.CommandService
                 CommandName = commandInfo.Name,
                 Date = DateTime.UtcNow,
                 IsSuccess = result.IsSuccess,
-                UserId = context.User.Id
+                UserId = context.User.Id,
+                ExecutionTimeMs = executionTime
             };
 
             await commandRepository.AddAsync(log);
@@ -213,7 +213,8 @@ namespace Huppy.Core.Services.CommandService
                 CommandName = component.Data.CustomId,
                 Date = DateTime.UtcNow,
                 IsSuccess = component.IsValidToken,
-                UserId = component.User.Id
+                UserId = component.User.Id,
+                ExecutionTimeMs = executionTime
             };
 
             await commandRepository.AddAsync(log);

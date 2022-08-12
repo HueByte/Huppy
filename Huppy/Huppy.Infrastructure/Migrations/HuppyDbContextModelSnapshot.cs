@@ -29,6 +29,9 @@ namespace Huppy.Infrastructure.Migrations
                     b.Property<DateTime?>("Date")
                         .HasColumnType("TEXT");
 
+                    b.Property<long>("ExecutionTimeMs")
+                        .HasColumnType("INTEGER");
+
                     b.Property<bool>("IsSuccess")
                         .HasColumnType("INTEGER");
 

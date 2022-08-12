@@ -10,6 +10,7 @@ namespace Huppy.Core.Models
         public string? CommandName { get; set; }
         public DateTime? Date { get; set; }
         public bool IsSuccess { get; set; }
+        public long ExecutionTimeMs { get; set; }
 
         [ForeignKey("UserId")]
         public ulong UserId { get; set; }
