@@ -57,7 +57,7 @@ namespace Huppy.App.Configuration
             DiscordShardedClient client = new(new DiscordSocketConfig
             {
                 LogLevel = LogSeverity.Info,
-                MessageCacheSize = 1000,
+                MessageCacheSize = 100,
                 GatewayIntents = GatewayIntents.AllUnprivileged | GatewayIntents.GuildMembers | GatewayIntents.GuildBans | GatewayIntents.DirectMessages
             });
 

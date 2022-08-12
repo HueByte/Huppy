@@ -54,7 +54,7 @@ namespace Huppy.Core.Services.PaginatorService
 
                 foreach (var command in group.SlashCommands)
                 {
-                    embed.AddField($"`{command.Name}`", command.Description, false);
+                    embed.AddField($"`{command.Name}`", $"> {command.Description}", false);
                 }
 
                 PaginatorPage page = new()
