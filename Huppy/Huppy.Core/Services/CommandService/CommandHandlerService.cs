@@ -135,6 +135,18 @@ namespace Huppy.Core.Services.CommandService
 
             var executionTime = StopExecutionMeasurement(context.Interaction.Id);
 
+            CommandLog log = new()
+            {
+                CommandName = commandInfo.Name,
+                Date = DateTime.UtcNow,
+                IsSuccess = result.IsSuccess,
+                UserId = context.User.Id,
+                ExecutionTimeMs = executionTime,
+                ChannelId = context.Channel.Id,
+                ErrorMessage = result.ErrorReason,
+                GuildId = context.Guild.Id
+            };
+
             if (result.IsSuccess)
             {
                 _logger.LogInformation("Command [{CommandName}] executed for [{Username}] in [{GuildName}] [{time} ms]", commandInfo.Name, context.User.Username, context.Guild.Name, string.Format("{0:n0}", executionTime));
@@ -187,15 +199,6 @@ namespace Huppy.Core.Services.CommandService
                 }
             }
 
-            CommandLog log = new()
-            {
-                CommandName = commandInfo.Name,
-                Date = DateTime.UtcNow,
-                IsSuccess = result.IsSuccess,
-                UserId = context.User.Id,
-                ExecutionTimeMs = executionTime
-            };
-
             await commandRepository.AddAsync(log);
         }
 
@@ -214,7 +217,10 @@ namespace Huppy.Core.Services.CommandService
                 Date = DateTime.UtcNow,
                 IsSuccess = component.IsValidToken,
                 UserId = component.User.Id,
-                ExecutionTimeMs = executionTime
+                ExecutionTimeMs = executionTime,
+                ChannelId = component.Channel.Id,
+                ErrorMessage = "",
+                GuildId = component.GuildId,
             };
 
             await commandRepository.AddAsync(log);

@@ -3,6 +3,7 @@ using System;
 using Huppy.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Huppy.Infrastructure.Migrations
 {
     [DbContext(typeof(HuppyDbContext))]
-    partial class HuppyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220812153538_Executiontime")]
+    partial class Executiontime
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "6.0.2");
@@ -23,22 +25,13 @@ namespace Huppy.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<ulong>("ChannelId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("CommandName")
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime?>("Date")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("ErrorMessage")
-                        .HasColumnType("TEXT");
-
                     b.Property<long>("ExecutionTimeMs")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<ulong?>("GuildId")
                         .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsSuccess")
@@ -48,8 +41,6 @@ namespace Huppy.Infrastructure.Migrations
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("GuildId");
 
                     b.HasIndex("UserId");
 
@@ -144,17 +135,11 @@ namespace Huppy.Infrastructure.Migrations
 
             modelBuilder.Entity("Huppy.Core.Models.CommandLog", b =>
                 {
-                    b.HasOne("Huppy.Core.Models.Server", "Guild")
-                        .WithMany()
-                        .HasForeignKey("GuildId");
-
                     b.HasOne("Huppy.Core.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Guild");
 
                     b.Navigation("User");
                 });
