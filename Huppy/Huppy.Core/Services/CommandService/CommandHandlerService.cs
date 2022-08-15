@@ -219,7 +219,7 @@ namespace Huppy.Core.Services.CommandService
                 UserId = component.User.Id,
                 ExecutionTimeMs = executionTime,
                 ChannelId = component.Channel.Id,
-                ErrorMessage = "",
+                ErrorMessage = null,
                 GuildId = component.GuildId,
             };
 

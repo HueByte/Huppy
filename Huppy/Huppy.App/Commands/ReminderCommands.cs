@@ -31,14 +31,14 @@ namespace Huppy.App.Commands
             _reminderRepository = reminderRepository;
         }
 
-        [SlashCommand("date", "Add reminder by date")]
+        [SlashCommand("date", "Add reminder by date (format: dd/mm/yyyy 00:00:00)")]
         [Ephemeral]
         public async Task RemindMe(DateTime date, string message)
         {
             await AddRemindMe(date.ToUniversalTime(), message);
         }
 
-        [SlashCommand("time", "Add reminder by time")]
+        [SlashCommand("time", "Add reminder by time (format: 0d0h0m0s)")]
         [Ephemeral]
         public async Task RemindMe(TimeSpan time, string message)
         {
