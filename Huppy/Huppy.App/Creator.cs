@@ -153,7 +153,7 @@ namespace Huppy.App
                 string[]? debugGuildsTemp = _appSettings.DebugGuilds?.Split(';').ToArray()!;
                 ulong[] debugGuilds = debugGuildsTemp?.Length > 0 ? Array.ConvertAll(debugGuildsTemp, UInt64.Parse) : Array.Empty<ulong>();
 
-                var notAutoRegisteredCommandGroups = _interactionService.Modules
+                var debugCommands = _interactionService.Modules
                     .Where(e => e.Attributes.Any(e => e is DebugGroupAttribute))
                     .ToList();
 
@@ -174,7 +174,7 @@ namespace Huppy.App
                 _logger.LogInformation("Registering debug commands");
                 foreach (var guild in debugGuilds)
                 {
-                    await _interactionService.AddModulesToGuildAsync(guild, false, notAutoRegisteredCommandGroups.ToArray());
+                    await _interactionService.AddModulesToGuildAsync(guild, false, debugCommands.ToArray());
                 }
             }
             catch (Exception exp)
