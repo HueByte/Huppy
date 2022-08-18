@@ -92,7 +92,7 @@ namespace Huppy.App.Commands
 
             if (!(reminderCount > 0))
             {
-                Func<AsyncServiceScope, object?, Task<PaginatorPage>> page = (scope, data) =>
+                var page = Task<PaginatorPage> (AsyncServiceScope scope, object? data) =>
                 {
                     if (data is not IUser user) return null!;
 
@@ -121,7 +121,7 @@ namespace Huppy.App.Commands
                 for (int i = 0; i < pages; i++)
                 {
                     int currentPage = i;
-                    Func<AsyncServiceScope, object?, Task<PaginatorPage>> page = async (scope, data) =>
+                    var page = async Task<PaginatorPage> (AsyncServiceScope scope, object? data) =>
                     {
                         if (data is not IUser user) return null!;
 

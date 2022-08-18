@@ -43,7 +43,7 @@ namespace Huppy.App.Commands
                 Data = null
             };
 
-            Func<AsyncServiceScope, object?, Task<PaginatorPage>> page1 = async (scope, data) =>
+            var page1 = async Task<PaginatorPage> (AsyncServiceScope scope, object? data) =>
             {
                 var serverRepository = scope.ServiceProvider.GetRequiredService<IServerRepository>();
 
@@ -72,7 +72,7 @@ namespace Huppy.App.Commands
                 };
             };
 
-            Func<AsyncServiceScope, object?, Task<PaginatorPage>> page2 = async (scope, data) =>
+            var page2 = async Task<PaginatorPage> (AsyncServiceScope scope, object? data) =>
             {
                 var serverRepository = scope.ServiceProvider.GetRequiredService<IServerRepository>();
 
