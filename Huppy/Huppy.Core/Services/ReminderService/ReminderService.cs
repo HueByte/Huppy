@@ -40,6 +40,7 @@ namespace Huppy.Core.Services.ReminderService
         {
             // every {fetchingPeriod} register fresh bulk of reminders to save memory
             _logger.LogInformation("Starting Reminder Service");
+
             _timedEventsService.AddJob(
                 Guid.NewGuid(),
                 null,
@@ -109,9 +110,11 @@ namespace Huppy.Core.Services.ReminderService
             };
 
             var resultId = await _reminderRepository.AddAsync(reminder);
+
             if (resultId is null) throw new Exception("Failed to create reminder");
 
             ReminderInput reminderInput = new(user, message);
+
             _logger.LogInformation("Added reminder for [{user}] at [{date}] UTC", user.Username, reminder.RemindDate);
 
             if (date < FetchingDate)
