@@ -73,7 +73,6 @@ namespace Huppy.App.Commands
                 .WithCurrentTimestamp();
 
             if (withAuthor) embed.WithAuthor(Context.User);
-            // if (!string.IsNullOrEmpty(imageUrl)) embed.WithImageUrl(imageUrl);
 
             var orginalMessage = await FollowupAsync(embed: new EmbedBuilder().WithTitle("Sending embed...").Build());
             await orginalMessage.DeleteAsync();
