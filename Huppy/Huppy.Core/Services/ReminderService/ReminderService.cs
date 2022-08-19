@@ -61,7 +61,7 @@ namespace Huppy.Core.Services.ReminderService
 
             // fetch reminders before fetchPeriod date
             var reminders = await _reminderRepository
-                .GetQueryable()
+                .GetAllQueryable()
                 .Where(reminder => reminder.RemindDate < FetchingDate)
                 .ToListAsync();
 
@@ -90,7 +90,7 @@ namespace Huppy.Core.Services.ReminderService
 
         public async Task<List<Reminder>> GetUserRemindersAsync(ulong userId)
         {
-            return await _reminderRepository.GetQueryable(userId).ToListAsync();
+            return await _reminderRepository.GetAllQueryable(userId).ToListAsync();
         }
 
         public async Task AddReminder(DateTime date, ulong userId, string message)

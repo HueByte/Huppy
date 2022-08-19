@@ -13,17 +13,17 @@ namespace Huppy.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<IEnumerable<Reminder>> GetAllAsync()
+        public IEnumerable<Reminder> GetAllAsync()
         {
-            return await _context.Reminders.ToListAsync();
+            return _context.Reminders.AsEnumerable();
         }
 
-        public IQueryable<Reminder> GetQueryable()
+        public IQueryable<Reminder> GetAllQueryable()
         {
             return _context.Reminders.AsQueryable();
         }
 
-        public IQueryable<Reminder> GetQueryable(ulong userId)
+        public IQueryable<Reminder> GetAllQueryable(ulong userId)
         {
             return _context.Reminders.Where(reminder => reminder.UserId == userId).AsQueryable();
         }
@@ -54,7 +54,7 @@ namespace Huppy.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task RemoveByIdAsync(int id)
+        public async Task RemoveAsync(int id)
         {
             Reminder reminder = new() { Id = id };
             _context.Remove(reminder);
