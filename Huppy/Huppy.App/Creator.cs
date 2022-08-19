@@ -20,6 +20,7 @@ namespace Huppy.App
 {
     public class Creator
     {
+        #region properties
         private readonly IServiceProvider _serviceProvider;
         private readonly DiscordShardedClient _client;
         private readonly AppSettings _appSettings;
@@ -36,6 +37,7 @@ namespace Huppy.App
         private readonly IReminderService _reminderService;
         private bool isBotInitialized = false;
 
+        #endregion
         public Creator(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
@@ -126,7 +128,7 @@ namespace Huppy.App
             await _client.SetGameAsync("Hello World!", null, Discord.ActivityType.Playing);
         }
 
-        public async Task StartTimedEvents()
+        private async Task StartTimedEvents()
         {
             if (isBotInitialized) return;
 
@@ -134,7 +136,7 @@ namespace Huppy.App
             _eventService.Initialize();
         }
 
-        public async Task CreateReminders()
+        private async Task CreateReminders()
         {
             if (isBotInitialized) return;
 
@@ -181,6 +183,16 @@ namespace Huppy.App
             {
                 Log.Error($"{exp.Message}\n{exp.StackTrace}");
             }
+        }
+
+        private static List<ModuleInfo?> GetBetaCommands()
+        {
+            throw new NotImplementedException();
+        }
+
+        private static List<ModuleInfo?> GetDebugCommands()
+        {
+            throw new NotImplementedException();
         }
 
         private static bool IsProd()
