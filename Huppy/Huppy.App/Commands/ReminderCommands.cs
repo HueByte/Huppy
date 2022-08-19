@@ -75,6 +75,41 @@ namespace Huppy.App.Commands
             });
         }
 
+        [SlashCommand("remove", "remove your reminder")]
+        [Ephemeral]
+        public async Task RemoveReminder(int reminderId)
+        {
+            var reminder = await _reminderRepository.GetAsync(Context.User.Id, reminderId);
+
+            var embed = new EmbedBuilder().WithColor(Color.LightOrange)
+                .WithCurrentTimestamp();
+
+            if (reminder is null)
+            {
+                embed.WithTitle($"Couldn't remove reminder with {reminderId} ID")
+                     .WithDescription("Ensure you provided proper reminder ID, you can check them via /reminder list");
+
+                await ModifyOriginalResponseAsync((msg) =>
+                {
+                    msg.Embed = embed.Build();
+                });
+
+                return;
+            }
+
+            await _reminderService.RemoveReminder(reminder);
+
+            embed.WithTitle("Success")
+                 .WithDescription($"Reminder with `{reminderId}` ID got removed")
+                 .AddField("Date", TimestampTag.FromDateTime(DateTime.SpecifyKind(reminder.RemindDate, DateTimeKind.Utc)))
+                 .AddField("Message", $"```vb\n{reminder.Message}\n```");
+
+            await ModifyOriginalResponseAsync((msg) =>
+            {
+                msg.Embed = embed.Build();
+            });
+        }
+
         [SlashCommand("list", "Get list of your reminders")]
         [Ephemeral]
         public async Task GetUserReminders()
@@ -145,7 +180,7 @@ namespace Huppy.App.Commands
                         {
                             TimestampTag timestamp = TimestampTag.FromDateTime(DateTime.SpecifyKind(reminder.RemindDate, DateTimeKind.Utc));
                             embed.AddField(
-                                $"✨ Reminder at {timestamp}",
+                                $"✨ Reminder at {timestamp} | ID: {reminder.Id}",
                                 $"```vb\n{reminder.Message}```",
                                 false);
                         }

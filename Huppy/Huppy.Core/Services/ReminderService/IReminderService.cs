@@ -10,7 +10,7 @@ namespace Huppy.Core.Services.ReminderService
         Task<List<Reminder>> GetUserRemindersAsync(ulong userId);
         Task AddReminder(DateTime date, ulong userId, string message);
         Task AddReminder(DateTime date, IUser user, string message);
-        Task RemoveReminder(int id);
+        Task RemoveReminder(Reminder reminder);
         Task RemoveReminderRange(string[] ids);
         Task RemoveReminderRange(int[] ids);
     }

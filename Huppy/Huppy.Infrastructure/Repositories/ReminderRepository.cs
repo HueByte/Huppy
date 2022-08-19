@@ -1,3 +1,4 @@
+using Discord.Interactions;
 using Huppy.Core.IRepositories;
 using Huppy.Core.Models;
 using Microsoft.EntityFrameworkCore;
@@ -27,9 +28,9 @@ namespace Huppy.Infrastructure.Repositories
             return _context.Reminders.Where(reminder => reminder.UserId == userId).AsQueryable();
         }
 
-        public async Task<Reminder?> GetAsync(int id)
+        public async Task<Reminder?> GetAsync(ulong userId, int id)
         {
-            return await _context.Reminders.FirstOrDefaultAsync(e => e.Id == id);
+            return await _context.Reminders.FirstOrDefaultAsync(e => e.Id == id && e.UserId == userId);
         }
 
         public async Task<int?> AddAsync(Reminder? reminder)
@@ -53,12 +54,19 @@ namespace Huppy.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
+        public async Task RemoveByIdAsync(int id)
+        {
+            Reminder reminder = new() { Id = id };
+            _context.Remove(reminder);
+            await _context.SaveChangesAsync();
+        }
+
         public async Task RemoveAsync(Reminder? reminder)
         {
             if (reminder is null) return;
 
             var doesExist = await _context.Reminders.AnyAsync(e => e.Id == reminder.Id);
-            if (doesExist) return;
+            if (!doesExist) return;
 
             _context.Reminders.Remove(reminder);
             await _context.SaveChangesAsync();

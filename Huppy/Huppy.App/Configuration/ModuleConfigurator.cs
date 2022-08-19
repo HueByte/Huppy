@@ -85,12 +85,14 @@ namespace Huppy.App.Configuration
             _services.AddSingleton<ITimedEventsService, TimedEventsService>();
             _services.AddSingleton<IPaginatorService, PaginatorService>();
             _services.AddSingleton<IEventService, EventService>();
+
             _services.AddScoped<IReminderService, ReminderService>();
 
             _services.AddScoped<IGPTService, GPTService>();
             _services.AddScoped<IUrbanService, UrbanService>();
             _services.AddScoped<INewsApiService, NewsApiService>();
 
+            // repositories
             _services.AddScoped<IUserRepository, UserRepository>();
             _services.AddScoped<IServerRepository, ServerRepository>();
             _services.AddScoped<ICommandLogRepository, CommandLogRepository>();

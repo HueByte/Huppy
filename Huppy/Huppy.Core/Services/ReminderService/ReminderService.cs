@@ -126,10 +126,10 @@ namespace Huppy.Core.Services.ReminderService
             }
         }
 
-        public async Task RemoveReminder(int id)
+        public async Task RemoveReminder(Reminder reminder)
         {
-            var reminder = await _reminderRepository.GetAsync(id);
-            await _reminderRepository.RemoveAsync(reminder!);
+            await _reminderRepository.RemoveAsync(reminder);
+            await _eventService.Remove(reminder.RemindDate, reminder.Id.ToString());
         }
 
         public async Task RemoveReminderRange(string[] ids)
