@@ -40,7 +40,7 @@ namespace Huppy.Core.Services.EventService
             await AddRange(time, new List<Event>() { job });
         }
 
-        public async Task AddRange(DateTime time, ICollection<Event> eventJobs)
+        public Task AddRange(DateTime time, ICollection<Event> eventJobs)
         {
             var targetTime = GetTargetTime(time);
             try
@@ -57,6 +57,27 @@ namespace Huppy.Core.Services.EventService
                 }
             }
             catch (Exception ex) { _logger.LogError("Event loop adding event error", ex); }
+
+            return Task.CompletedTask;
+        }
+
+        public async Task Remove(DateTime time, string eventName)
+        {
+            var targetTime = GetTargetTime(time);
+            await Remove(targetTime, eventName);
+        }
+
+        public Task Remove(ulong time, string eventName)
+        {
+            jobs.TryGetValue(time, out var value);
+
+            if (value is null) return Task.CompletedTask;
+
+            var entity = value.FirstOrDefault(e => e.Name == eventName);
+
+            if (entity is not null) value.Remove(entity);
+
+            return Task.CompletedTask;
         }
 
         // To remake
