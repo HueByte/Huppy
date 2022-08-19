@@ -51,17 +51,29 @@ namespace Huppy.App.Commands
 
         [SlashCommand("embed", "Send embed message")]
         [RequireUserPermission(GuildPermission.ManageMessages)]
-        public async Task SendEmbed(string title, string content, bool withAuthor = true, string? thumbnail = null)
+        public async Task SendEmbed(string? title = null, string? content = null, bool withAuthor = true, string? thumbnail = null, string? imageUrl = null)
         {
-            content = content.Replace("\\n", "\n");
+            bool isValid = !(
+                   string.IsNullOrEmpty(title)
+                && string.IsNullOrEmpty(content)
+                && string.IsNullOrEmpty(thumbnail)
+                && string.IsNullOrEmpty(imageUrl)
+                && !withAuthor);
 
-            var embed = new EmbedBuilder().WithTitle(title)
-                .WithCurrentTimestamp()
+            if (!isValid)
+                throw new Exception("Invalid embed content, at least one parameter has to be fulfilled");
+
+            content = content?.Replace("\\n", "\n");
+
+            var embed = new EmbedBuilder().WithTitle(title ?? "")
                 .WithThumbnailUrl(thumbnail ?? "")
-                .WithDescription(content)
-                .WithColor(Color.Teal);
+                .WithImageUrl(imageUrl ?? "")
+                .WithDescription(content ?? "")
+                .WithColor(Color.Teal)
+                .WithCurrentTimestamp();
 
             if (withAuthor) embed.WithAuthor(Context.User);
+            // if (!string.IsNullOrEmpty(imageUrl)) embed.WithImageUrl(imageUrl);
 
             var orginalMessage = await FollowupAsync(embed: new EmbedBuilder().WithTitle("Sending embed...").Build());
             await orginalMessage.DeleteAsync();
