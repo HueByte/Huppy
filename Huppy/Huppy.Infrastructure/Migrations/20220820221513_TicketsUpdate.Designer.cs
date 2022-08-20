@@ -3,6 +3,7 @@ using System;
 using Huppy.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Huppy.Infrastructure.Migrations
 {
     [DbContext(typeof(HuppyDbContext))]
-    partial class HuppyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220820221513_TicketsUpdate")]
+    partial class TicketsUpdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "6.0.2");
@@ -144,10 +146,6 @@ namespace Huppy.Infrastructure.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("TicketAnswer")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Topic")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<ulong>("UserId")
