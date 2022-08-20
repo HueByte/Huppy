@@ -120,7 +120,7 @@ namespace Huppy.App.Commands
                 CurrentPage = 0,
                 Name = Guid.NewGuid().ToString(),
                 Pages = new(),
-                Data = (object?)Context.User
+                Data = Context.User
             };
 
             var reminderCount = await _reminderRepository.GetAllQueryable(Context.User.Id).CountAsync();

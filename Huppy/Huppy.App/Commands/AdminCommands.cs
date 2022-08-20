@@ -1,9 +1,6 @@
-using System.Collections.ObjectModel;
-using System.Text;
 using Discord;
 using Discord.Interactions;
 using Huppy.Core.Attributes;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 
 namespace Huppy.App.Commands
