@@ -13,14 +13,12 @@ namespace Huppy.Core.Services.PaginatorService
         private readonly CacheService _cacheService;
         private readonly ILogger<PaginatorService> _logger;
         private Dictionary<string, List<PaginatorPage>> _staticEmbeds;
-        private readonly InteractionService _interactionService;
 
         public PaginatorService(ILogger<PaginatorService> logger, CacheService cacheService, InteractionService interactionService)
         {
             _logger = logger;
             _cacheService = cacheService;
             _staticEmbeds = new();
-            _interactionService = interactionService;
         }
 
         public void AddStaticEmbed(string key, List<PaginatorPage> pages)
