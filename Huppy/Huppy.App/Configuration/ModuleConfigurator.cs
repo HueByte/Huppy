@@ -14,6 +14,7 @@ using Huppy.Core.Services.NewsService;
 using Huppy.Core.Services.PaginatorService;
 using Huppy.Core.Services.ReminderService;
 using Huppy.Core.Services.ServerInteractionService;
+using Huppy.Core.Services.TicketService;
 using Huppy.Core.Services.TimedEventsService;
 using Huppy.Core.Services.UrbanService;
 using Huppy.Infrastructure;
@@ -87,6 +88,7 @@ namespace Huppy.App.Configuration
             _services.AddSingleton<IEventService, EventService>();
 
             _services.AddScoped<IReminderService, ReminderService>();
+            _services.AddScoped<ITicketService, TicketService>();
 
             _services.AddScoped<IGPTService, GPTService>();
             _services.AddScoped<IUrbanService, UrbanService>();
@@ -97,6 +99,7 @@ namespace Huppy.App.Configuration
             _services.AddScoped<IServerRepository, ServerRepository>();
             _services.AddScoped<ICommandLogRepository, CommandLogRepository>();
             _services.AddScoped<IReminderRepository, ReminderRepository>();
+            _services.AddScoped<ITicketRepository, TicketRepository>();
 
             return this;
         }
