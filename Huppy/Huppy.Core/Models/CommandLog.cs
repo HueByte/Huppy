@@ -3,10 +3,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Huppy.Core.Models
 {
-    public class CommandLog
+    public class CommandLog : DbModel<int>
     {
         [Key]
-        public int Id { get; set; }
+        public override int Id { get; set; }
         public string? CommandName { get; set; }
         public string? ErrorMessage { get; set; }
         public DateTime? Date { get; set; }
