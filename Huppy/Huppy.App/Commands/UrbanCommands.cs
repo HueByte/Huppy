@@ -2,13 +2,14 @@ using System.Text;
 using Discord;
 using Discord.Interactions;
 using Huppy.Core.Common.Constants;
+using Huppy.Core.Services.CommandService;
 using Huppy.Core.Services.UrbanService;
 using Microsoft.Extensions.Logging;
 
 namespace Huppy.App.Commands
 {
     [Group("urban", "Urban dicionary commands")]
-    public class UrbanCommands : InteractionModuleBase<ShardedInteractionContext>
+    public class UrbanCommands : InteractionModuleBase<ExtendedShardedInteractionContext>
     {
         ILogger<UrbanCommands> _logger;
         IUrbanService _urbanService;

@@ -61,7 +61,13 @@ namespace Huppy.App.Configuration
                 GatewayIntents = GatewayIntents.AllUnprivileged | GatewayIntents.GuildMembers | GatewayIntents.GuildBans | GatewayIntents.DirectMessages
             });
 
-            InteractionService interactionService = new(client);
+            InteractionServiceConfig interactionServiceConfig = new()
+            {
+                AutoServiceScopes = false,
+                DefaultRunMode = RunMode.Async,
+            };
+
+            InteractionService interactionService = new(client, interactionServiceConfig);
 
             _services.AddSingleton(client)
                      .AddSingleton(interactionService)

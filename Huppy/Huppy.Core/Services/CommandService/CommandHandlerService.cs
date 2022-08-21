@@ -91,14 +91,14 @@ namespace Huppy.Core.Services.CommandService
         {
             StartExecutionTimeMeasurement(command.Id);
 
-            using var scope = _serviceFactory.CreateAsyncScope();
-            var commandRepository = scope.ServiceProvider.GetRequiredService<ICommandLogRepository>();
-            var userRepository = scope.ServiceProvider.GetRequiredService<IUserRepository>();
-
             try
             {
                 bool useEphemeral = CheckIfEphemeral((command as SocketSlashCommand)!);
                 await command.DeferAsync(useEphemeral);
+
+                // Disposed in ExtendedShardedInteractionContext
+                var scope = _serviceFactory.CreateAsyncScope();
+                var userRepository = scope.ServiceProvider.GetRequiredService<IUserRepository>();
 
                 // cache keeps all user IDs existing in database, if user is not present, he shall be added
                 if (!_cacheService.CacheUsers.ContainsKey(command.User.Id))
@@ -116,8 +116,8 @@ namespace Huppy.Core.Services.CommandService
                     await _cacheService.AddCacheUser(command.User.Id, command.User.Username);
                 }
 
-                var ctx = new ShardedInteractionContext(_client, command);
-                await _interactionService.ExecuteCommandAsync(ctx, _serviceProvider);
+                var ctx = new ExtendedShardedInteractionContext(_client, command, scope);
+                await _interactionService.ExecuteCommandAsync(ctx, scope.ServiceProvider);
             }
             catch (Exception ex)
             {
@@ -130,76 +130,87 @@ namespace Huppy.Core.Services.CommandService
 
         public async Task SlashCommandExecuted(SlashCommandInfo commandInfo, IInteractionContext context, IResult result)
         {
-            using var scope = _serviceFactory.CreateAsyncScope();
-            var commandRepository = scope.ServiceProvider.GetRequiredService<ICommandLogRepository>();
+            var extendedContext = context as ExtendedShardedInteractionContext;
+            var scope = extendedContext is not null ? extendedContext.AsyncScope : _serviceFactory.CreateAsyncScope();
 
-            var executionTime = StopExecutionMeasurement(context.Interaction.Id);
-
-            CommandLog log = new()
+            try
             {
-                CommandName = commandInfo.Name,
-                Date = DateTime.UtcNow,
-                IsSuccess = result.IsSuccess,
-                UserId = context.User.Id,
-                ExecutionTimeMs = executionTime,
-                ChannelId = context.Channel.Id,
-                ErrorMessage = result.ErrorReason,
-                GuildId = context.Guild.Id
-            };
+                var commandRepository = scope.ServiceProvider.GetRequiredService<ICommandLogRepository>();
 
-            if (result.IsSuccess)
-            {
-                _logger.LogInformation("Command [{CommandName}] executed for [{Username}] in [{GuildName}] [{time} ms]", commandInfo.Name, context.User.Username, context.Guild.Name, string.Format("{0:n0}", executionTime));
-            }
-            else
-            {
-                var embed = new EmbedBuilder().WithCurrentTimestamp()
-                                              .WithColor(Color.Red)
-                                              .WithThumbnailUrl(Icons.Error);
+                var executionTime = StopExecutionMeasurement(context.Interaction.Id);
 
-                _logger.LogError("Command [{CommandName}] resulted in error: [{Error}]", commandInfo.Name, result.ErrorReason);
-
-                switch (result.Error)
+                CommandLog log = new()
                 {
-                    case InteractionCommandError.UnmetPrecondition:
-                        embed.WithTitle("Unmet Precondition");
-                        embed.WithDescription(result.ErrorReason);
-                        await context.Interaction.ModifyOriginalResponseAsync((msg) => msg.Embed = embed.Build());
-                        break;
+                    CommandName = commandInfo.Name,
+                    Date = DateTime.UtcNow,
+                    IsSuccess = result.IsSuccess,
+                    UserId = context.User.Id,
+                    ExecutionTimeMs = executionTime,
+                    ChannelId = context.Channel.Id,
+                    ErrorMessage = result.ErrorReason,
+                    GuildId = context.Guild.Id
+                };
 
-                    case InteractionCommandError.UnknownCommand:
-                        embed.WithTitle("Unknown command");
-                        embed.WithDescription(result.ErrorReason);
-                        await context.Interaction.ModifyOriginalResponseAsync((msg) => msg.Embed = embed.Build());
-                        break;
-
-                    case InteractionCommandError.BadArgs:
-                        embed.WithTitle($"Invalid number or arguments");
-                        embed.WithDescription(result.ErrorReason);
-                        await context.Interaction.ModifyOriginalResponseAsync((msg) => msg.Embed = embed.Build());
-                        break;
-
-                    case InteractionCommandError.Exception:
-                        embed.WithTitle("Command exception");
-                        embed.WithDescription(result.ErrorReason);
-                        await context.Interaction.ModifyOriginalResponseAsync((msg) => msg.Embed = embed.Build());
-                        break;
-
-                    case InteractionCommandError.Unsuccessful:
-                        embed.WithTitle("Command could not be executed");
-                        embed.WithDescription(result.ErrorReason);
-                        await context.Interaction.ModifyOriginalResponseAsync((msg) => msg.Embed = embed.Build());
-                        break;
-
-                    default:
-                        embed.WithTitle("Something went wrong");
-                        embed.WithDescription(result.ErrorReason);
-                        await context.Interaction.ModifyOriginalResponseAsync((msg) => msg.Embed = embed.Build());
-                        break;
+                if (result.IsSuccess)
+                {
+                    _logger.LogInformation("Command [{CommandName}] executed for [{Username}] in [{GuildName}] [{time} ms]", commandInfo.Name, context.User.Username, context.Guild.Name, string.Format("{0:n0}", executionTime));
                 }
-            }
+                else
+                {
+                    var embed = new EmbedBuilder().WithCurrentTimestamp()
+                                                  .WithColor(Color.Red)
+                                                  .WithThumbnailUrl(Icons.Error);
 
-            await commandRepository.AddAsync(log);
+                    _logger.LogError("Command [{CommandName}] resulted in error: [{Error}]", commandInfo.Name, result.ErrorReason);
+
+                    switch (result.Error)
+                    {
+                        case InteractionCommandError.UnmetPrecondition:
+                            embed.WithTitle("Unmet Precondition");
+                            embed.WithDescription(result.ErrorReason);
+                            await context.Interaction.ModifyOriginalResponseAsync((msg) => msg.Embed = embed.Build());
+                            break;
+
+                        case InteractionCommandError.UnknownCommand:
+                            embed.WithTitle("Unknown command");
+                            embed.WithDescription(result.ErrorReason);
+                            await context.Interaction.ModifyOriginalResponseAsync((msg) => msg.Embed = embed.Build());
+                            break;
+
+                        case InteractionCommandError.BadArgs:
+                            embed.WithTitle($"Invalid number or arguments");
+                            embed.WithDescription(result.ErrorReason);
+                            await context.Interaction.ModifyOriginalResponseAsync((msg) => msg.Embed = embed.Build());
+                            break;
+
+                        case InteractionCommandError.Exception:
+                            embed.WithTitle("Command exception");
+                            embed.WithDescription(result.ErrorReason);
+                            await context.Interaction.ModifyOriginalResponseAsync((msg) => msg.Embed = embed.Build());
+                            break;
+
+                        case InteractionCommandError.Unsuccessful:
+                            embed.WithTitle("Command could not be executed");
+                            embed.WithDescription(result.ErrorReason);
+                            await context.Interaction.ModifyOriginalResponseAsync((msg) => msg.Embed = embed.Build());
+                            break;
+
+                        default:
+                            embed.WithTitle("Something went wrong");
+                            embed.WithDescription(result.ErrorReason);
+                            await context.Interaction.ModifyOriginalResponseAsync((msg) => msg.Embed = embed.Build());
+                            break;
+                    }
+                }
+
+                await commandRepository.AddAsync(log);
+            }
+            catch (Exception) { }
+            finally
+            {
+                if (extendedContext is null) await scope.DisposeAsync();
+                else await extendedContext.DisposeAsync();
+            }
         }
 
         public async Task ComponentExecuted(SocketMessageComponent component)

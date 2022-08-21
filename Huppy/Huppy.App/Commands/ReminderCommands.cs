@@ -3,6 +3,7 @@ using Discord;
 using Discord.Interactions;
 using Huppy.Core.Attributes;
 using Huppy.Core.IRepositories;
+using Huppy.Core.Services.CommandService;
 using Huppy.Core.Services.PaginatorService;
 using Huppy.Core.Services.PaginatorService.Entities;
 using Huppy.Core.Services.ReminderService;
@@ -15,7 +16,7 @@ using Serilog;
 namespace Huppy.App.Commands
 {
     [Group("reminder", "reminder commands")]
-    public class ReminderCommands : InteractionModuleBase<ShardedInteractionContext>
+    public class ReminderCommands : InteractionModuleBase<ExtendedShardedInteractionContext>
     {
         private readonly ILogger<ReminderCommands> _logger;
         private readonly IReminderService _reminderService;

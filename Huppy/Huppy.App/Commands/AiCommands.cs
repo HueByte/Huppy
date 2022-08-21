@@ -2,13 +2,14 @@ using System.Text;
 using Discord;
 using Discord.Interactions;
 using Huppy.Core.Common.HuppyMessages;
+using Huppy.Core.Services.CommandService;
 using Huppy.Core.Services.GPTService;
 using Huppy.Core.Services.HuppyCacheService;
 
 namespace Huppy.App.Commands
 {
     [Group("ai", "Enjoy AI commands!")]
-    public class AiCommands : InteractionModuleBase<ShardedInteractionContext>
+    public class AiCommands : InteractionModuleBase<ExtendedShardedInteractionContext>
     {
         private readonly IGPTService _aiService;
         private readonly CacheService _cacheService;
