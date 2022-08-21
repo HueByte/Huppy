@@ -3,13 +3,8 @@ using Huppy.Core.Models;
 
 namespace Huppy.Core.IRepositories
 {
-    public interface IServerRepository
+    public interface IServerRepository : IRepository<ulong, Server>
     {
-        Task AddOneAsync(Server server);
-        Task AddOneAsync(ShardedInteractionContext DiscordContext);
-        Task<List<Server>> GetAll();
-        Task<Server?> GetOneAsync(ulong ID);
         Task<Server> GetOrCreateAsync(ShardedInteractionContext DiscordContext);
-        Task UpdateOne(Server server);
     }
 }

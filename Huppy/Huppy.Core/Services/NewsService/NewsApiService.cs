@@ -80,16 +80,17 @@ namespace Huppy.Core.Services.NewsService
 
                     foreach (var server in servers)
                     {
-                        var guild = _client.GetGuild(server.ID);
+                        var guild = _client.GetGuild(server.Id);
 
                         if (guild is null)
                         {
-                            _logger.LogWarning("Didn't find server with ID {ServerID}, no news sent", server.ID);
+                            _logger.LogWarning("Didn't find server with ID {ServerID}, no news sent", server.Id);
 
                             server.UseGreet = false;
 
                             // TODO: consider fire and forget
-                            await _serverRepository.UpdateOne(server);
+                            await _serverRepository.UpdateAsync(server);
+                            await _serverRepository.SaveChangesAsync();
                             continue;
                         }
 

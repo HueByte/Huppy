@@ -54,7 +54,7 @@ namespace Huppy.App.Commands
                           .WithThumbnailUrl(Context.Guild.IconUrl)
                           .WithFooter("If you want to change server configuration use /configure");
 
-                embed.AddField("ID", server.ID, true);
+                embed.AddField("ID", server.Id, true);
                 embed.AddField("Server Name", Context.Guild.Name, true);
                 embed.AddField("User count", Context.Guild.MemberCount, true);
                 embed.AddField("Use Greet", server.UseGreet, true);
@@ -126,7 +126,8 @@ namespace Huppy.App.Commands
                     server.Rooms.GreetingRoom = GreetingRoom.Id;
             }
 
-            await _serverRepository.UpdateOne(server);
+            await _serverRepository.UpdateAsync(server);
+            await _serverRepository.SaveChangesAsync();
 
             var embed = new EmbedBuilder().WithDescription("Updated your server settings\nUse `/server info` command to see current configuration")
                                           .WithThumbnailUrl(Icons.Huppy1)

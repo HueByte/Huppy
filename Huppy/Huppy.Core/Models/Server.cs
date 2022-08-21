@@ -3,10 +3,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Huppy.Core.Models
 {
-    public class Server
+    public class Server : DbModel<ulong>
     {
         [Key]
-        public ulong ID { get; set; }
+        public override ulong Id { get; set; }
         public string? ServerName { get; set; }
         public bool UseGreet { get; set; }
         public string? GreetMessage { get; set; }

@@ -37,7 +37,7 @@ namespace Huppy.Core.Services.ServerInteractionService
 
             _logger.LogInformation("New user joined [{Username}] at [{ServerName}]", user.Username, user.Guild.Name);
 
-            var server = await _serverRepository.GetOneAsync(user.Guild.Id);
+            var server = await _serverRepository.GetAsync(user.Guild.Id);
             if (server is not null)
             {
                 if (server.UseGreet)
@@ -51,7 +51,7 @@ namespace Huppy.Core.Services.ServerInteractionService
                     ISocketMessageChannel? channel = default;
                     if (server!.Rooms is not null && server!.Rooms.GreetingRoom > 0)
                         channel = user.Guild.GetChannel(server.Rooms.GreetingRoom) as ISocketMessageChannel;
-                    
+
                     channel ??= user.Guild.DefaultChannel;
 
                     await channel.SendMessageAsync(null, false, embed.Build());
@@ -64,8 +64,9 @@ namespace Huppy.Core.Services.ServerInteractionService
                     {
                         _logger.LogWarning("Role with [{RoleID}] ID on [{ServerName}] is not found. Updating default role to none", server.RoleID, user.Guild.Name);
                         server.RoleID = default;
-                        
-                        await _serverRepository.UpdateOne(server);
+
+                        await _serverRepository.UpdateAsync(server);
+                        await _serverRepository.SaveChangesAsync();
                         return;
                     }
 
