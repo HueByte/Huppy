@@ -2,10 +2,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Huppy.Core.Models
 {
-    public class Reminder
+    public class Reminder : DbModel<int>
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
+        public override int Id { get; set; }
         public DateTime RemindDate { get; set; }
         public string Message { get; set; } = null!;
 
