@@ -204,6 +204,7 @@ namespace Huppy.Core.Services.CommandService
                 }
 
                 await commandRepository.AddAsync(log);
+                await commandRepository.SaveChangesAsync();
             }
             catch (Exception) { }
             finally
@@ -235,6 +236,7 @@ namespace Huppy.Core.Services.CommandService
             };
 
             await commandRepository.AddAsync(log);
+            await commandRepository.SaveChangesAsync();
         }
 
         private Stopwatch StartExecutionTimeMeasurement(ulong commandId)
