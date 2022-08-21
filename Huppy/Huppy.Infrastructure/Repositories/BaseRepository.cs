@@ -10,7 +10,7 @@ namespace Huppy.Infrastructure.Repositories
         where TEntity : DbModel<TKeyType>, new()
         where TContext : DbContext, new()
     {
-        private readonly TContext _context;
+        protected internal readonly TContext _context;
         public BaseRepository(TContext context)
         {
             context = _context ?? new TContext();
