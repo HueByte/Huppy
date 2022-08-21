@@ -114,8 +114,9 @@ namespace Huppy.Core.Services.ReminderService
             };
 
             var result = await _reminderRepository.AddAsync(reminder);
+            await _reminderRepository.SaveChangesAsync();
 
-            if (result) throw new Exception("Failed to create reminder");
+            if (!result) throw new Exception("Failed to create reminder");
 
             ReminderInput reminderInput = new(user, message);
 
