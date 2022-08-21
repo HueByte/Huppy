@@ -16,15 +16,13 @@ namespace Huppy.App.Commands
     public class ServerCommands : InteractionModuleBase<ExtendedShardedInteractionContext>
     {
         private readonly ILogger _logger;
-        private readonly ICommandLogRepository _commandRepository;
         private readonly IServerRepository _serverRepository;
         private readonly CacheService _cacheService;
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IPaginatorService _paginatorService;
-        public ServerCommands(ILogger<ServerCommands> logger, CacheService cacheService, ICommandLogRepository commandLogRepository, IServerRepository serverRepository, IServiceScopeFactory scopeFactory, IPaginatorService paginatorService)
+        public ServerCommands(ILogger<ServerCommands> logger, CacheService cacheService, IServerRepository serverRepository, IServiceScopeFactory scopeFactory, IPaginatorService paginatorService)
         {
             _logger = logger;
-            _commandRepository = commandLogRepository;
             _cacheService = cacheService;
             _serverRepository = serverRepository;
             _scopeFactory = scopeFactory;
