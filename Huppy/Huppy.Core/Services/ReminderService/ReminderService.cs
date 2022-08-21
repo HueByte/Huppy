@@ -61,8 +61,9 @@ namespace Huppy.Core.Services.ReminderService
             _logger.LogInformation("Registering fresh bulk of reminders");
 
             // fetch reminders before fetchPeriod date
-            var reminders = await _reminderRepository
-                .GetAllQueryable()
+            var remindersQueryable = await _reminderRepository.GetAllAsync();
+
+            var reminders = await remindersQueryable
                 .Where(reminder => reminder.RemindDate < FetchingDate)
                 .ToListAsync();
 
