@@ -11,9 +11,9 @@ assignees: ''
 *Put your description here*
 
 ## Goals
-[ ] Task1
-[ ] Task2
-[ ] Task3
+- [ ] Task1
+- [ ] Task2
+- [ ] Task3
 
 ## Related tasks
 #11 #12 #13
