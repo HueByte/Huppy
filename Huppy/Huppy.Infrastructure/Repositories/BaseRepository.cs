@@ -13,7 +13,7 @@ namespace Huppy.Infrastructure.Repositories
         protected internal readonly TContext _context;
         public BaseRepository(TContext context)
         {
-            context = _context ?? new TContext();
+            _context = context ?? new TContext();
         }
 
         public virtual async Task<bool> AddAsync(TEntity? entity)
