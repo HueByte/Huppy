@@ -1,11 +1,8 @@
-using System.Text;
 using Discord;
 using Discord.Interactions;
-using Discord.WebSocket;
-using Huppy.Core.Common.Constants;
 using Huppy.Core.Common.HuppyMessages;
-using Huppy.Core.Entities;
 using Huppy.Core.IRepositories;
+using Huppy.Core.Services.CommandService;
 using Huppy.Core.Services.HuppyCacheService;
 using Huppy.Core.Services.NewsService;
 using Huppy.Core.Services.PaginatorService;
@@ -15,7 +12,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Huppy.App.Commands
 {
-    public class GeneralCommands : InteractionModuleBase<ShardedInteractionContext>
+    public class GeneralCommands : InteractionModuleBase<ExtendedShardedInteractionContext>
     {
         private readonly ILogger _logger;
         private readonly ICommandLogRepository _commandRepository;

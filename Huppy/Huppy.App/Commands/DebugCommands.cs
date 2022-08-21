@@ -3,6 +3,7 @@ using System.Text;
 using Discord;
 using Discord.Interactions;
 using Huppy.Core.Attributes;
+using Huppy.Core.Services.CommandService;
 using Huppy.Core.Services.HuppyCacheService;
 using Microsoft.Extensions.Logging;
 
@@ -11,7 +12,7 @@ namespace Huppy.App.Commands
     [Group("debug", "debug commands")]
     [DontAutoRegister]
     [DebugGroup]
-    public class DebugCommands : InteractionModuleBase<ShardedInteractionContext>
+    public class DebugCommands : InteractionModuleBase<ExtendedShardedInteractionContext>
     {
         private readonly ILogger<DebugCommands> _logger;
         private readonly CacheService _cacheService;

@@ -3,6 +3,7 @@ using Discord.Interactions;
 using Discord.WebSocket;
 using Huppy.Core.Common.Constants;
 using Huppy.Core.IRepositories;
+using Huppy.Core.Services.CommandService;
 using Huppy.Core.Services.HuppyCacheService;
 using Huppy.Core.Services.PaginatorService;
 using Huppy.Core.Services.PaginatorService.Entities;
@@ -12,7 +13,7 @@ using Microsoft.Extensions.Logging;
 namespace Huppy.App.Commands
 {
     [Group("server", "server commands")]
-    public class ServerCommands : InteractionModuleBase<ShardedInteractionContext>
+    public class ServerCommands : InteractionModuleBase<ExtendedShardedInteractionContext>
     {
         private readonly ILogger _logger;
         private readonly ICommandLogRepository _commandRepository;

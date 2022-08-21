@@ -1,12 +1,13 @@
 using Discord;
 using Discord.Interactions;
 using Huppy.Core.Attributes;
+using Huppy.Core.Services.CommandService;
 using Microsoft.Extensions.Logging;
 
 namespace Huppy.App.Commands
 {
     [Group("admin", "Moderation commands")]
-    public class AdminCommands : InteractionModuleBase<ShardedInteractionContext>
+    public class AdminCommands : InteractionModuleBase<ExtendedShardedInteractionContext>
     {
         private readonly ILogger _logger;
         public AdminCommands(ILogger<AdminCommands> logger)
