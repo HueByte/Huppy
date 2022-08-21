@@ -1,6 +1,8 @@
+using Huppy.Core.Models;
+
 namespace Huppy.Core.IRepositories
 {
-    public interface IRepository<Tkey, TEntity>
+    public interface IRepository<Tkey, TEntity> where Tkey : IConvertible where TEntity : DbModel<Tkey>
     {
         Task<TEntity?> GetAsync(Tkey id);
         Task<IQueryable<TEntity>> GetAllAsync();
