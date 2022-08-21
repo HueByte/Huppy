@@ -2,10 +2,10 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Huppy.Core.Models
 {
-    public class User
+    public class User : DbModel<ulong>
     {
         [Key]
-        public ulong Id { get; set; }
+        public override ulong Id { get; set; }
         public string? Username { get; set; }
         public DateTime? JoinDate { get; set; }
     }

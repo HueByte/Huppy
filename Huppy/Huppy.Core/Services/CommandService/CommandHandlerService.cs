@@ -113,6 +113,7 @@ namespace Huppy.Core.Services.CommandService
                     };
 
                     await userRepository.AddAsync(user);
+                    await userRepository.SaveChangesAsync();
                     await _cacheService.AddCacheUser(command.User.Id, command.User.Username);
                 }
 

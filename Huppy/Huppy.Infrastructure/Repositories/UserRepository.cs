@@ -4,22 +4,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Huppy.Infrastructure.Repositories
 {
-    public class UserRepository : IUserRepository
+    public class UserRepository : BaseRepository<ulong, User, HuppyDbContext>, IUserRepository
     {
-        private readonly HuppyDbContext _context;
-        public UserRepository(HuppyDbContext context)
-        {
-            _context = context;
-        }
-
-        public async Task AddAsync(User user)
-        {
-            var doesExist = await _context.Users.AnyAsync(e => e.Id == user.Id);
-            if (doesExist) return;
-
-            await _context.Users.AddAsync(user);
-            await _context.SaveChangesAsync();
-        }
+        public UserRepository(HuppyDbContext context) : base(context) { }
 
         public async Task<Dictionary<ulong, string?>> GetUsersForCacheAsync() =>
             await _context.Users?.ToDictionaryAsync(p => p.Id, p => p.Username)!;
