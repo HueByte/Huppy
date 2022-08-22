@@ -10,6 +10,9 @@ assignees: ''
 ## Describe the bug
 A clear and concise description of what the bug is.
 
+## Huppy version
+- provide Huppy version (like v1.0.0)
+
 ## To Reproduce
 Steps to reproduce the behavior:
 1. Go to '...'
@@ -22,10 +25,6 @@ A clear and concise description of what you expected to happen.
 
 ## Screenshots
 If applicable, add screenshots to help explain your problem.
-
-## Desktop (please complete the following information):
- - OS: [e.g. iOS]
- - Huppy Version [e.g. 1.0.0]
 
 ## Related Issues
 - T #11
