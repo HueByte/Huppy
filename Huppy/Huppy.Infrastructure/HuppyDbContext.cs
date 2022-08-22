@@ -23,5 +23,6 @@ namespace Huppy.Infrastructure
         public DbSet<CommandLog> CommandLogs { get; set; }
         public DbSet<Server> Servers { get; set; }
         public DbSet<Reminder> Reminders { get; set; }
+        public DbSet<Ticket> Tickets { get; set; }
     }
 }
