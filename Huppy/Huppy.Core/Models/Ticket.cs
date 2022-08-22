@@ -3,10 +3,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Huppy.Core.Models
 {
-    public class Ticket
+    public class Ticket : DbModel<string>
     {
         [Key]
-        public string Id { get; set; } = null!;
+        public override string Id { get; set; } = null!;
         public string Topic { get; set; } = null!;
         public string Description { get; set; } = null!;
         public bool IsClosed { get; set; }
