@@ -27,5 +27,9 @@ If applicable, add screenshots to help explain your problem.
  - OS: [e.g. iOS]
  - Huppy Version [e.g. 1.0.0]
 
+## Related Issues
+- T #11
+- B #12
+
 ## Additional context
 Add any other context about the problem here.

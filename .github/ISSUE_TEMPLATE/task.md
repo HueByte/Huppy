@@ -16,4 +16,5 @@ assignees: ''
 - [ ] Task3
 
 ## Related tasks
-#11 #12 #13
+- T #11
+- B #12
