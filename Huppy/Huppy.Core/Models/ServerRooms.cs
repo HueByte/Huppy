@@ -4,11 +4,11 @@ using System.Diagnostics.Contracts;
 
 namespace Huppy.Core.Models
 {
-    public class ServerRooms
+    public class ServerRooms : DbModel<ulong>
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
-        public ulong ServerRoomsID { get; set; }
+        public override ulong Id { get; set; }
         public ulong OutputRoom { get; set; }
         public ulong GreetingRoom { get; set; }
 

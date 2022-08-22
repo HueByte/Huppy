@@ -15,7 +15,7 @@ namespace Huppy.Infrastructure
             builder.Entity<Server>()
                    .HasOne(e => e.Rooms)
                    .WithOne(e => e.Server)
-                   .HasForeignKey<ServerRooms>(k => k.ServerRoomsID)
+                   .HasForeignKey<ServerRooms>(k => k.Id)
                    .OnDelete(DeleteBehavior.Cascade);
         }
 

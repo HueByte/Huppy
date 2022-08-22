@@ -3,11 +3,9 @@ using Huppy.Core.Models;
 
 namespace Huppy.Core.IRepositories
 {
-    public interface ICommandLogRepository
+    public interface ICommandLogRepository : IRepository<int, CommandLog>
     {
-        Task AddAsync(CommandLog commandLog);
-        Task<Dictionary<ulong, AiUser>> GetAiUsage();
-        Task<List<CommandLog>> GetAll();
         Task<int> GetCount();
+        Task<Dictionary<ulong, AiUser>> GetAiUsage();
     }
 }

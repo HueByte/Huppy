@@ -61,8 +61,9 @@ namespace Huppy.Core.Services.ReminderService
             _logger.LogInformation("Registering fresh bulk of reminders");
 
             // fetch reminders before fetchPeriod date
-            var reminders = await _reminderRepository
-                .GetAllQueryable()
+            var remindersQueryable = await _reminderRepository.GetAllAsync();
+
+            var reminders = await remindersQueryable
                 .Where(reminder => reminder.RemindDate < FetchingDate)
                 .ToListAsync();
 
@@ -91,7 +92,10 @@ namespace Huppy.Core.Services.ReminderService
 
         public async Task<List<Reminder>> GetUserRemindersAsync(ulong userId)
         {
-            return await _reminderRepository.GetAllQueryable(userId).ToListAsync();
+            var reminders = await _reminderRepository.GetAllAsync();
+
+            return await reminders.Where(reminder => reminder.UserId == userId)
+                                  .ToListAsync();
         }
 
         public async Task AddReminder(DateTime date, ulong userId, string message)
@@ -109,9 +113,10 @@ namespace Huppy.Core.Services.ReminderService
                 UserId = user.Id
             };
 
-            var resultId = await _reminderRepository.AddAsync(reminder);
+            var result = await _reminderRepository.AddAsync(reminder);
+            await _reminderRepository.SaveChangesAsync();
 
-            if (resultId is null) throw new Exception("Failed to create reminder");
+            if (!result) throw new Exception("Failed to create reminder");
 
             ReminderInput reminderInput = new(user, message);
 
@@ -119,7 +124,7 @@ namespace Huppy.Core.Services.ReminderService
 
             if (date < FetchingDate)
             {
-                await _eventService.AddEvent(date, resultId.ToString()!, reminderInput, async (input) =>
+                await _eventService.AddEvent(date, reminder.Id.ToString()!, reminderInput, async (input) =>
                 {
                     if (input is ReminderInput data)
                     {
@@ -132,6 +137,7 @@ namespace Huppy.Core.Services.ReminderService
         public async Task RemoveReminder(Reminder reminder)
         {
             await _reminderRepository.RemoveAsync(reminder);
+            await _reminderRepository.SaveChangesAsync();
             await _eventService.Remove(reminder.RemindDate, reminder.Id.ToString());
         }
 
@@ -146,6 +152,7 @@ namespace Huppy.Core.Services.ReminderService
             if (!(ids.Length > 0)) return;
 
             await _reminderRepository.RemoveRangeAsync(ids);
+            await _reminderRepository.SaveChangesAsync();
         }
 
         private async Task StandardReminder(IUser user, string message)

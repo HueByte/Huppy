@@ -124,7 +124,8 @@ namespace Huppy.App.Commands
                 Data = Context.User
             };
 
-            var reminderCount = await _reminderRepository.GetAllQueryable(Context.User.Id).CountAsync();
+            var reminders = await _reminderRepository.GetAllAsync();
+            var reminderCount = await reminders.Where(entry => entry.UserId == Context.User.Id).CountAsync();
 
             if (!(reminderCount > 0))
             {
@@ -163,8 +164,9 @@ namespace Huppy.App.Commands
 
                         var reminderRepository = scope.ServiceProvider.GetRequiredService<IReminderRepository>();
 
-                        var pageReminders = await reminderRepository
-                            .GetAllQueryable(user.Id)
+                        var reminders = await reminderRepository.GetAllAsync();
+                        var pageReminders = await reminders
+                            .Where(reminder => reminder.UserId == user.Id)
                             .OrderBy(e => e.RemindDate)
                             .Skip(currentPage * RemindersPerPage)
                             .Take(RemindersPerPage)

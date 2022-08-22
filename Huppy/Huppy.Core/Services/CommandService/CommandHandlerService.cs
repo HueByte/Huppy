@@ -113,6 +113,7 @@ namespace Huppy.Core.Services.CommandService
                     };
 
                     await userRepository.AddAsync(user);
+                    await userRepository.SaveChangesAsync();
                     await _cacheService.AddCacheUser(command.User.Id, command.User.Username);
                 }
 
@@ -204,6 +205,7 @@ namespace Huppy.Core.Services.CommandService
                 }
 
                 await commandRepository.AddAsync(log);
+                await commandRepository.SaveChangesAsync();
             }
             catch (Exception) { }
             finally
@@ -235,6 +237,7 @@ namespace Huppy.Core.Services.CommandService
             };
 
             await commandRepository.AddAsync(log);
+            await commandRepository.SaveChangesAsync();
         }
 
         private Stopwatch StartExecutionTimeMeasurement(ulong commandId)

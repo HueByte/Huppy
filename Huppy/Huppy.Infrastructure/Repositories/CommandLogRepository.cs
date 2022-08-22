@@ -5,35 +5,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Huppy.Infrastructure.Repositories
 {
-    public class CommandLogRepository : ICommandLogRepository
+    public class CommandLogRepository : BaseRepository<int, CommandLog, HuppyDbContext>, ICommandLogRepository
     {
-        private readonly HuppyDbContext _context;
-        public CommandLogRepository(HuppyDbContext context)
-        {
-            _context = context;
-        }
+        public CommandLogRepository(HuppyDbContext context) : base(context) { }
 
-        public async Task AddAsync(CommandLog commandLog)
-        {
-            await _context.CommandLogs.AddAsync(commandLog);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task AddRange(CommandLog[] commandLogs)
-        {
-            await _context.CommandLogs.AddRangeAsync(commandLogs);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task<List<CommandLog>> GetAll()
-        {
-            return await _context.CommandLogs.ToListAsync();
-        }
-
-        public Task<int> GetCount()
-        {
-            return Task.FromResult(_context.CommandLogs.Count());
-        }
+        public async Task<int> GetCount() => await _context.CommandLogs.CountAsync();
 
         public async Task<Dictionary<ulong, AiUser>> GetAiUsage()
         {

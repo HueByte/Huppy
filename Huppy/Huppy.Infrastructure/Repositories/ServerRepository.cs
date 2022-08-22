@@ -5,53 +5,18 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Huppy.Infrastructure.Repositories
 {
-    public class ServerRepository : IServerRepository
+    public class ServerRepository : BaseRepository<ulong, Server, HuppyDbContext>, IServerRepository
     {
-        private readonly HuppyDbContext _context;
-        public ServerRepository(HuppyDbContext context)
+        public ServerRepository(HuppyDbContext context) : base(context) { }
+
+        public override async Task<Server?> GetAsync(ulong id)
         {
-            _context = context;
-        }
-
-        public async Task<List<Server>> GetAll()
-        {
-            return await _context.Servers.Include(e => e.Rooms)
-                                         .ToListAsync();
-        }
-
-        public async Task AddOneAsync(Server server)
-        {
-            await _context.Servers.AddAsync(server);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task AddOneAsync(ShardedInteractionContext DiscordContext)
-        {
-            if (await _context.Servers.AnyAsync(en => en.ID == DiscordContext.Guild.Id))
-                throw new Exception($"Server with [{DiscordContext.Guild.Id}] ID already exists");
-
-            Server server = new()
-            {
-                ID = DiscordContext.Guild.Id,
-                GreetMessage = "Welcome {username}!",
-                Rooms = new()
-                {
-                    OutputRoom = DiscordContext.Guild.DefaultChannel.Id,
-                    GreetingRoom = 0
-                },
-                UseGreet = false,
-                ServerName = DiscordContext.Guild.Name,
-                RoleID = 0,
-            };
-
-            await _context.Servers.AddAsync(server);
-            await _context.SaveChangesAsync();
+            return await _context.Servers.Include(e => e.Rooms).FirstOrDefaultAsync(entry => entry.Id == id);
         }
 
         public async Task<Server> GetOrCreateAsync(ShardedInteractionContext DiscordContext)
         {
-            var server = await _context.Servers.Include(e => e.Rooms)
-                                               .FirstOrDefaultAsync(en => en.ID == DiscordContext.Guild.Id);
+            var server = await GetAsync(DiscordContext.Guild.Id);
 
             if (server is not null)
             {
@@ -63,8 +28,8 @@ namespace Huppy.Infrastructure.Repositories
                         GreetingRoom = default
                     };
 
-                    _context.Servers.Update(server);
-                    await _context.SaveChangesAsync();
+                    await base.UpdateAsync(server);
+                    await base.SaveChangesAsync();
                 }
 
                 return server;
@@ -72,7 +37,7 @@ namespace Huppy.Infrastructure.Repositories
 
             server = new()
             {
-                ID = DiscordContext.Guild.Id,
+                Id = DiscordContext.Guild.Id,
                 GreetMessage = "Welcome {username}!",
                 Rooms = new()
                 {
@@ -84,26 +49,10 @@ namespace Huppy.Infrastructure.Repositories
                 UseGreet = false,
             };
 
-            await _context.Servers.AddAsync(server);
-            await _context.SaveChangesAsync();
+            await base.AddAsync(server);
+            await base.SaveChangesAsync();
 
             return server;
-        }
-
-        public async Task<Server?> GetOneAsync(ulong ID)
-        {
-            return await _context.Servers.Include(e => e.Rooms)
-                                         .Where(en => en.ID == ID)
-                                         .FirstOrDefaultAsync();
-        }
-
-        public async Task UpdateOne(Server server)
-        {
-            if (!await _context.Servers.AnyAsync(en => en.ID == server.ID))
-                throw new Exception("Couldn't find this server");
-
-            _context.Servers.Update(server);
-            await _context.SaveChangesAsync();
         }
     }
 }

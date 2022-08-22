@@ -16,15 +16,13 @@ namespace Huppy.App.Commands
     public class ServerCommands : InteractionModuleBase<ExtendedShardedInteractionContext>
     {
         private readonly ILogger _logger;
-        private readonly ICommandLogRepository _commandRepository;
         private readonly IServerRepository _serverRepository;
         private readonly CacheService _cacheService;
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IPaginatorService _paginatorService;
-        public ServerCommands(ILogger<ServerCommands> logger, CacheService cacheService, ICommandLogRepository commandLogRepository, IServerRepository serverRepository, IServiceScopeFactory scopeFactory, IPaginatorService paginatorService)
+        public ServerCommands(ILogger<ServerCommands> logger, CacheService cacheService, IServerRepository serverRepository, IServiceScopeFactory scopeFactory, IPaginatorService paginatorService)
         {
             _logger = logger;
-            _commandRepository = commandLogRepository;
             _cacheService = cacheService;
             _serverRepository = serverRepository;
             _scopeFactory = scopeFactory;
@@ -56,7 +54,7 @@ namespace Huppy.App.Commands
                           .WithThumbnailUrl(Context.Guild.IconUrl)
                           .WithFooter("If you want to change server configuration use /configure");
 
-                embed.AddField("ID", server.ID, true);
+                embed.AddField("ID", server.Id, true);
                 embed.AddField("Server Name", Context.Guild.Name, true);
                 embed.AddField("User count", Context.Guild.MemberCount, true);
                 embed.AddField("Use Greet", server.UseGreet, true);
@@ -128,7 +126,8 @@ namespace Huppy.App.Commands
                     server.Rooms.GreetingRoom = GreetingRoom.Id;
             }
 
-            await _serverRepository.UpdateOne(server);
+            await _serverRepository.UpdateAsync(server);
+            await _serverRepository.SaveChangesAsync();
 
             var embed = new EmbedBuilder().WithDescription("Updated your server settings\nUse `/server info` command to see current configuration")
                                           .WithThumbnailUrl(Icons.Huppy1)

@@ -2,9 +2,8 @@ using Huppy.Core.Models;
 
 namespace Huppy.Core.IRepositories
 {
-    public interface IUserRepository
+    public interface IUserRepository : IRepository<ulong, User>
     {
-        Task AddAsync(User user);
         Task<Dictionary<ulong, string?>> GetUsersForCacheAsync();
     }
 }
