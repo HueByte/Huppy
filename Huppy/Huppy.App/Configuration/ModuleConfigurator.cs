@@ -59,7 +59,17 @@ namespace Huppy.App.Configuration
             {
                 LogLevel = LogSeverity.Info,
                 MessageCacheSize = 100,
-                GatewayIntents = GatewayIntents.AllUnprivileged | GatewayIntents.GuildMembers | GatewayIntents.GuildBans | GatewayIntents.DirectMessages
+                GatewayIntents = GatewayIntents.Guilds
+                    | GatewayIntents.GuildBans
+                    | GatewayIntents.GuildEmojis
+                    | GatewayIntents.GuildIntegrations
+                    | GatewayIntents.GuildWebhooks
+                    | GatewayIntents.GuildInvites
+                    | GatewayIntents.GuildVoiceStates
+                    | GatewayIntents.GuildMessageReactions
+                    | GatewayIntents.DirectMessageReactions
+                    | GatewayIntents.GuildScheduledEvents
+                    | GatewayIntents.GuildMembers
             });
 
             InteractionServiceConfig interactionServiceConfig = new()
