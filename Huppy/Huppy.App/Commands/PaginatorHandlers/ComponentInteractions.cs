@@ -1,12 +1,13 @@
 using Discord.Interactions;
 using Discord.WebSocket;
+using Huppy.Core.Services.CommandService;
 using Huppy.Core.Services.HuppyCacheService;
 using Huppy.Core.Services.PaginatorService;
 using Microsoft.Extensions.Logging;
 
 namespace Huppy.App.Commands
 {
-    public class ComponentInteractions : InteractionModuleBase<ShardedInteractionContext>
+    public class ComponentInteractions : InteractionModuleBase<ExtendedShardedInteractionContext>
     {
         private readonly ILogger _logger;
         private readonly CacheService _cacheService;

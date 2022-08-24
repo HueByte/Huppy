@@ -19,7 +19,7 @@ namespace Huppy.Core.Services.CommandService
         private readonly DiscordShardedClient _client;
         private readonly InteractionService _interactionService;
         private readonly IServiceProvider _serviceProvider;
-        private readonly Microsoft.Extensions.Logging.ILogger _logger;
+        private readonly ILogger _logger;
         private readonly CacheService _cacheService;
         private readonly IServiceScopeFactory _serviceFactory;
         private HashSet<string> _ephemeralCommands;
@@ -56,7 +56,7 @@ namespace Huppy.Core.Services.CommandService
                 // extract method info from them and then check for EphemeralAtrribute and SlashCommandAttribute,
                 // if contains both of them, the command name is added to ephemeral hashset of names
                 var methods = asm.GetTypes()
-                    .Where(type => !type.IsInterface && typeof(InteractionModuleBase<ShardedInteractionContext>).IsAssignableFrom(type))
+                    .Where(type => !type.IsInterface && typeof(InteractionModuleBase<ExtendedShardedInteractionContext>).IsAssignableFrom(type))
                     .SelectMany(t => t.GetMethods())
                     .Where(method => method.GetCustomAttributes(typeof(EphemeralAttribute), false).Length > 0 && method.GetCustomAttributes(typeof(SlashCommandAttribute), false).Length > 0)
                     .Select(method => (method.GetCustomAttribute(typeof(SlashCommandAttribute), false) as SlashCommandAttribute)?.Name)
