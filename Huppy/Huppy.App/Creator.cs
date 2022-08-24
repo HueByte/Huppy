@@ -190,7 +190,7 @@ namespace Huppy.App
                         resultCommands = resultCommands.Union(debugCommands).ToList();
                     }
 
-                    _logger.LogInformation("Registering {privateCount} private modules to [ {id} ]", debugModules.Length + betaModules.Length, guildId);
+                    _logger.LogInformation("Registering {privateCount} private modules to [ {id} ]", resultModules.Count, guildId);
                     await _interactionService.AddModulesToGuildAsync(guildId, false, resultModules.ToArray());
 
                     // disabled as for now since [DontAutoRegister] attribute works only for classes (for groups)
