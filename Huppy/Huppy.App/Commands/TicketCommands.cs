@@ -2,6 +2,7 @@ using System.Text;
 using Discord;
 using Discord.Interactions;
 using Huppy.Core.Attributes;
+using Huppy.Core.Services.CommandService;
 using Huppy.Core.Services.PaginatorService;
 using Huppy.Core.Services.PaginatorService.Entities;
 using Huppy.Core.Services.TicketService;
@@ -12,7 +13,7 @@ namespace Huppy.App.Commands
 {
     [Group("ticket", "Give us your feedback or let me know when you see some bugs")]
     [DebugGroup]
-    public class TicketCommands : InteractionModuleBase<ShardedInteractionContext>
+    public class TicketCommands : InteractionModuleBase<ExtendedShardedInteractionContext>
     {
         private readonly ILogger _logger;
         private readonly ITicketService _ticketService;
