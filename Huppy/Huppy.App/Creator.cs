@@ -151,6 +151,13 @@ namespace Huppy.App
 
             try
             {
+                // register commands to the global flow
+                if (IsProd())
+                {
+                    _logger.LogInformation("Registering commands globally...");
+                    await _interactionService.RegisterCommandsGloballyAsync();
+                }
+
                 string[]? betaTestingGuildsTemp = _appSettings.BetaTestingGuilds?.Split(';').ToArray();
                 ulong[] betaTestingGuilds = betaTestingGuildsTemp?.Length > 0 ? Array.ConvertAll(betaTestingGuildsTemp, UInt64.Parse) : Array.Empty<ulong>();
 
@@ -165,6 +172,12 @@ namespace Huppy.App
                     List<ModuleInfo> resultModules = new();
                     List<ICommandInfo> resultCommands = new();
 
+                    // auto register commands to guilds 
+                    if (!IsProd() && debugGuilds.Contains(guildId))
+                    {
+                        await _interactionService.RegisterCommandsToGuildAsync(guildId, true);
+                    }
+
                     if (betaTestingGuilds.Contains(guildId))
                     {
                         resultModules.AddRange(betaModules);
@@ -178,21 +191,12 @@ namespace Huppy.App
                     }
 
                     _logger.LogInformation("Registering {privateCount} private modules to [ {id} ]", debugModules.Length + betaModules.Length, guildId);
-                    await _interactionService.AddModulesToGuildAsync(guildId, true, resultModules.ToArray());
+                    await _interactionService.AddModulesToGuildAsync(guildId, false, resultModules.ToArray());
 
                     // disabled as for now since [DontAutoRegister] attribute works only for classes (for groups)
                     // so it cannot be applied for individual commands 
                     // await _interactionService.AddCommandsToGuildAsync(guildId, true, resultCommands.ToArray());
                 }
-
-                // register commands to the global flow
-                if (IsProd())
-                {
-                    _logger.LogInformation("Registering commands globally...");
-                    await _interactionService.RegisterCommandsGloballyAsync();
-                }
-
-                _logger.LogInformation("Registering debug commands");
             }
             catch (Exception exp)
             {
