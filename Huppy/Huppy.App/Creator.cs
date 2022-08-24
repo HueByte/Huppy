@@ -18,7 +18,7 @@ using Serilog;
 
 namespace Huppy.App
 {
-    public class Creator
+    public sealed class Creator
     {
         #region properties
         private readonly IServiceProvider _serviceProvider;
@@ -145,6 +145,8 @@ namespace Huppy.App
 
         private async Task CreateSlashCommands(DiscordSocketClient socketClient)
         {
+            if (isBotInitialized) return;
+
             _logger.LogInformation("Creating slash commands");
 
             try
@@ -155,29 +157,42 @@ namespace Huppy.App
                 string[]? debugGuildsTemp = _appSettings.DebugGuilds?.Split(';').ToArray()!;
                 ulong[] debugGuilds = debugGuildsTemp?.Length > 0 ? Array.ConvertAll(debugGuildsTemp, UInt64.Parse) : Array.Empty<ulong>();
 
-                var debugCommands = _interactionService.Modules
-                    .Where(e => e.Attributes.Any(e => e is DebugGroupAttribute))
-                    .ToList();
+                (var debugModules, var debugCommands) = GetSpecialCommands<DebugCommandGroupAttribute, DebugCommandAttribute>();
+                (var betaModules, var betaCommands) = GetSpecialCommands<BetaCommandGroupAttribute, BetaCommandAttribute>();
 
-                _logger.LogInformation("Registering beta commands");
-                foreach (var guild in betaTestingGuilds)
+                foreach (var guildId in betaTestingGuilds.Union(debugGuilds))
                 {
-                    _logger.LogInformation("Registering beta commands to [{guild}]", guild);
-                    await _interactionService.RegisterCommandsToGuildAsync(guild);
+                    List<ModuleInfo> resultModules = new();
+                    List<ICommandInfo> resultCommands = new();
+
+                    if (betaTestingGuilds.Contains(guildId))
+                    {
+                        resultModules.AddRange(betaModules);
+                        resultCommands.AddRange(betaCommands);
+                    }
+
+                    if (debugGuilds.Contains(guildId))
+                    {
+                        resultModules = resultModules.Union(debugModules).ToList();
+                        resultCommands = resultCommands.Union(debugCommands).ToList();
+                    }
+
+                    _logger.LogInformation("Registering {privateCount} private modules to [ {id} ]", debugModules.Length + betaModules.Length, guildId);
+                    await _interactionService.AddModulesToGuildAsync(guildId, true, resultModules.ToArray());
+
+                    // disabled as for now since [DontAutoRegister] attribute works only for classes (for groups)
+                    // so it cannot be applied for individual commands 
+                    // await _interactionService.AddCommandsToGuildAsync(guildId, true, resultCommands.ToArray());
                 }
 
                 // register commands to the global flow
                 if (IsProd())
                 {
                     _logger.LogInformation("Registering commands globally...");
-                    if (!isBotInitialized) await _interactionService.RegisterCommandsGloballyAsync();
+                    await _interactionService.RegisterCommandsGloballyAsync();
                 }
 
                 _logger.LogInformation("Registering debug commands");
-                foreach (var guild in debugGuilds)
-                {
-                    await _interactionService.AddModulesToGuildAsync(guild, false, debugCommands.ToArray());
-                }
             }
             catch (Exception exp)
             {
@@ -185,14 +200,30 @@ namespace Huppy.App
             }
         }
 
-        private static List<ModuleInfo?> GetBetaCommands()
+        private Tuple<ModuleInfo[], ICommandInfo[]> GetSpecialCommands<TGroup, TMethod>()
         {
-            throw new NotImplementedException();
-        }
+            // get command groups with TGroup attribute
+            var commandModules = _interactionService.Modules
+                .Where(e => e.Attributes.Any(e => e is TGroup))
+                .ToArray();
 
-        private static List<ModuleInfo?> GetDebugCommands()
-        {
-            throw new NotImplementedException();
+            // get top level commands with TMethod attribute
+            // var topLevelCommands = _interactionService.SlashCommands
+            //     .Where(command => command.Attributes.Any(attrib => attrib is TMethod && command.IsTopLevelCommand))
+            //     .Select(command => (CommandInfo<SlashCommandParameterInfo>)command)
+            //     .ToArray();
+
+            // get individual group commands from modules that hasn't got TGroup attribute, and have TMethod attribute 
+            var moduleCommands = _interactionService.Modules
+                .Where(module => !commandModules.Contains(module))
+                .SelectMany(module => module.SlashCommands)
+                .Where(command => command.Attributes.Any(attrib => attrib is TMethod))
+                .ToArray();
+
+            // connect individual module commands and top level commands for bulk insert
+            // var commandInfoResult = topLevelCommands.Union(moduleCommands).ToArray();
+
+            return new Tuple<ModuleInfo[], ICommandInfo[]>(commandModules, moduleCommands);
         }
 
         private static bool IsProd()

@@ -12,7 +12,6 @@ using Microsoft.Extensions.Logging;
 namespace Huppy.App.Commands
 {
     [Group("ticket", "Give us your feedback or let me know when you see some bugs")]
-    [DebugGroup]
     public class TicketCommands : InteractionModuleBase<ExtendedShardedInteractionContext>
     {
         private readonly ILogger _logger;

@@ -34,7 +34,7 @@ namespace Huppy.Core.Services.PaginatorService
 
             var commandGroups = _interactionService.Modules
                 .OrderByDescending(e => e.SlashCommands.Count)
-                .Where(e => !e.Attributes.Any(e => e is DebugGroupAttribute))
+                .Where(e => !e.Attributes.Any(e => e is DebugCommandGroupAttribute))
                 .ToList();
 
             int pageNumber = 0;

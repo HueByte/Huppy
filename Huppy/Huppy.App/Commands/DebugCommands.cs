@@ -10,8 +10,7 @@ using Microsoft.Extensions.Logging;
 namespace Huppy.App.Commands
 {
     [Group("debug", "debug commands")]
-    [DontAutoRegister]
-    [DebugGroup]
+    [DebugCommandGroup]
     public class DebugCommands : InteractionModuleBase<ExtendedShardedInteractionContext>
     {
         private readonly ILogger<DebugCommands> _logger;
