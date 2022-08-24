@@ -154,8 +154,8 @@ namespace Huppy.App
                 // register commands to the global flow
                 if (IsProd())
                 {
-                    _logger.LogInformation("Registering commands globally...");
-                    await _interactionService.RegisterCommandsGloballyAsync();
+                    _logger.LogInformation("Registering commands globally");
+                    await _interactionService.RegisterCommandsGloballyAsync(true);
                 }
 
                 string[]? betaTestingGuildsTemp = _appSettings.BetaTestingGuilds?.Split(';').ToArray();
@@ -175,6 +175,7 @@ namespace Huppy.App
                     // auto register commands to guilds 
                     if (!IsProd() && debugGuilds.Contains(guildId))
                     {
+                        _logger.LogInformation("Registering commands for debug guilds with non prod environment");
                         await _interactionService.RegisterCommandsToGuildAsync(guildId, true);
                     }
 
