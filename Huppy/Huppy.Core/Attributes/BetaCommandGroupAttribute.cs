@@ -4,8 +4,8 @@ namespace Huppy.Core.Attributes
 {
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
     [DontAutoRegister]
-    public class BetaCommandGroup : Attribute
+    public class BetaCommandGroupAttribute : Attribute
     {
-        public BetaCommandGroup() { }
+        public BetaCommandGroupAttribute() { }
     }
 }
