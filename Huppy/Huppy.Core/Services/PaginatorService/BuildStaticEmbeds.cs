@@ -34,10 +34,34 @@ namespace Huppy.Core.Services.PaginatorService
 
             var commandGroups = _interactionService.Modules
                 .OrderByDescending(e => e.SlashCommands.Count)
-                .Where(e => !e.Attributes.Any(e => e is DebugCommandGroupAttribute))
+                .Where(e => !e.Attributes.Any(e => e is DebugCommandGroupAttribute || e is BetaCommandGroupAttribute) && e.SlashCommands.Count > 0)
                 .ToList();
 
-            int pageNumber = 0;
+            // first page summinary
+            var summinary = new EmbedBuilder()
+                .WithTitle("Huppy summinary")
+                .WithDescription("Navigate to appropriate page to get more detailed information about the command module")
+                .WithColor(Color.LightOrange)
+                .WithThumbnailUrl(Icons.Huppy1);
+
+            for (int i = 0; i < commandGroups.Count; i++)
+            {
+                string title = string.IsNullOrEmpty(commandGroups[i].SlashGroupName) ? $"⚗ `{i + 2}` `General Commands`" : $"⚗ `{i + 2}` `/{commandGroups[i].SlashGroupName}`";
+                string description = string.IsNullOrEmpty(commandGroups[i].Description) ? "*Miscellaneous commands*" : $"*{commandGroups[i].Description}*";
+
+                summinary.AddField(title, description, true);
+            }
+
+            PaginatorPage summinaryPage = new()
+            {
+                Name = "Help0",
+                Page = (byte)0,
+                Embed = summinary
+            };
+
+            helpEmbeds.Add(summinaryPage);
+
+            int pageNumber = 1;
             foreach (var group in commandGroups)
             {
                 if (group.SlashCommands.Count == 0)
