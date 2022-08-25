@@ -35,14 +35,16 @@ namespace Huppy.Core.Services.GPTService
             var aiContext = _settings?.GPT?.AiContextMessage;
 
             if (string.IsNullOrEmpty(aiContext)) aiContext = "";
+            if (!(prompt.EndsWith('?') || prompt.EndsWith('.'))) prompt += '.';
 
-            aiContext += prompt;
+            aiContext += prompt + "\n[Huppy]:";
 
             GPTDto model = new()
             {
-                MaxTokens = 150,
+                MaxTokens = 200,
                 Prompt = aiContext,
-                Temperature = 0.7,
+                Temperature = 0.6,
+                FrequencyPenalty = 0.5,
                 N = 1
             };
 

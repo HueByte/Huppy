@@ -29,9 +29,9 @@ namespace Huppy.Core.Dto
         public string[]? Stop { get; set; }
 
         [JsonPropertyName("frequency_penalty")]
-        public int FrequencyPenalty { get; set; }
+        public double FrequencyPenalty { get; set; }
 
         [JsonPropertyName("presence_penalty")]
-        public int PresencePenalty { get; set; }
+        public double PresencePenalty { get; set; }
     }
 }
