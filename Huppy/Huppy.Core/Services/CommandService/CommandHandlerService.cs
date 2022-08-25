@@ -98,11 +98,21 @@ namespace Huppy.Core.Services.CommandService
 
                 // Disposed in ExtendedShardedInteractionContext
                 var scope = _serviceFactory.CreateAsyncScope();
-                var userRepository = scope.ServiceProvider.GetRequiredService<IUserRepository>();
+                var ctx = new ExtendedShardedInteractionContext(_client, command, scope);
+
+                // fetch guilds from cache and check if server is already registered
+                if (ctx.Guild is not null && !_cacheService.RegisteredGuildsIds.Contains(ctx.Guild.Id))
+                {
+                    var serverRepository = scope.ServiceProvider.GetRequiredService<IServerRepository>();
+                    await serverRepository.GetOrCreateAsync(ctx);
+                    await serverRepository.SaveChangesAsync();
+                    _cacheService.RegisteredGuildsIds.Add(ctx.Guild.Id);
+                }
 
                 // cache keeps all user IDs existing in database, if user is not present, he shall be added
                 if (!_cacheService.CacheUsers.ContainsKey(command.User.Id))
                 {
+                    var userRepository = scope.ServiceProvider.GetRequiredService<IUserRepository>();
                     _logger.LogInformation("Adding new user [{Username}] to database", command.User.Username);
 
                     User user = new()
@@ -117,7 +127,6 @@ namespace Huppy.Core.Services.CommandService
                     await _cacheService.AddCacheUser(command.User.Id, command.User.Username);
                 }
 
-                var ctx = new ExtendedShardedInteractionContext(_client, command, scope);
                 await _interactionService.ExecuteCommandAsync(ctx, scope.ServiceProvider);
             }
             catch (Exception ex)
@@ -125,7 +134,9 @@ namespace Huppy.Core.Services.CommandService
                 _logger.LogError("Command execution error", ex);
 
                 await command.ModifyOriginalResponseAsync((msg) => msg.Content = "Something went wrong");
-                throw;
+
+                // TODO: uncomment to rethrow for future global error handler
+                // throw;
             }
         }
 
@@ -137,7 +148,6 @@ namespace Huppy.Core.Services.CommandService
             try
             {
                 var commandRepository = scope.ServiceProvider.GetRequiredService<ICommandLogRepository>();
-
                 var executionTime = StopExecutionMeasurement(context.Interaction.Id);
 
                 CommandLog log = new()

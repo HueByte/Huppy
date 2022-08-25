@@ -178,6 +178,12 @@ namespace Huppy.App
                         _logger.LogInformation("Registering commands for debug guilds with non prod environment");
                         await _interactionService.RegisterCommandsToGuildAsync(guildId, true);
                     }
+                    else
+                    {
+                        // clear guild registered modules
+                        _logger.LogInformation("Clearing guild scoped commands");
+                        await _interactionService.AddModulesToGuildAsync(guildId, true, resultModules.ToArray());
+                    }
 
                     if (betaTestingGuilds.Contains(guildId))
                     {
@@ -192,6 +198,8 @@ namespace Huppy.App
                     }
 
                     _logger.LogInformation("Registering {privateCount} private modules to [ {id} ]", resultModules.Count, guildId);
+
+                    // append special modules
                     await _interactionService.AddModulesToGuildAsync(guildId, false, resultModules.ToArray());
 
                     // disabled as for now since [DontAutoRegister] attribute works only for classes (for groups)
