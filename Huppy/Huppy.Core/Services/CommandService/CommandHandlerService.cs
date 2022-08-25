@@ -42,24 +42,6 @@ namespace Huppy.Core.Services.CommandService
             _ephemeralCommands = GetEphemeralCommands();
         }
 
-        private Type[] GetMiddlewaresTypes()
-        {
-            var assemblies = AppDomain.CurrentDomain.GetAssemblies()
-                .Where(asm => asm.FullName!.StartsWith("Huppy"));
-
-            List<Type> types = new();
-            foreach (var asm in assemblies)
-            {
-                var middlewares = asm.GetTypes()
-                    .Where(type => !type.IsInterface && typeof(IMiddleware).IsAssignableFrom(type))
-                    .ToList();
-
-                types.AddRange(middlewares);
-            }
-
-            return types.ToArray();
-        }
-
         private HashSet<string> GetEphemeralCommands()
         {
             _logger.LogInformation("Registering ephemeral commands");
