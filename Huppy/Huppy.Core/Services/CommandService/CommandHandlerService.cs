@@ -182,7 +182,7 @@ namespace Huppy.Core.Services.CommandService
                 for (int i = _middlewaresTypes.Length; i-- > 0;)
                 {
                     if (scope.ServiceProvider.GetRequiredService(_middlewaresTypes[i]) is not IMiddleware middlewareInstance) return;
-                    await middlewareInstance.BeforeAsync(extendedContext!);
+                    await middlewareInstance.AfterAsync(extendedContext!);
                 }
 
                 CommandLog log = new()
