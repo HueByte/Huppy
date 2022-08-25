@@ -6,6 +6,7 @@ using Huppy.Core.Services.CommandService;
 using Huppy.Core.Services.EventService;
 using Huppy.Core.Services.HuppyCacheService;
 using Huppy.Core.Services.LoggerService;
+using Huppy.Core.Services.MiddlewareExecutor;
 using Huppy.Core.Services.PaginatorService;
 using Huppy.Core.Services.ReminderService;
 using Huppy.Core.Services.ServerInteractionService;
@@ -35,6 +36,7 @@ namespace Huppy.App
         private readonly IPaginatorService _paginatorService;
         private readonly IEventService _eventService;
         private readonly IReminderService _reminderService;
+        private readonly MiddlewareExecutorService _middlewareExecutor;
         private bool isBotInitialized = false;
 
         #endregion
@@ -54,6 +56,7 @@ namespace Huppy.App
             _eventService = _serviceProvider.GetRequiredService<IEventService>();
             _paginatorService = _serviceProvider.GetRequiredService<IPaginatorService>();
             _reminderService = _serviceProvider.GetRequiredService<IReminderService>();
+            _middlewareExecutor = _serviceProvider.GetRequiredService<MiddlewareExecutorService>();
         }
 
         public async Task CreateDatabase()
@@ -95,7 +98,7 @@ namespace Huppy.App
             // command events
             _client.InteractionCreated += _commandHandler.HandleCommandAsync;
             _interactionService.SlashCommandExecuted += _commandHandler.SlashCommandExecuted;
-            _client.ButtonExecuted += _commandHandler.ComponentExecuted;
+            _interactionService.ComponentCommandExecuted += _commandHandler.ComponentExecuted;
 
             // logger events
             _client.Log += _loggingService.OnLogAsync;
@@ -103,6 +106,18 @@ namespace Huppy.App
 
             // others
             _eventService.OnEventsRemoved += _reminderService.RemoveReminderRange;
+
+            // _middlewareExecutor.OnMiddlewareStart += (typeName) =>
+            // {
+            //     _logger.LogInformation("Started {name} middleware", typeName);
+            //     return Task.CompletedTask;
+            // };
+
+            // _middlewareExecutor.OnMiddlewareFinish += (typeName) =>
+            // {
+            //     _logger.LogInformation("Finished {name} middleware", typeName);
+            //     return Task.CompletedTask;
+            // };
 
             return Task.CompletedTask;
         }
