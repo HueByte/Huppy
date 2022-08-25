@@ -11,6 +11,7 @@ namespace Huppy.App.Commands
 {
     [Group("debug", "debug commands")]
     [DebugCommandGroup]
+    [DontAutoRegister]
     public class DebugCommands : InteractionModuleBase<ExtendedShardedInteractionContext>
     {
         private readonly ILogger<DebugCommands> _logger;
