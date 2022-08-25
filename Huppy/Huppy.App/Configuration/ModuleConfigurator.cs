@@ -14,6 +14,7 @@ using Huppy.Core.Services.LoggerService;
 using Huppy.Core.Services.NewsService;
 using Huppy.Core.Services.PaginatorService;
 using Huppy.Core.Services.ReminderService;
+using Huppy.Core.Services.ScopedDataService;
 using Huppy.Core.Services.ServerInteractionService;
 using Huppy.Core.Services.TicketService;
 using Huppy.Core.Services.TimedEventsService;
@@ -56,7 +57,7 @@ namespace Huppy.App.Configuration
 
         public ModuleConfigurator AddMiddlewares()
         {
-            _services.AddMiddleware<CurrentUserMiddleware>();
+            _services.AddMiddleware<ScopedDataMiddleware>();
 
             return this;
         }
@@ -113,6 +114,7 @@ namespace Huppy.App.Configuration
 
             _services.AddScoped<IReminderService, ReminderService>();
             _services.AddScoped<ITicketService, TicketService>();
+            _services.AddScoped<IScopedDataService, ScopedDataService>();
 
             _services.AddScoped<IGPTService, GPTService>();
             _services.AddScoped<IUrbanService, UrbanService>();
