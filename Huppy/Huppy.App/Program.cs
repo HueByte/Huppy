@@ -19,6 +19,7 @@ IServiceProvider _serviceProvider = new ModuleConfigurator().AddAppSettings(appS
                                                             .AddServices()
                                                             .AddDatabase()
                                                             .AddHttpClients()
+                                                            .AddMiddlewares()
                                                             .Build();
 
 // Start bot
