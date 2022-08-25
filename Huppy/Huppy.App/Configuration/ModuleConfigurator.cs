@@ -2,6 +2,7 @@ using System.Net;
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
+using Huppy.App.Middlewares;
 using Huppy.Core.Entities;
 using Huppy.Core.IRepositories;
 using Huppy.Core.Services.AiStabilizerService;
@@ -49,6 +50,13 @@ namespace Huppy.App.Configuration
         {
             _services.AddLogging(conf => conf.AddSerilog(logger));
             _services.AddSingleton<LoggingService>();
+
+            return this;
+        }
+
+        public ModuleConfigurator AddMiddlewares()
+        {
+            _services.AddMiddleware<CurrentUserMiddleware>();
 
             return this;
         }

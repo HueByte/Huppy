@@ -1,12 +1,15 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Net;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Huppy.Core.Attributes;
 using Huppy.Core.Common.Constants;
 using Huppy.Core.IRepositories;
+using Huppy.Core.Lib;
 using Huppy.Core.Models;
 using Huppy.Core.Services.HuppyCacheService;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,6 +27,7 @@ namespace Huppy.Core.Services.CommandService
         private readonly IServiceScopeFactory _serviceFactory;
         private HashSet<string> _ephemeralCommands;
         private readonly ConcurrentDictionary<ulong, Stopwatch> _executionTimes = new();
+        private Type[] _middlewaresTypes;
         public CommandHandlerService(DiscordShardedClient client, InteractionService interactionService, IServiceProvider serviceProvider, ILogger<CommandHandlerService> logger, CacheService cacheService, IServiceScopeFactory serviceFactory)
         {
             _client = client;
@@ -39,6 +43,25 @@ namespace Huppy.Core.Services.CommandService
         {
             await _interactionService.AddModulesAsync(Assembly.GetEntryAssembly(), _serviceProvider);
             _ephemeralCommands = GetEphemeralCommands();
+            _middlewaresTypes = GetMiddlewaresTypes();
+        }
+
+        private Type[] GetMiddlewaresTypes()
+        {
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies()
+                .Where(asm => asm.FullName!.StartsWith("Huppy"));
+
+            List<Type> types = new();
+            foreach (var asm in assemblies)
+            {
+                var middlewares = asm.GetTypes()
+                    .Where(type => !type.IsInterface && typeof(IMiddleware).IsAssignableFrom(type))
+                    .ToList();
+
+                types.AddRange(middlewares);
+            }
+
+            return types.ToArray();
         }
 
         private HashSet<string> GetEphemeralCommands()
@@ -100,6 +123,12 @@ namespace Huppy.Core.Services.CommandService
                 var scope = _serviceFactory.CreateAsyncScope();
                 var ctx = new ExtendedShardedInteractionContext(_client, command, scope);
 
+                foreach (var type in _middlewaresTypes)
+                {
+                    if (scope.ServiceProvider.GetRequiredService(type) is not IMiddleware middlewareInstance) return;
+                    await middlewareInstance.BeforeAsync(ctx);
+                }
+
                 // fetch guilds from cache and check if server is already registered
                 if (ctx.Guild is not null && !_cacheService.RegisteredGuildsIds.Contains(ctx.Guild.Id))
                 {
@@ -149,6 +178,12 @@ namespace Huppy.Core.Services.CommandService
             {
                 var commandRepository = scope.ServiceProvider.GetRequiredService<ICommandLogRepository>();
                 var executionTime = StopExecutionMeasurement(context.Interaction.Id);
+
+                for (int i = _middlewaresTypes.Length; i-- > 0;)
+                {
+                    if (scope.ServiceProvider.GetRequiredService(_middlewaresTypes[i]) is not IMiddleware middlewareInstance) return;
+                    await middlewareInstance.BeforeAsync(extendedContext!);
+                }
 
                 CommandLog log = new()
                 {
