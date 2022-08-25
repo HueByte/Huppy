@@ -12,12 +12,10 @@ namespace Huppy.App.Middlewares
         }
         public async Task AfterAsync(ExtendedShardedInteractionContext context)
         {
-            _logger.LogInformation("Finish middleware");
         }
 
         public async Task BeforeAsync(ExtendedShardedInteractionContext context)
         {
-            _logger.LogInformation("Start middleware");
         }
     }
 }
