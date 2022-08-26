@@ -100,40 +100,11 @@ namespace Huppy.Core.Services.CommandService
                 var ctx = new ExtendedShardedInteractionContext(_client, command, scope);
 
                 await _middlewareExecutor.ExecuteBeforeAsync(scope, ctx);
-
-                // fetch guilds from cache and check if server is already registered
-                if (ctx.Guild is not null && !_cacheService.RegisteredGuildsIds.Contains(ctx.Guild.Id))
-                {
-                    var serverRepository = scope.ServiceProvider.GetRequiredService<IServerRepository>();
-                    await serverRepository.GetOrCreateAsync(ctx);
-                    await serverRepository.SaveChangesAsync();
-                    _cacheService.RegisteredGuildsIds.Add(ctx.Guild.Id);
-                }
-
-                // cache keeps all user IDs existing in database, if user is not present, he shall be added
-                if (!_cacheService.CacheUsers.ContainsKey(command.User.Id))
-                {
-                    var userRepository = scope.ServiceProvider.GetRequiredService<IUserRepository>();
-                    _logger.LogInformation("Adding new user [{Username}] to database", command.User.Username);
-
-                    User user = new()
-                    {
-                        Id = command.User.Id,
-                        Username = command.User.Username,
-                        JoinDate = DateTime.UtcNow,
-                    };
-
-                    await userRepository.AddAsync(user);
-                    await userRepository.SaveChangesAsync();
-                    await _cacheService.AddCacheUser(command.User.Id, command.User.Username);
-                }
-
                 await _interactionService.ExecuteCommandAsync(ctx, scope.ServiceProvider);
             }
             catch (Exception ex)
             {
                 _logger.LogError("Command execution error", ex);
-
                 await command.ModifyOriginalResponseAsync((msg) => msg.Content = "Something went wrong");
 
                 // TODO: uncomment to rethrow for future global error handler
