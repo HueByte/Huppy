@@ -1,8 +1,4 @@
-using System.Collections.Concurrent;
-using System.Diagnostics;
-using System.Net;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
@@ -12,6 +8,7 @@ using Huppy.Core.IRepositories;
 using Huppy.Core.Lib;
 using Huppy.Core.Models;
 using Huppy.Core.Services.HuppyCacheService;
+using Huppy.Core.Services.MiddlewareExecutor;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -26,9 +23,8 @@ namespace Huppy.Core.Services.CommandService
         private readonly CacheService _cacheService;
         private readonly IServiceScopeFactory _serviceFactory;
         private HashSet<string> _ephemeralCommands;
-        private readonly ConcurrentDictionary<ulong, Stopwatch> _executionTimes = new();
-        private Type[] _middlewaresTypes;
-        public CommandHandlerService(DiscordShardedClient client, InteractionService interactionService, IServiceProvider serviceProvider, ILogger<CommandHandlerService> logger, CacheService cacheService, IServiceScopeFactory serviceFactory)
+        private readonly MiddlewareExecutorService _middlewareExecutor;
+        public CommandHandlerService(DiscordShardedClient client, InteractionService interactionService, IServiceProvider serviceProvider, ILogger<CommandHandlerService> logger, CacheService cacheService, IServiceScopeFactory serviceFactory, MiddlewareExecutorService middlewareExecutor)
         {
             _client = client;
             _interactionService = interactionService;
@@ -37,31 +33,13 @@ namespace Huppy.Core.Services.CommandService
             _cacheService = cacheService;
             _serviceFactory = serviceFactory;
             _ephemeralCommands = new();
+            _middlewareExecutor = middlewareExecutor;
         }
 
         public async Task InitializeAsync()
         {
             await _interactionService.AddModulesAsync(Assembly.GetEntryAssembly(), _serviceProvider);
             _ephemeralCommands = GetEphemeralCommands();
-            _middlewaresTypes = GetMiddlewaresTypes();
-        }
-
-        private Type[] GetMiddlewaresTypes()
-        {
-            var assemblies = AppDomain.CurrentDomain.GetAssemblies()
-                .Where(asm => asm.FullName!.StartsWith("Huppy"));
-
-            List<Type> types = new();
-            foreach (var asm in assemblies)
-            {
-                var middlewares = asm.GetTypes()
-                    .Where(type => !type.IsInterface && typeof(IMiddleware).IsAssignableFrom(type))
-                    .ToList();
-
-                types.AddRange(middlewares);
-            }
-
-            return types.ToArray();
         }
 
         private HashSet<string> GetEphemeralCommands()
@@ -112,8 +90,6 @@ namespace Huppy.Core.Services.CommandService
 
         public async Task HandleCommandAsync(SocketInteraction command)
         {
-            StartExecutionTimeMeasurement(command.Id);
-
             try
             {
                 bool useEphemeral = CheckIfEphemeral((command as SocketSlashCommand)!);
@@ -123,45 +99,12 @@ namespace Huppy.Core.Services.CommandService
                 var scope = _serviceFactory.CreateAsyncScope();
                 var ctx = new ExtendedShardedInteractionContext(_client, command, scope);
 
-                foreach (var type in _middlewaresTypes)
-                {
-                    if (scope.ServiceProvider.GetRequiredService(type) is not IMiddleware middlewareInstance) return;
-                    await middlewareInstance.BeforeAsync(ctx);
-                }
-
-                // fetch guilds from cache and check if server is already registered
-                if (ctx.Guild is not null && !_cacheService.RegisteredGuildsIds.Contains(ctx.Guild.Id))
-                {
-                    var serverRepository = scope.ServiceProvider.GetRequiredService<IServerRepository>();
-                    await serverRepository.GetOrCreateAsync(ctx);
-                    await serverRepository.SaveChangesAsync();
-                    _cacheService.RegisteredGuildsIds.Add(ctx.Guild.Id);
-                }
-
-                // cache keeps all user IDs existing in database, if user is not present, he shall be added
-                if (!_cacheService.CacheUsers.ContainsKey(command.User.Id))
-                {
-                    var userRepository = scope.ServiceProvider.GetRequiredService<IUserRepository>();
-                    _logger.LogInformation("Adding new user [{Username}] to database", command.User.Username);
-
-                    User user = new()
-                    {
-                        Id = command.User.Id,
-                        Username = command.User.Username,
-                        JoinDate = DateTime.UtcNow,
-                    };
-
-                    await userRepository.AddAsync(user);
-                    await userRepository.SaveChangesAsync();
-                    await _cacheService.AddCacheUser(command.User.Id, command.User.Username);
-                }
-
+                await _middlewareExecutor.ExecuteBeforeAsync(scope, ctx);
                 await _interactionService.ExecuteCommandAsync(ctx, scope.ServiceProvider);
             }
             catch (Exception ex)
             {
                 _logger.LogError("Command execution error", ex);
-
                 await command.ModifyOriginalResponseAsync((msg) => msg.Content = "Something went wrong");
 
                 // TODO: uncomment to rethrow for future global error handler
@@ -176,81 +119,48 @@ namespace Huppy.Core.Services.CommandService
 
             try
             {
-                var commandRepository = scope.ServiceProvider.GetRequiredService<ICommandLogRepository>();
-                var executionTime = StopExecutionMeasurement(context.Interaction.Id);
-
-                for (int i = _middlewaresTypes.Length; i-- > 0;)
-                {
-                    if (scope.ServiceProvider.GetRequiredService(_middlewaresTypes[i]) is not IMiddleware middlewareInstance) return;
-                    await middlewareInstance.AfterAsync(extendedContext!);
-                }
-
-                CommandLog log = new()
-                {
-                    CommandName = commandInfo.Name,
-                    Date = DateTime.UtcNow,
-                    IsSuccess = result.IsSuccess,
-                    UserId = context.User.Id,
-                    ExecutionTimeMs = executionTime,
-                    ChannelId = context.Channel.Id,
-                    ErrorMessage = result.ErrorReason,
-                    GuildId = context.Guild.Id
-                };
-
-                if (result.IsSuccess)
-                {
-                    _logger.LogInformation("Command [{CommandName}] executed for [{Username}] in [{GuildName}] [{time} ms]", commandInfo.Name, context.User.Username, context.Guild.Name, string.Format("{0:n0}", executionTime));
-                }
-                else
+                if (!result.IsSuccess)
                 {
                     var embed = new EmbedBuilder().WithCurrentTimestamp()
                                                   .WithColor(Color.Red)
                                                   .WithThumbnailUrl(Icons.Error);
-
-                    _logger.LogError("Command [{CommandName}] resulted in error: [{Error}]", commandInfo.Name, result.ErrorReason);
-
                     switch (result.Error)
                     {
                         case InteractionCommandError.UnmetPrecondition:
                             embed.WithTitle("Unmet Precondition");
                             embed.WithDescription(result.ErrorReason);
-                            await context.Interaction.ModifyOriginalResponseAsync((msg) => msg.Embed = embed.Build());
                             break;
 
                         case InteractionCommandError.UnknownCommand:
                             embed.WithTitle("Unknown command");
                             embed.WithDescription(result.ErrorReason);
-                            await context.Interaction.ModifyOriginalResponseAsync((msg) => msg.Embed = embed.Build());
                             break;
 
                         case InteractionCommandError.BadArgs:
                             embed.WithTitle($"Invalid number or arguments");
                             embed.WithDescription(result.ErrorReason);
-                            await context.Interaction.ModifyOriginalResponseAsync((msg) => msg.Embed = embed.Build());
                             break;
 
                         case InteractionCommandError.Exception:
                             embed.WithTitle("Command exception");
                             embed.WithDescription(result.ErrorReason);
-                            await context.Interaction.ModifyOriginalResponseAsync((msg) => msg.Embed = embed.Build());
                             break;
 
                         case InteractionCommandError.Unsuccessful:
                             embed.WithTitle("Command could not be executed");
                             embed.WithDescription(result.ErrorReason);
-                            await context.Interaction.ModifyOriginalResponseAsync((msg) => msg.Embed = embed.Build());
                             break;
 
                         default:
                             embed.WithTitle("Something went wrong");
                             embed.WithDescription(result.ErrorReason);
-                            await context.Interaction.ModifyOriginalResponseAsync((msg) => msg.Embed = embed.Build());
                             break;
                     }
+
+                    await context.Interaction.ModifyOriginalResponseAsync((msg) => msg.Embed = embed.Build());
                 }
 
-                await commandRepository.AddAsync(log);
-                await commandRepository.SaveChangesAsync();
+                await _middlewareExecutor.ExecuteAfterAsync(scope, commandInfo, extendedContext!, result);
             }
             catch (Exception) { }
             finally
@@ -260,47 +170,21 @@ namespace Huppy.Core.Services.CommandService
             }
         }
 
-        public async Task ComponentExecuted(SocketMessageComponent component)
+        public async Task ComponentExecuted(ComponentCommandInfo commandInfo, IInteractionContext context, IResult result)
         {
-            using var scope = _serviceFactory.CreateAsyncScope();
-            var commandRepository = scope.ServiceProvider.GetRequiredService<ICommandLogRepository>();
+            var extendedContext = context as ExtendedShardedInteractionContext;
+            var scope = extendedContext is not null ? extendedContext.AsyncScope : _serviceFactory.CreateAsyncScope();
 
-            var executionTime = StopExecutionMeasurement(component.Id);
-
-            _logger.LogInformation("Component [{dataid}] used by [{username}] [{time} ms]", component.Data.CustomId, component.User.Username, string.Format("{0:n0}", executionTime));
-
-            CommandLog log = new()
+            try
             {
-                CommandName = component.Data.CustomId,
-                Date = DateTime.UtcNow,
-                IsSuccess = component.IsValidToken,
-                UserId = component.User.Id,
-                ExecutionTimeMs = executionTime,
-                ChannelId = component.Channel.Id,
-                ErrorMessage = null,
-                GuildId = component.GuildId,
-            };
-
-            await commandRepository.AddAsync(log);
-            await commandRepository.SaveChangesAsync();
-        }
-
-        private Stopwatch StartExecutionTimeMeasurement(ulong commandId)
-        {
-            var watch = new Stopwatch();
-            watch.Start();
-            _executionTimes.TryAdd(commandId, watch);
-            return watch;
-        }
-
-        private long StopExecutionMeasurement(ulong commandId)
-        {
-            _executionTimes.Remove(commandId, out var timer);
-
-            if (timer is null) return 0;
-
-            timer.Stop();
-            return timer.ElapsedMilliseconds;
+                await _middlewareExecutor.ExecuteAfterAsync(scope, commandInfo, extendedContext!, result);
+            }
+            catch (Exception) { }
+            finally
+            {
+                if (extendedContext is null) await scope.DisposeAsync();
+                else await extendedContext.DisposeAsync();
+            }
         }
     }
 }

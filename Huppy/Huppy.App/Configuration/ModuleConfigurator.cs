@@ -11,6 +11,7 @@ using Huppy.Core.Services.EventService;
 using Huppy.Core.Services.GPTService;
 using Huppy.Core.Services.HuppyCacheService;
 using Huppy.Core.Services.LoggerService;
+using Huppy.Core.Services.MiddlewareExecutor;
 using Huppy.Core.Services.NewsService;
 using Huppy.Core.Services.PaginatorService;
 using Huppy.Core.Services.ReminderService;
@@ -57,7 +58,14 @@ namespace Huppy.App.Configuration
 
         public ModuleConfigurator AddMiddlewares()
         {
-            _services.AddMiddleware<ScopedDataMiddleware>();
+            MiddlewareExecutorService middlewareExecutor = new();
+            _services.UseMiddleware<ScopedDataMiddleware>(middlewareExecutor);
+            _services.UseMiddleware<DataSynchronizationMiddleware>(middlewareExecutor);
+            _services.UseMiddleware<CommandLogMiddleware>(middlewareExecutor);
+
+            middlewareExecutor.FillMissingMiddlewares();
+
+            _services.AddSingleton(middlewareExecutor);
 
             return this;
         }

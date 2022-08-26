@@ -1,3 +1,4 @@
+using Discord.Interactions;
 using Huppy.Core.Services.CommandService;
 using Huppy.Core.Services.ScopedDataService;
 
@@ -10,7 +11,7 @@ namespace Huppy.App.Middlewares
         {
             _scopedDataService = scopedDataService;
         }
-        public Task AfterAsync(ExtendedShardedInteractionContext context)
+        public Task AfterAsync(ExtendedShardedInteractionContext context, ICommandInfo commandInfo, IResult result)
         {
             return Task.CompletedTask;
         }

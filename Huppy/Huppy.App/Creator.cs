@@ -6,6 +6,7 @@ using Huppy.Core.Services.CommandService;
 using Huppy.Core.Services.EventService;
 using Huppy.Core.Services.HuppyCacheService;
 using Huppy.Core.Services.LoggerService;
+using Huppy.Core.Services.MiddlewareExecutor;
 using Huppy.Core.Services.PaginatorService;
 using Huppy.Core.Services.ReminderService;
 using Huppy.Core.Services.ServerInteractionService;
@@ -35,6 +36,7 @@ namespace Huppy.App
         private readonly IPaginatorService _paginatorService;
         private readonly IEventService _eventService;
         private readonly IReminderService _reminderService;
+        private readonly MiddlewareExecutorService _middlewareExecutor;
         private bool isBotInitialized = false;
 
         #endregion
@@ -54,6 +56,7 @@ namespace Huppy.App
             _eventService = _serviceProvider.GetRequiredService<IEventService>();
             _paginatorService = _serviceProvider.GetRequiredService<IPaginatorService>();
             _reminderService = _serviceProvider.GetRequiredService<IReminderService>();
+            _middlewareExecutor = _serviceProvider.GetRequiredService<MiddlewareExecutorService>();
         }
 
         public async Task CreateDatabase()
@@ -95,7 +98,7 @@ namespace Huppy.App
             // command events
             _client.InteractionCreated += _commandHandler.HandleCommandAsync;
             _interactionService.SlashCommandExecuted += _commandHandler.SlashCommandExecuted;
-            _client.ButtonExecuted += _commandHandler.ComponentExecuted;
+            _interactionService.ComponentCommandExecuted += _commandHandler.ComponentExecuted;
 
             // logger events
             _client.Log += _loggingService.OnLogAsync;
@@ -103,6 +106,7 @@ namespace Huppy.App
 
             // others
             _eventService.OnEventsRemoved += _reminderService.RemoveReminderRange;
+            _middlewareExecutor.OnLogAsync += _loggingService.OnMiddlewareLog;
 
             return Task.CompletedTask;
         }
@@ -175,13 +179,13 @@ namespace Huppy.App
                     // auto register commands to guilds 
                     if (!IsProd() && debugGuilds.Contains(guildId))
                     {
-                        _logger.LogInformation("Registering commands for debug guilds with non prod environment");
+                        _logger.LogInformation("Registering commands for debug guilds with non prod environment to [{guild}]", guildId);
                         await _interactionService.RegisterCommandsToGuildAsync(guildId, true);
                     }
                     else
                     {
                         // clear guild registered modules
-                        _logger.LogInformation("Clearing guild scoped commands");
+                        _logger.LogInformation("Clearing guild scoped commands of [{guild}]", guildId);
                         await _interactionService.AddModulesToGuildAsync(guildId, true, resultModules.ToArray());
                     }
 
@@ -197,7 +201,7 @@ namespace Huppy.App
                         resultCommands = resultCommands.Union(debugCommands).ToList();
                     }
 
-                    _logger.LogInformation("Registering {privateCount} private modules to [ {id} ]", resultModules.Count, guildId);
+                    _logger.LogInformation("Registering {privateCount} private modules to [{id}]", resultModules.Count, guildId);
 
                     // append special modules
                     await _interactionService.AddModulesToGuildAsync(guildId, false, resultModules.ToArray());
