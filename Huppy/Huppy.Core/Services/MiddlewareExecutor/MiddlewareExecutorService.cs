@@ -1,3 +1,4 @@
+using Discord;
 using Discord.Interactions;
 using Huppy.Core.Lib;
 using Huppy.Core.Services.CommandService;
@@ -8,8 +9,7 @@ namespace Huppy.Core.Services.MiddlewareExecutor
 {
     public sealed class MiddlewareExecutorService
     {
-        public event Func<string, Task> OnMiddlewareStart;
-        public event Func<string, Task> OnMiddlewareFinish;
+        public event Func<string, Task>? OnLogAsync;
         private readonly List<Type> _middlewaresTypes = new();
         public MiddlewareExecutorService() { }
 
@@ -23,7 +23,7 @@ namespace Huppy.Core.Services.MiddlewareExecutor
             {
                 if (scope.ServiceProvider.GetRequiredService(type) is not IMiddleware middlewareInstance) return;
                 await middlewareInstance.BeforeAsync(ctx);
-                OnMiddlewareStart?.Invoke(type.ToString());
+                OnLogAsync?.Invoke($"Middleware :: Executing before {type} middleware");
             }
         }
 
@@ -33,7 +33,7 @@ namespace Huppy.Core.Services.MiddlewareExecutor
             {
                 if (scope.ServiceProvider.GetRequiredService(_middlewaresTypes[i]) is not IMiddleware middlewareInstance) return;
                 await middlewareInstance.AfterAsync(context!, commandInfo, result);
-                OnMiddlewareFinish?.Invoke(_middlewaresTypes[i].ToString());
+                OnLogAsync?.Invoke($"Middleware :: Executing after {_middlewaresTypes[i]} middleware");
             }
         }
 
