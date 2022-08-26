@@ -22,6 +22,12 @@ namespace Huppy.Core.Services.LoggerService
             return Task.CompletedTask;
         }
 
+        public Task OnMiddlewareLog(string middlewareMessage)
+        {
+            _logger.LogDebug("{message}", middlewareMessage);
+            return Task.CompletedTask;
+        }
+
         public Task OnLogAsync(LogMessage msg)
         {
             string logMessage = $"{msg.Exception?.ToString() ?? msg.Message}";

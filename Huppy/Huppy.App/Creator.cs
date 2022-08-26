@@ -106,18 +106,7 @@ namespace Huppy.App
 
             // others
             _eventService.OnEventsRemoved += _reminderService.RemoveReminderRange;
-
-            // _middlewareExecutor.OnMiddlewareStart += (typeName) =>
-            // {
-            //     _logger.LogInformation("Started {name} middleware", typeName);
-            //     return Task.CompletedTask;
-            // };
-
-            // _middlewareExecutor.OnMiddlewareFinish += (typeName) =>
-            // {
-            //     _logger.LogInformation("Finished {name} middleware", typeName);
-            //     return Task.CompletedTask;
-            // };
+            _middlewareExecutor.OnLogAsync += _loggingService.OnMiddlewareLog;
 
             return Task.CompletedTask;
         }
@@ -190,13 +179,13 @@ namespace Huppy.App
                     // auto register commands to guilds 
                     if (!IsProd() && debugGuilds.Contains(guildId))
                     {
-                        _logger.LogInformation("Registering commands for debug guilds with non prod environment");
+                        _logger.LogInformation("Registering commands for debug guilds with non prod environment to [{guild}]", guildId);
                         await _interactionService.RegisterCommandsToGuildAsync(guildId, true);
                     }
                     else
                     {
                         // clear guild registered modules
-                        _logger.LogInformation("Clearing guild scoped commands");
+                        _logger.LogInformation("Clearing guild scoped commands of [{guild}]", guildId);
                         await _interactionService.AddModulesToGuildAsync(guildId, true, resultModules.ToArray());
                     }
 
@@ -212,7 +201,7 @@ namespace Huppy.App
                         resultCommands = resultCommands.Union(debugCommands).ToList();
                     }
 
-                    _logger.LogInformation("Registering {privateCount} private modules to [ {id} ]", resultModules.Count, guildId);
+                    _logger.LogInformation("Registering {privateCount} private modules to [{id}]", resultModules.Count, guildId);
 
                     // append special modules
                     await _interactionService.AddModulesToGuildAsync(guildId, false, resultModules.ToArray());
