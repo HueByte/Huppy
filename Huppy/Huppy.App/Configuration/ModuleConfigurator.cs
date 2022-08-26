@@ -60,6 +60,7 @@ namespace Huppy.App.Configuration
         {
             MiddlewareExecutorService middlewareExecutor = new();
             _services.UseMiddleware<ScopedDataMiddleware>(middlewareExecutor);
+            _services.UseMiddleware<DataSynchronizationMiddleware>(middlewareExecutor);
             _services.UseMiddleware<CommandLogMiddleware>(middlewareExecutor);
 
             middlewareExecutor.FillMissingMiddlewares();
