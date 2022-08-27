@@ -1,7 +1,9 @@
+using System.Net;
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Huppy.Core.Attributes;
+using Huppy.Core.Services.ActivityService;
 using Huppy.Core.Services.CommandService;
 using Huppy.Core.Services.EventService;
 using Huppy.Core.Services.HuppyCacheService;
@@ -37,6 +39,7 @@ namespace Huppy.App
         private readonly IEventService _eventService;
         private readonly IReminderService _reminderService;
         private readonly MiddlewareExecutorService _middlewareExecutor;
+        private readonly IActivityControlService _activityControlService;
         private bool isBotInitialized = false;
 
         #endregion
@@ -57,6 +60,7 @@ namespace Huppy.App
             _paginatorService = _serviceProvider.GetRequiredService<IPaginatorService>();
             _reminderService = _serviceProvider.GetRequiredService<IReminderService>();
             _middlewareExecutor = _serviceProvider.GetRequiredService<MiddlewareExecutorService>();
+            _activityControlService = _serviceProvider.GetRequiredService<IActivityControlService>();
         }
 
         public async Task CreateDatabase()
@@ -117,6 +121,7 @@ namespace Huppy.App
 
             await StartTimedEvents();
             await CreateReminders();
+            await StartActivityControlService();
 
             isBotInitialized = true;
         }
@@ -145,6 +150,11 @@ namespace Huppy.App
             if (isBotInitialized) return;
 
             await _reminderService.Initialize();
+        }
+
+        private async Task StartActivityControlService()
+        {
+            await _activityControlService.Initialize();
         }
 
         private async Task CreateSlashCommands(DiscordSocketClient socketClient)
