@@ -5,6 +5,7 @@ using Discord.WebSocket;
 using Huppy.App.Middlewares;
 using Huppy.Core.Entities;
 using Huppy.Core.IRepositories;
+using Huppy.Core.Services.ActivityService;
 using Huppy.Core.Services.AiStabilizerService;
 using Huppy.Core.Services.CommandService;
 using Huppy.Core.Services.EventService;
@@ -119,6 +120,7 @@ namespace Huppy.App.Configuration
             _services.AddSingleton<ITimedEventsService, TimedEventsService>();
             _services.AddSingleton<IPaginatorService, PaginatorService>();
             _services.AddSingleton<IEventService, EventService>();
+            _services.AddSingleton<IActivityControlService, ActivityControlService>();
 
             _services.AddScoped<IReminderService, ReminderService>();
             _services.AddScoped<ITicketService, TicketService>();
