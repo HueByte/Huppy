@@ -1,7 +1,9 @@
 using System.Net;
 using Discord;
 using Discord.WebSocket;
+using Huppy.Core.IRepositories;
 using Huppy.Core.Services.TimedEventsService;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualBasic;
@@ -15,7 +17,7 @@ namespace Huppy.Core.Services.ActivityService
         private readonly List<Func<AsyncServiceScope, Task<IActivity>>> _activities = new();
         private readonly DiscordShardedClient _client;
         private int _lastIndex = 0;
-        private readonly TimeSpan updateStatusFrequency = new(0, 5, 0);
+        private readonly TimeSpan updateStatusFrequency = new(0, 0, 10);
 
         public ActivityControlService(ITimedEventsService timedEventsService, ILogger<ActivityControlService> logger, DiscordShardedClient client)
         {
@@ -89,8 +91,19 @@ namespace Huppy.Core.Services.ActivityService
                 return Task.FromResult(activity);
             };
 
+            var usersActivity = async Task<IActivity> (AsyncServiceScope scope) =>
+            {
+                var userRepository = scope.ServiceProvider.GetRequiredService<IUserRepository>();
+                var userCount = await (await userRepository.GetAllAsync()).CountAsync();
+                var message = $"I've been used by over {userCount} users";
+
+                IActivity activity = new Game(message, ActivityType.Playing);
+                return activity;
+            };
+
             _activities.Add(serverCountActivity);
             _activities.Add(helpActivity);
+            _activities.Add(usersActivity);
         }
     }
 }
