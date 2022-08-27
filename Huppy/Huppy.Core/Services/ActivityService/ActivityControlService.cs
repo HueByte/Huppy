@@ -17,7 +17,7 @@ namespace Huppy.Core.Services.ActivityService
         private readonly List<Func<AsyncServiceScope, Task<IActivity>>> _activities = new();
         private readonly DiscordShardedClient _client;
         private int _lastIndex = 0;
-        private readonly TimeSpan updateStatusFrequency = new(0, 0, 10);
+        private readonly TimeSpan updateStatusFrequency = new(0, 10, 0);
 
         public ActivityControlService(ITimedEventsService timedEventsService, ILogger<ActivityControlService> logger, DiscordShardedClient client)
         {
