@@ -1,5 +1,6 @@
 using Discord;
 using Discord.Interactions;
+using Huppy.Core.Interfaces;
 using Huppy.Core.Lib;
 using Huppy.Core.Services.CommandService;
 using Microsoft.Extensions.DependencyInjection;
