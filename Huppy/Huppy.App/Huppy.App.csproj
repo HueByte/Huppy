@@ -2,6 +2,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Huppy.Core\Huppy.Core.csproj" />
     <ProjectReference Include="..\Huppy.Infrastructure\Huppy.Infrastructure.csproj" />
+    <ProjectReference Include="..\Huppy.Kernel\Huppy.Kernel.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.2">

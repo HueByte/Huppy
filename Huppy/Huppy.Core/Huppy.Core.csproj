@@ -15,4 +15,7 @@
     <PackageReference Include="Serilog.Sinks.Console" Version="4.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.2" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Huppy.Kernel\Huppy.Kernel.csproj" />
+  </ItemGroup>
 </Project>
