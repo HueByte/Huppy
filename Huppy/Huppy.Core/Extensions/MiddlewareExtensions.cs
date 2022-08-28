@@ -1,17 +1,9 @@
-using Discord;
-using Discord.Interactions;
-using Huppy.Core.Services.CommandService;
+using Huppy.Core.Interfaces;
 using Huppy.Core.Services.MiddlewareExecutor;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Huppy.Core.Lib
+namespace Huppy.Core.Extensions
 {
-    public interface IMiddleware
-    {
-        Task BeforeAsync(ExtendedShardedInteractionContext context);
-        Task AfterAsync(ExtendedShardedInteractionContext context, ICommandInfo commandInfo, IResult result);
-    }
-
     public static class MiddlewareExtensions
     {
         public static void UseMiddleware<T>(this IServiceCollection services, MiddlewareExecutorService middlewareExecutor) where T : class

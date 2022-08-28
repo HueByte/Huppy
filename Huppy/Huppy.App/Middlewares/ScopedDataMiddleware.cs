@@ -1,4 +1,5 @@
 using Discord.Interactions;
+using Huppy.Core.Interfaces;
 using Huppy.Core.Services.CommandService;
 using Huppy.Core.Services.ScopedDataService;
 

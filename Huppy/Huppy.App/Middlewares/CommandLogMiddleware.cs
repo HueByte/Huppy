@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Discord.Interactions;
+using Huppy.Core.Interfaces;
 using Huppy.Core.IRepositories;
 using Huppy.Core.Services.CommandService;
 using Microsoft.Extensions.Logging;

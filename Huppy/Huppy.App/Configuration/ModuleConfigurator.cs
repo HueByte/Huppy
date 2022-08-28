@@ -4,6 +4,7 @@ using Discord.Interactions;
 using Discord.WebSocket;
 using Huppy.App.Middlewares;
 using Huppy.Core.Entities;
+using Huppy.Core.Extensions;
 using Huppy.Core.IRepositories;
 using Huppy.Core.Services.ActivityService;
 using Huppy.Core.Services.AiStabilizerService;
