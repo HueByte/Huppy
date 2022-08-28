@@ -3,14 +3,10 @@ using Discord.Interactions;
 using Huppy.Core.Attributes;
 using Huppy.Core.Services.PaginatorService.Entities;
 using Huppy.Kernel.Constants;
+using Huppy.Kernel.Enums;
 
 namespace Huppy.Kernel
 {
-    public enum StaticEmbeds
-    {
-        Help
-    }
-
     public class BuildStaticEmbeds
     {
         private readonly InteractionService _interactionService;
