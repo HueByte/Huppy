@@ -2,10 +2,10 @@ using System.Net;
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
-using Huppy.Core.IRepositories;
+using Huppy.Core.Interfaces.IRepositories;
+using Huppy.Core.Interfaces.IServices;
 using Huppy.Core.Models;
-using Huppy.Core.Services.EventService;
-using Huppy.Core.Services.TimedEventsService;
+using Huppy.Kernel.Constants;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -160,7 +160,7 @@ namespace Huppy.Core.Services.ReminderService
             var embed = new EmbedBuilder()
                 .WithTitle("Your reminder")
                 .WithColor(Color.Teal)
-                .WithThumbnailUrl(Common.Constants.Icons.Huppy1)
+                .WithThumbnailUrl(Icons.Huppy1)
                 .WithDescription(message)
                 .WithCurrentTimestamp()
                 .Build();

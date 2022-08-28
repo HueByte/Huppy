@@ -1,4 +1,6 @@
 using Discord;
+using Huppy.Core.Interfaces;
+using Huppy.Core.Interfaces.IServices;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 

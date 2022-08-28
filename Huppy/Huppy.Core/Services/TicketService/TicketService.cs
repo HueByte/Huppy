@@ -1,5 +1,6 @@
 using Discord;
-using Huppy.Core.IRepositories;
+using Huppy.Core.Interfaces.IRepositories;
+using Huppy.Core.Interfaces.IServices;
 using Huppy.Core.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;

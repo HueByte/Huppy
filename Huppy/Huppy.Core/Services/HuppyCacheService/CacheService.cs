@@ -1,6 +1,6 @@
 using System.Collections.Specialized;
 using Huppy.Core.Entities;
-using Huppy.Core.IRepositories;
+using Huppy.Core.Interfaces.IRepositories;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Huppy.Core.Services.HuppyCacheService

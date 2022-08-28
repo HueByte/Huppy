@@ -1,6 +1,7 @@
 using System.Runtime.CompilerServices;
-using Huppy.Core.Entities;
+using Huppy.Core.Interfaces.IServices;
 using Huppy.Core.Services.NewsService;
+using Huppy.Kernel;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 

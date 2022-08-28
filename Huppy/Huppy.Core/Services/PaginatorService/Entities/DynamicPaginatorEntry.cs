@@ -1,4 +1,5 @@
 using Discord;
+using Huppy.Core.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Huppy.Core.Services.PaginatorService.Entities

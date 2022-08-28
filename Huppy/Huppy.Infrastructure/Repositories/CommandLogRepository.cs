@@ -1,6 +1,7 @@
 using Huppy.Core.Entities;
-using Huppy.Core.IRepositories;
+using Huppy.Core.Interfaces.IRepositories;
 using Huppy.Core.Models;
+using Huppy.Kernel.Abstraction;
 using Microsoft.EntityFrameworkCore;
 
 namespace Huppy.Infrastructure.Repositories

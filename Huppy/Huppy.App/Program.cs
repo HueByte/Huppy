@@ -1,5 +1,6 @@
 ﻿using Huppy.App;
 using Huppy.App.Configuration;
+using Huppy.Kernel;
 using Serilog;
 
 Logo.Print();

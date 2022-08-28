@@ -1,6 +1,7 @@
 using Discord.Interactions;
-using Huppy.Core.Services.CommandService;
-using Huppy.Core.Services.ScopedDataService;
+using Huppy.Core.Interfaces;
+using Huppy.Core.Interfaces.IServices;
+using Huppy.Kernel;
 
 namespace Huppy.App.Middlewares
 {

@@ -3,12 +3,11 @@ using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Huppy.Core.Attributes;
-using Huppy.Core.Common.Constants;
-using Huppy.Core.IRepositories;
-using Huppy.Core.Lib;
-using Huppy.Core.Models;
+using Huppy.Core.Interfaces.IServices;
 using Huppy.Core.Services.HuppyCacheService;
 using Huppy.Core.Services.MiddlewareExecutor;
+using Huppy.Kernel;
+using Huppy.Kernel.Constants;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 

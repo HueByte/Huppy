@@ -1,3 +1,4 @@
+using Huppy.Kernel;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Huppy.Core.Models

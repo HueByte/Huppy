@@ -1,10 +1,10 @@
 using Discord;
 using Discord.WebSocket;
-using Huppy.Core.Common.Constants;
-using Huppy.Core.Common.HuppyMessages;
-using Huppy.Core.IRepositories;
+using Huppy.Core.Interfaces.IRepositories;
+using Huppy.Core.Interfaces.IServices;
 using Huppy.Core.Models;
 using Huppy.Core.Services.HuppyCacheService;
+using Huppy.Kernel.Constants;
 using Microsoft.EntityFrameworkCore.Query.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;

@@ -1,9 +1,7 @@
-using Discord;
 using Discord.Interactions;
-using Huppy.Core.Lib;
-using Huppy.Core.Services.CommandService;
+using Huppy.Core.Interfaces;
+using Huppy.Kernel;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 namespace Huppy.Core.Services.MiddlewareExecutor
 {
