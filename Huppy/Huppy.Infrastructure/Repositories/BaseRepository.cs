@@ -1,5 +1,4 @@
-using Huppy.Core.IRepositories;
-using Huppy.Core.Models;
+using Huppy.Kernel;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 

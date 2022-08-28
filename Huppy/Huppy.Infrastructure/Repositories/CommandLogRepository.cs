@@ -1,5 +1,5 @@
 using Huppy.Core.Entities;
-using Huppy.Core.IRepositories;
+using Huppy.Core.Interfaces.IRepositories;
 using Huppy.Core.Models;
 using Microsoft.EntityFrameworkCore;
 

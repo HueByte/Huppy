@@ -1,10 +1,10 @@
 using Discord;
 using Discord.Interactions;
 using Huppy.Core.Attributes;
-using Huppy.Core.Common.Constants;
 using Huppy.Core.Services.PaginatorService.Entities;
+using Huppy.Kernel.Constants;
 
-namespace Huppy.Core.Services.PaginatorService
+namespace Huppy.Kernel
 {
     public enum StaticEmbeds
     {

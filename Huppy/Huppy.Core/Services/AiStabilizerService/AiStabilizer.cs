@@ -1,3 +1,4 @@
+using Huppy.Core.Interfaces.IServices;
 using Microsoft.Extensions.Logging;
 
 namespace Huppy.Core.Services.AiStabilizerService

@@ -1,8 +1,8 @@
 using System.Net;
 using Discord;
 using Discord.WebSocket;
-using Huppy.Core.IRepositories;
-using Huppy.Core.Services.TimedEventsService;
+using Huppy.Core.Interfaces.IRepositories;
+using Huppy.Core.Interfaces.IServices;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;

@@ -1,4 +1,5 @@
 using Discord;
+using Huppy.Core.Interfaces.IServices;
 
 namespace Huppy.Core.Services.ScopedDataService
 {

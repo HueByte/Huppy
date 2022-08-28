@@ -1,5 +1,6 @@
 using System.Net.Http.Json;
-using Huppy.Core.Dto;
+using Huppy.Core.Entities;
+using Huppy.Core.Interfaces.IServices;
 using Microsoft.Extensions.Logging;
 
 namespace Huppy.Core.Services.UrbanService

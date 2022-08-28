@@ -1,7 +1,8 @@
 using System.Net.Http.Json;
-using Huppy.Core.Common.Constants;
-using Huppy.Core.Dto;
 using Huppy.Core.Entities;
+using Huppy.Core.Interfaces.IServices;
+using Huppy.Kernel;
+using Huppy.Kernel.Constants;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
@@ -39,7 +40,7 @@ namespace Huppy.Core.Services.GPTService
 
             aiContext += prompt + "\n[Huppy]:";
 
-            GPTDto model = new()
+            GPTRequest model = new()
             {
                 MaxTokens = 200,
                 Prompt = aiContext,

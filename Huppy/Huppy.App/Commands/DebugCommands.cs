@@ -3,8 +3,8 @@ using System.Text;
 using Discord;
 using Discord.Interactions;
 using Huppy.Core.Attributes;
-using Huppy.Core.Services.CommandService;
 using Huppy.Core.Services.HuppyCacheService;
+using Huppy.Kernel;
 using Microsoft.Extensions.Logging;
 
 namespace Huppy.App.Commands

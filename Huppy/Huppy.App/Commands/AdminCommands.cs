@@ -1,7 +1,8 @@
 using Discord;
 using Discord.Interactions;
 using Huppy.Core.Attributes;
-using Huppy.Core.Services.CommandService;
+using Huppy.Kernel;
+using Huppy.Kernel.Constants;
 using Microsoft.Extensions.Logging;
 
 namespace Huppy.App.Commands

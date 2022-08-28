@@ -1,10 +1,10 @@
 using System.Text;
 using Discord;
 using Discord.Interactions;
-using Huppy.Core.Common.HuppyMessages;
-using Huppy.Core.Services.CommandService;
-using Huppy.Core.Services.GPTService;
+using Huppy.Core.Interfaces.IServices;
 using Huppy.Core.Services.HuppyCacheService;
+using Huppy.Kernel;
+using Huppy.Kernel.Constants;
 
 namespace Huppy.App.Commands
 {

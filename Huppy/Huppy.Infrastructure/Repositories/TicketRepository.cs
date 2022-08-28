@@ -1,4 +1,4 @@
-using Huppy.Core.IRepositories;
+using Huppy.Core.Interfaces.IRepositories;
 using Huppy.Core.Models;
 
 namespace Huppy.Infrastructure.Repositories

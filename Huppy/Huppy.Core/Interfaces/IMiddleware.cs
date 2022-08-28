@@ -1,11 +1,10 @@
 using Discord.Interactions;
-using Huppy.Core.Services.CommandService;
+using Huppy.Kernel;
 
-namespace Huppy.Core.Interfaces
+namespace Huppy.Core.Interfaces;
+
+public interface IMiddleware
 {
-    public interface IMiddleware
-    {
-        Task BeforeAsync(ExtendedShardedInteractionContext context);
-        Task AfterAsync(ExtendedShardedInteractionContext context, ICommandInfo commandInfo, IResult result);
-    }
+    Task BeforeAsync(ExtendedShardedInteractionContext context);
+    Task AfterAsync(ExtendedShardedInteractionContext context, ICommandInfo commandInfo, IResult result);
 }

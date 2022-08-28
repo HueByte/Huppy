@@ -2,10 +2,10 @@ using System.Text;
 using Discord;
 using Discord.Interactions;
 using Huppy.Core.Attributes;
-using Huppy.Core.Services.CommandService;
-using Huppy.Core.Services.PaginatorService;
+using Huppy.Core.Interfaces.IServices;
 using Huppy.Core.Services.PaginatorService.Entities;
-using Huppy.Core.Services.TicketService;
+using Huppy.Kernel;
+using Huppy.Kernel.Constants;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 

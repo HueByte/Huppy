@@ -1,6 +1,6 @@
 using System.Diagnostics;
 using Huppy.Core.Entities;
-using Huppy.Core.Services.PaginatorService.Entities;
+using Huppy.Core.Interfaces;
 
 namespace Huppy.Core.Services.HuppyCacheService
 {

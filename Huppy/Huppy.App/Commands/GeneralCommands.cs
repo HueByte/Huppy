@@ -1,12 +1,11 @@
 using Discord;
 using Discord.Interactions;
-using Huppy.Core.Common.HuppyMessages;
-using Huppy.Core.IRepositories;
-using Huppy.Core.Services.CommandService;
+using Huppy.Core.Interfaces.IRepositories;
+using Huppy.Core.Interfaces.IServices;
 using Huppy.Core.Services.HuppyCacheService;
-using Huppy.Core.Services.NewsService;
-using Huppy.Core.Services.PaginatorService;
 using Huppy.Core.Services.PaginatorService.Entities;
+using Huppy.Kernel;
+using Huppy.Kernel.Constants;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 

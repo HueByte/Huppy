@@ -1,8 +1,8 @@
 using Discord.Interactions;
 using Discord.WebSocket;
-using Huppy.Core.Services.CommandService;
+using Huppy.Core.Interfaces.IServices;
 using Huppy.Core.Services.HuppyCacheService;
-using Huppy.Core.Services.PaginatorService;
+using Huppy.Kernel;
 using Microsoft.Extensions.Logging;
 
 namespace Huppy.App.Commands

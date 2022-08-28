@@ -1,6 +1,8 @@
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
+using Huppy.Core.Interfaces;
+using Huppy.Core.Interfaces.IServices;
 using Huppy.Core.Services.HuppyCacheService;
 using Huppy.Core.Services.PaginatorService.Entities;
 using Microsoft.Extensions.DependencyInjection;

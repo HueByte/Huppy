@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using Huppy.Core.Interfaces.IServices;
 using Microsoft.Extensions.Logging;
 
 namespace Huppy.Core.Services.EventService
