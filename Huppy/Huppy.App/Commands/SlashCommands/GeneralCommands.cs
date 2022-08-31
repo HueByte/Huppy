@@ -18,15 +18,13 @@ public class GeneralCommands : InteractionModuleBase<ExtendedShardedInteractionC
     private readonly ICommandLogRepository _commandRepository;
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly CacheService _cacheService;
-    private readonly INewsApiService _newsService;
     private readonly InteractionService _interactionService;
     private readonly IPaginatorService _paginatorService;
-    public GeneralCommands(ILogger<GeneralCommands> logger, CacheService cacheService, ICommandLogRepository commandLogRepository, INewsApiService newsService, InteractionService interactionService, IPaginatorService paginatorService, IServiceScopeFactory scopeFactory)
+    public GeneralCommands(ILogger<GeneralCommands> logger, CacheService cacheService, ICommandLogRepository commandLogRepository, InteractionService interactionService, IPaginatorService paginatorService, IServiceScopeFactory scopeFactory)
     {
         _logger = logger;
         _commandRepository = commandLogRepository;
         _cacheService = cacheService;
-        _newsService = newsService;
         _interactionService = interactionService;
         _paginatorService = paginatorService;
         _scopeFactory = scopeFactory;
@@ -42,7 +40,11 @@ public class GeneralCommands : InteractionModuleBase<ExtendedShardedInteractionC
     public async Task SayCommand(string message)
     {
         var orginalMessage = await FollowupAsync(embed: new EmbedBuilder().WithTitle("Sending message...").Build());
-        await orginalMessage.DeleteAsync();
+
+        await (Context.Channel as ITextChannel).CreateThreadAsync("TEST", message: orginalMessage);
+
+        // await orginalMessage.DeleteAsync();
+
         await Context.Channel.SendMessageAsync(text: message);
     }
 

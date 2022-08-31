@@ -130,7 +130,6 @@ namespace Huppy.App.Configuration
 
             _services.AddScoped<IGPTService, GPTService>();
             _services.AddScoped<IUrbanService, UrbanService>();
-            _services.AddScoped<INewsApiService, NewsApiService>();
 
             // repositories
             _services.AddScoped<IUserRepository, UserRepository>();
