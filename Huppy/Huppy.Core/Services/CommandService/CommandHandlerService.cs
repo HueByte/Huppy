@@ -19,17 +19,15 @@ namespace Huppy.Core.Services.CommandService
         private readonly InteractionService _interactionService;
         private readonly IServiceProvider _serviceProvider;
         private readonly ILogger _logger;
-        private readonly CacheService _cacheService;
         private readonly IServiceScopeFactory _serviceFactory;
         private HashSet<string> _ephemeralCommands;
         private readonly MiddlewareExecutorService _middlewareExecutor;
-        public CommandHandlerService(DiscordShardedClient client, InteractionService interactionService, IServiceProvider serviceProvider, ILogger<CommandHandlerService> logger, CacheService cacheService, IServiceScopeFactory serviceFactory, MiddlewareExecutorService middlewareExecutor)
+        public CommandHandlerService(DiscordShardedClient client, InteractionService interactionService, IServiceProvider serviceProvider, ILogger<CommandHandlerService> logger, IServiceScopeFactory serviceFactory, MiddlewareExecutorService middlewareExecutor)
         {
             _client = client;
             _interactionService = interactionService;
             _serviceProvider = serviceProvider;
             _logger = logger;
-            _cacheService = cacheService;
             _serviceFactory = serviceFactory;
             _ephemeralCommands = new();
             _middlewareExecutor = middlewareExecutor;
