@@ -1,7 +1,7 @@
 using Discord;
 using Discord.WebSocket;
 using Huppy.Core.Interfaces;
-using Huppy.Core.Services.PaginatorService.Entities;
+using Huppy.Core.Services.Paginator.Entities;
 
 namespace Huppy.Core.Interfaces.IServices
 {

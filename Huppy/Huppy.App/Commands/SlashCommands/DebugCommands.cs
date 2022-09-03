@@ -3,7 +3,7 @@ using System.Text;
 using Discord;
 using Discord.Interactions;
 using Huppy.Core.Attributes;
-using Huppy.Core.Services.HuppyCacheService;
+using Huppy.Core.Services.HuppyCache;
 using Huppy.Kernel;
 using Microsoft.Extensions.Logging;
 

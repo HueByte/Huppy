@@ -1,7 +1,7 @@
 using Discord.Interactions;
 using Discord.WebSocket;
 using Huppy.Core.Interfaces.IServices;
-using Huppy.Core.Services.HuppyCacheService;
+using Huppy.Core.Services.HuppyCache;
 using Microsoft.Extensions.Logging;
 
 namespace Huppy.App.Commands.ComponentInteractions;

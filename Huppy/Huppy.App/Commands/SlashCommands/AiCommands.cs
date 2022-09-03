@@ -2,7 +2,7 @@ using System.Text;
 using Discord;
 using Discord.Interactions;
 using Huppy.Core.Interfaces.IServices;
-using Huppy.Core.Services.HuppyCacheService;
+using Huppy.Core.Services.HuppyCache;
 using Huppy.Kernel;
 using Huppy.Kernel.Constants;
 

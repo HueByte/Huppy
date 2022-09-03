@@ -3,7 +3,7 @@ using Discord;
 using Discord.Interactions;
 using Huppy.Core.Attributes;
 using Huppy.Core.Interfaces.IServices;
-using Huppy.Core.Services.PaginatorService.Entities;
+using Huppy.Core.Services.Paginator.Entities;
 using Huppy.Kernel.Constants;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
