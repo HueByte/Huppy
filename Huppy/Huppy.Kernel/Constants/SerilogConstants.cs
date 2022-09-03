@@ -1,4 +1,4 @@
-namespace Huppy.Kernel
+namespace Huppy.Kernel.Constants
 {
     public class SerilogConstants
     {

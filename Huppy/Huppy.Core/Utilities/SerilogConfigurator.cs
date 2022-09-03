@@ -1,8 +1,10 @@
+using Huppy.Kernel;
+using Huppy.Kernel.Constants;
 using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.SystemConsole.Themes;
 
-namespace Huppy.Kernel
+namespace Huppy.Core.Utilities
 {
     public static class SerilogConfigurator
     {

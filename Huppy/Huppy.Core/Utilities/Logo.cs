@@ -1,4 +1,4 @@
-namespace Huppy.Kernel
+namespace Huppy.Core.Utilities
 {
     public static class Logo
     {
