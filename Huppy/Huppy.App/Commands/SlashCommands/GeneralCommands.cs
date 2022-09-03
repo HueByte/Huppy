@@ -41,9 +41,7 @@ public class GeneralCommands : InteractionModuleBase<ExtendedShardedInteractionC
     {
         var orginalMessage = await FollowupAsync(embed: new EmbedBuilder().WithTitle("Sending message...").Build());
 
-        await (Context.Channel as ITextChannel).CreateThreadAsync("TEST", message: orginalMessage);
-
-        // await orginalMessage.DeleteAsync();
+        await orginalMessage.DeleteAsync();
 
         await Context.Channel.SendMessageAsync(text: message);
     }
