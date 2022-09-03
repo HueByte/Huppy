@@ -5,7 +5,6 @@ using Huppy.Core.Interfaces.IRepositories;
 using Huppy.Core.Interfaces.IServices;
 using Huppy.Core.Services.HuppyCacheService;
 using Huppy.Core.Services.PaginatorService.Entities;
-using Huppy.Kernel;
 using Huppy.Kernel.Constants;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -17,13 +16,11 @@ public class ServerCommands : InteractionModuleBase<ExtendedShardedInteractionCo
 {
     private readonly ILogger _logger;
     private readonly IServerRepository _serverRepository;
-    private readonly CacheService _cacheService;
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly IPaginatorService _paginatorService;
-    public ServerCommands(ILogger<ServerCommands> logger, CacheService cacheService, IServerRepository serverRepository, IServiceScopeFactory scopeFactory, IPaginatorService paginatorService)
+    public ServerCommands(ILogger<ServerCommands> logger, IServerRepository serverRepository, IServiceScopeFactory scopeFactory, IPaginatorService paginatorService)
     {
         _logger = logger;
-        _cacheService = cacheService;
         _serverRepository = serverRepository;
         _scopeFactory = scopeFactory;
         _paginatorService = paginatorService;

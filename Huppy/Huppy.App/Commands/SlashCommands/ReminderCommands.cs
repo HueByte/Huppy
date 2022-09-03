@@ -1,16 +1,12 @@
-using System.Collections.ObjectModel;
 using Discord;
 using Discord.Interactions;
 using Huppy.Core.Attributes;
 using Huppy.Core.Interfaces.IRepositories;
 using Huppy.Core.Interfaces.IServices;
 using Huppy.Core.Services.PaginatorService.Entities;
-using Huppy.Kernel;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Serilog;
 
 namespace Huppy.App.Commands.SlashCommands;
 

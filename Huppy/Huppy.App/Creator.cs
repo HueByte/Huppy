@@ -1,4 +1,3 @@
-using System.Net;
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
@@ -8,7 +7,6 @@ using Huppy.Core.Services.HuppyCacheService;
 using Huppy.Core.Services.LoggerService;
 using Huppy.Core.Services.MiddlewareExecutor;
 using Huppy.Infrastructure;
-using Huppy.Kernel;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
