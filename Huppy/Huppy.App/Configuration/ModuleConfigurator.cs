@@ -15,6 +15,7 @@ using Huppy.Core.Services.Logger;
 using Huppy.Core.Services.MiddlewareExecutor;
 using Huppy.Core.Services.Paginator;
 using Huppy.Core.Services.Reminder;
+using Huppy.Core.Services.Resources;
 using Huppy.Core.Services.ScopedData;
 using Huppy.Core.Services.ServerInteraction;
 using Huppy.Core.Services.Ticket;
@@ -134,6 +135,7 @@ namespace Huppy.App.Configuration
             _services.AddScoped<ICommandLogRepository, CommandLogRepository>();
             _services.AddScoped<IReminderRepository, ReminderRepository>();
             _services.AddScoped<ITicketRepository, TicketRepository>();
+            _services.AddScoped<IResourcesService, ResourcesService>();
 
             return this;
         }

@@ -1,10 +1,8 @@
-using System.Net;
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Huppy.Core.Interfaces.IRepositories;
 using Huppy.Core.Interfaces.IServices;
-using Huppy.Core.Models;
 using Huppy.Kernel.Constants;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;

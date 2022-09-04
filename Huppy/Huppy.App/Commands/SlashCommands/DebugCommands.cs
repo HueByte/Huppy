@@ -2,7 +2,9 @@ using System.Diagnostics;
 using System.Text;
 using Discord;
 using Discord.Interactions;
+using Discord.WebSocket;
 using Huppy.Core.Attributes;
+using Huppy.Core.Interfaces.IServices;
 using Huppy.Core.Services.HuppyCache;
 using Huppy.Kernel;
 using Microsoft.Extensions.Logging;
@@ -16,10 +18,48 @@ public class DebugCommands : InteractionModuleBase<ExtendedShardedInteractionCon
 {
     private readonly ILogger<DebugCommands> _logger;
     private readonly CacheService _cacheService;
-    public DebugCommands(ILogger<DebugCommands> logger, CacheService cacheService)
+    private readonly IResourcesService _resourceService;
+    private readonly DiscordShardedClient _client;
+    public DebugCommands(ILogger<DebugCommands> logger, CacheService cacheService, IResourcesService resourceService, DiscordShardedClient client)
     {
         _logger = logger;
         _cacheService = cacheService;
+        _resourceService = resourceService;
+        _client = client;
+    }
+
+    [SlashCommand("info", "Gets current resources statistics of Huppy")]
+    [RequireOwner]
+    public async Task GetStatus()
+    {
+        var embed = new EmbedBuilder()
+            .WithColor(Color.Magenta)
+            .WithThumbnailUrl(_client.CurrentUser.GetAvatarUrl())
+            .WithDescription("Current state of resources of Huppy")
+            .WithTitle("Resource Monitor");
+
+        var cpuUsage = await _resourceService.GetCpuUsageAsync();
+        var ramUsage = _resourceService.GetRamUsage();
+        var shardCount = _resourceService.GetShardCount();
+        var avgExecutionTime = await _resourceService.GetAverageExecutionTimeAsync();
+
+        var upTime = _resourceService.GetUpTime();
+        var upTimeFormatted = string.Format(
+            @"{0}::{1}::{2}::{3}::{4}",
+            upTime.Days,
+            upTime.Hours,
+            upTime.Minutes,
+            upTime.Seconds,
+            upTime.Milliseconds);
+
+        embed.AddField("CPU", $"`{cpuUsage}`", true);
+        embed.AddField("RAM", $"`{ramUsage}`", true);
+        embed.AddField("Shard Count", $"`{shardCount}`", true);
+        embed.AddField("Bot Uptime (DD:HH:MM:SS:MS)", $"`{upTimeFormatted}`", true);
+        embed.AddField("Average command executon time", $"`{avgExecutionTime} ms`", true);
+        embed.AddField("Bot Version", $"`v...`", true);
+
+        await ModifyOriginalResponseAsync((msg) => msg.Embed = embed.Build());
     }
 
     [SlashCommand("getmemory", "Gets memory usage of Huppy")]

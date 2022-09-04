@@ -4,7 +4,6 @@ using Discord.Interactions;
 using Discord.WebSocket;
 using Huppy.Core.Attributes;
 using Huppy.Core.Interfaces.IServices;
-using Huppy.Core.Services.HuppyCacheService;
 using Huppy.Core.Services.MiddlewareExecutor;
 using Huppy.Kernel;
 using Huppy.Kernel.Constants;
