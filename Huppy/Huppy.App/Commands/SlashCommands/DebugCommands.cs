@@ -38,12 +38,12 @@ public class DebugCommands : InteractionModuleBase<ExtendedShardedInteractionCon
             .WithDescription("Current state of resources of Huppy")
             .WithTitle("Resource Monitor");
 
-        var cpuUsage = await _resourceService.GetCpuUsage();
-        var ramUsage = await _resourceService.GetRamUsage();
-        var shardCount = await _resourceService.GetShardCount();
-        var avgExecutionTime = await _resourceService.GetAverageExecutionTime();
+        var cpuUsage = await _resourceService.GetCpuUsageAsync();
+        var ramUsage = _resourceService.GetRamUsage();
+        var shardCount = _resourceService.GetShardCount();
+        var avgExecutionTime = await _resourceService.GetAverageExecutionTimeAsync();
 
-        var upTime = await _resourceService.GetUpTime();
+        var upTime = _resourceService.GetUpTime();
         var upTimeFormatted = string.Format(
             @"{0}::{1}::{2}::{3}::{4}",
             upTime.Days,

@@ -2,11 +2,11 @@ namespace Huppy.Core.Interfaces.IServices
 {
     public interface IResourcesService
     {
-        Task<string> GetCpuUsage();
-        Task<string> GetRamUsage();
-        Task<int> GetShardCount();
-        Task<TimeSpan> GetUpTime();
-        Task<double> GetAverageExecutionTime();
-        Task<string> GetBotVersion();
+        Task<string> GetCpuUsageAsync();
+        string GetRamUsage();
+        int GetShardCount();
+        TimeSpan GetUpTime();
+        Task<double> GetAverageExecutionTimeAsync();
+        Task<string> GetBotVersionAsync();
     }
 }
