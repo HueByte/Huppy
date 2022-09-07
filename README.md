@@ -43,4 +43,5 @@ There are 2 ways of branch creation
 - In description put `- [*T* or *B*] [*resolves* or *fixes*] {#issueNumber}` (for more information about closing keywords [click here](https://docs.devart.com/studio-for-sql-server/source-controlling-databases/associating-commits-with-github-issues.html))
 
 ### Other info
+- Example of Task with PR properly linked [Issue #47](https://github.com/HueByte/Huppy/issues/47)
 - To display task in github description use (`- #{issueNumber}`)
