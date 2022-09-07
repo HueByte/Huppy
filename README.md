@@ -8,9 +8,10 @@
 > `appsettings.json` is generated each time when found missing, when moved to the root project directory (`Huppy.App`), it will be copied each build to debug folder 
 
 ### Migration
-- Comment out all lines under `// start bot `
-- Copy connection string to `HuppyContext#OnConfiguring` `optionsBuilder.UseSqlite` from appsettings
-- use `CreateMigration.bat` to create migration with name of it as command argument
+- Comment out all lines under `// start bot ` in `Program.cs`
+- Copy connection string to `HuppyDbContext#OnConfiguring` `optionsBuilder.UseSqlite` from appsettings
+- Use `CreateMigration.bat` to create migration with name of it as command argument
+- Reverse changes from `Program.cs` & `HuppyDbContext`
 
 ## Git guide
 ### Issue creation
