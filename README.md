@@ -32,7 +32,7 @@ There are 2 ways of branch creation
 - Checkout locally to created branch on github
 
 > Locally 
-- Checkout to branch (pattern `{#issueNumber}-{here-description}`)
+- Checkout to branch (pattern `{issueNumber}-{here-description}`)
 
 ### Commits
 - Use pattern for tasks `T {#issueNumber} {descriptionTopic1} & {descriptionTopic2}...`
