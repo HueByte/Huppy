@@ -24,7 +24,8 @@
 
 ### Branch creation
 There are 2 ways of branch creation
-> Github (recommended because integration with github)
+> Github 
+<br>(Recommended, When branches are created from issues, their pull requests are automatically linked.)
 - Navigate to the issue 
 - On the right side menu press `Create a branch` in `Development` section
 - Checkout locally to created branch on github
