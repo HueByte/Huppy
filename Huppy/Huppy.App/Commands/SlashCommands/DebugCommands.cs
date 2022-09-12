@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime;
 using System.Text;
 using Discord;
 using Discord.Interactions;
@@ -58,6 +59,7 @@ public class DebugCommands : InteractionModuleBase<ExtendedShardedInteractionCon
         embed.AddField("Bot Uptime (DD:HH:MM:SS:MS)", $"`{upTimeFormatted}`", true);
         embed.AddField("Average command executon time", $"`{avgExecutionTime} ms`", true);
         embed.AddField("Bot Version", $"`v...`", true);
+        embed.AddField("IsServerGC", $"`{GCSettings.IsServerGC}`", true);
 
         await ModifyOriginalResponseAsync((msg) => msg.Embed = embed.Build());
     }
