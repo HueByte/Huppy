@@ -160,7 +160,5 @@ namespace Huppy.App.Configuration
 
             return this;
         }
-
-        public IServiceProvider Build() => _services.BuildServiceProvider();
     }
 }
