@@ -13,7 +13,10 @@ namespace Huppy.Core.Utilities
             if (!Directory.Exists(Path.Combine(AppContext.BaseDirectory, @"logs")))
                 Directory.CreateDirectory(Path.Combine(AppContext.BaseDirectory, @"logs"));
 
-            return new LoggerConfiguration().MinimumLevel.Is(GetLogEventLevel(appSettings.Logger!.LogLevel!))
+            return new LoggerConfiguration()
+                .MinimumLevel.Is(GetLogEventLevel(appSettings.Logger?.LogLevel!))
+                .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database.Command", LogEventLevel.Warning)
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                 .Enrich.FromLogContext()
                 .WriteTo.Async(e => e.Console(theme: AnsiConsoleTheme.Code, applyThemeToRedirectedOutput: true))
                 .WriteTo.Async(e => e.File(Path.Combine(AppContext.BaseDirectory, "logs/log.txt"), rollingInterval: GetRollingInterval(appSettings.Logger!.TimeInterval!)))

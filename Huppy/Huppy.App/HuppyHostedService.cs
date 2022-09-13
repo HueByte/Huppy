@@ -13,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace Huppy.Core.Services.Huppy;
 
@@ -69,6 +70,7 @@ public class HuppyHostedService : IHostedService
     public Task StopAsync(CancellationToken cancellationToken)
     {
         _logger.LogInformation("Closing Huppy");
+        Log.CloseAndFlush();
         return Task.CompletedTask;
     }
 
