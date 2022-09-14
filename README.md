@@ -1,5 +1,5 @@
 <p align="center">
-<img width="256" src="https://images-ext-2.discordapp.net/external/Tfsh5HEdZUnaOHp7gWXx83i8qv6hd7MlIn7TMYHMeHk/%3Fsize%3D4096/https/cdn.discordapp.com/avatars/894305597569257492/bc6f202d62ad3ba1fedad317d21dabcc.png?width=870&height=870" />
+<img width="256" src="https://cdn.discordapp.com/avatars/894305597569257492/d5cb90076cc4e2a2d5ed3c2cc1704649.png?size=256" />
 </p>
 
 ## Dev guide
