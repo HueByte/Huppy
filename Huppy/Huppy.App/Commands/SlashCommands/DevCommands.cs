@@ -38,7 +38,7 @@ public class DevCommands : InteractionModuleBase<ExtendedShardedInteractionConte
         _paginatorService = paginatorService;
     }
 
-    [SlashCommand("info", "Gets current resources statistics of Huppy")]
+    [SlashCommand("runtime", "Gets current runtime info of Huppy")]
     [RequireDev]
     public async Task GetStatus()
     {
