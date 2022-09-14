@@ -120,7 +120,7 @@ public class TicketCommands : InteractionModuleBase<ExtendedShardedInteractionCo
 
 
         var ticketsCount = await _ticketService.GetCountAsync(Context.User.Id);
-        if (ticketsCount < 0)
+        if (ticketsCount <= 0)
         {
             embed.WithDescription("You don't have tickets ✨");
             await ModifyOriginalResponseAsync((msg) =>
@@ -131,7 +131,7 @@ public class TicketCommands : InteractionModuleBase<ExtendedShardedInteractionCo
             return;
         }
 
-        var entry = await _paginatorService.GeneratePaginatorEntry(Context, ticketsCount, _ticketsPerPage, async (currentPage, scope, data) => 
+        var entry = await _paginatorService.GeneratePaginatorEntry(Context, ticketsCount, _ticketsPerPage, async (currentPage, scope, data) =>
         {
             if (data is not IUser user) return null;
 

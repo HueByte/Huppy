@@ -83,7 +83,7 @@ public class DevCommands : InteractionModuleBase<ExtendedShardedInteractionConte
             .WithCurrentTimestamp();
 
         var ticketsCount = await _ticketService.GetCountAsync(Context.User.Id);
-        if (ticketsCount < 0)
+        if (ticketsCount <= 0)
         {
             embed.WithDescription("There are no tickets ✨");
             await ModifyOriginalResponseAsync((msg) =>
