@@ -1,6 +1,7 @@
 <p align="center">
 <img width="256" src="https://images-ext-2.discordapp.net/external/Tfsh5HEdZUnaOHp7gWXx83i8qv6hd7MlIn7TMYHMeHk/%3Fsize%3D4096/https/cdn.discordapp.com/avatars/894305597569257492/bc6f202d62ad3ba1fedad317d21dabcc.png?width=870&height=870" />
 </p>
+
 ## Dev guide
 ### First run
 - Navigate to `Huppy.App`
