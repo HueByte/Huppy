@@ -1,6 +1,10 @@
-﻿using Huppy.App;
-using Huppy.App.Configuration;
+﻿using Huppy.App.Configuration;
+using Huppy.Core.Services.Huppy;
 using Huppy.Core.Utilities;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Serilog;
 
 Logo.Print();
@@ -10,30 +14,27 @@ var appSettings = AppSettings.IsCreated
     ? AppSettings.Load()
     : AppSettings.Create();
 
-// Configure Logger
 Log.Logger = SerilogConfigurator.ConfigureLogger(appSettings);
 
-// Configure Service provider
-IServiceProvider _serviceProvider = new ModuleConfigurator().AddAppSettings(appSettings)
-    .AddLogger(Log.Logger)
-    .AddDiscord()
-    .AddServices()
-    .AddDatabase()
-    .AddHttpClients()
-    .AddMiddlewares()
-    .Build();
+await Host.CreateDefaultBuilder(args)
+    .ConfigureHostConfiguration(host =>
+    {
+        host.AddUserSecrets<Program>();
+    })
+    .ConfigureServices(services =>
+    {
+        _ = new ModuleConfigurator(services)
+        .AddAppSettings(appSettings)
+        .AddLogger(Log.Logger)
+        .AddDiscord()
+        .AddServices()
+        .AddDatabase()
+        .AddHttpClients()
+        .AddMiddlewares();
 
-// Start bot
-Creator bot = new(_serviceProvider);
-
-await bot.CreateDatabase();
-
-await bot.CreateCommands();
-
-await bot.PopulateSingletons();
-
-await bot.CreateEvents();
-
-await bot.CreateBot();
-
-await Task.Delay(-1);
+        services.AddHostedService<HuppyHostedService>();
+    })
+    .ConfigureLogging(ctx => ctx.ClearProviders())
+    .UseSerilog(Log.Logger)
+    .Build()
+    .RunAsync();
