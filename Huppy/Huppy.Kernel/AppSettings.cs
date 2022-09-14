@@ -7,6 +7,7 @@ namespace Huppy.Kernel
     {
         public string? BotToken { get; set; }
         public string? DebugGuilds { get; set; }
+        public string? Developers { get; set; }
         public string? BetaTestingGuilds { get; set; }
         public string? ConnectionString { get; set; }
         public Logger? Logger { get; set; }
@@ -45,6 +46,7 @@ namespace Huppy.Kernel
             {
                 BotToken = "",
                 DebugGuilds = "",
+                Developers = "",
                 BetaTestingGuilds = "",
                 ConnectionString = $"Data Source={SavePath}",
                 Logger = new()
