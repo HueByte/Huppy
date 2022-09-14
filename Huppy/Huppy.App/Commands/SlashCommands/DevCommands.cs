@@ -19,7 +19,7 @@ namespace Huppy.App.Commands.SlashCommands;
 [DontAutoRegister]
 public class DevCommands : InteractionModuleBase<ExtendedShardedInteractionContext>
 {
-    private readonly ILogger<DebugCommands> _logger;
+    private readonly ILogger<DevCommands> _logger;
     private readonly CacheService _cacheService;
     private readonly IResourcesService _resourceService;
     private readonly DiscordShardedClient _client;
@@ -27,7 +27,7 @@ public class DevCommands : InteractionModuleBase<ExtendedShardedInteractionConte
     private readonly IPaginatorService _paginatorService;
     private const int _ticketsPerPage = 10;
 
-    public DevCommands(ILogger<DebugCommands> logger, CacheService cacheService, IResourcesService resourceService, DiscordShardedClient client,
+    public DevCommands(ILogger<DevCommands> logger, CacheService cacheService, IResourcesService resourceService, DiscordShardedClient client,
         ITicketService ticketService, IPaginatorService paginatorService)
     {
         _logger = logger;
