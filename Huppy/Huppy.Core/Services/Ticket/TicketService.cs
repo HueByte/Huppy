@@ -35,6 +35,19 @@ public class TicketService : ITicketService
         return tickets.Where(ticket => ticket.UserId == userId);
     }
 
+    public async Task<IEnumerable<Models.Ticket>> GetPaginatedTickets(int skip, int take)
+    {
+        var tickets = (await _ticketRepository.GetAllAsync())
+            .Include(ticket => ticket.User)
+            .OrderBy(ticket => ticket.IsClosed)
+            .ThenByDescending(ticket => ticket.CreatedDate)
+            .Skip(skip)
+            .Take(take)
+            .ToList();
+
+        return tickets;
+    }
+
     public async Task<IEnumerable<Models.Ticket>> GetPaginatedTickets(ulong userId, int skip, int take)
     {
         var tickets = (await _ticketRepository.GetAllAsync())
