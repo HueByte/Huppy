@@ -14,7 +14,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Huppy.App.Commands.SlashCommands;
 
-[Group("debug", "debug commands")]
+[Group("dev", "developer commands")]
 [DebugCommandGroup]
 [DontAutoRegister]
 public class DevCommands : InteractionModuleBase<ExtendedShardedInteractionContext>
