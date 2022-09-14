@@ -17,7 +17,9 @@ public class TicketCommands : InteractionModuleBase<ExtendedShardedInteractionCo
     private readonly ITicketService _ticketService;
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly IPaginatorService _paginatorService;
-    private const int TicketsPerPage = 5;
+
+    private const int _ticketsPerPage = 5;
+
     public TicketCommands(ILogger<TicketCommands> logger, ITicketService ticketService, IServiceScopeFactory scopeFactory, IPaginatorService paginatorService)
     {
         _logger = logger;
@@ -129,56 +131,40 @@ public class TicketCommands : InteractionModuleBase<ExtendedShardedInteractionCo
             return;
         }
 
-        DynamicPaginatorEntry entry = new(_scopeFactory)
+        var entry = await _paginatorService.GeneratePaginatorEntry(Context, ticketsCount, _ticketsPerPage, async (currentPage, scope, data) => 
         {
-            MessageId = 0,
-            CurrentPage = 0,
-            Name = Guid.NewGuid().ToString(),
-            Pages = new(),
-            Data = Context.User
-        };
+            if (data is not IUser user) return null;
 
-        int pages = Convert.ToInt32(Math.Ceiling((decimal)ticketsCount / TicketsPerPage));
-        for (int i = 0; i < pages; i++)
-        {
-            int currentPage = i;
-            var page = async Task<PaginatorPage?> (AsyncServiceScope scope, object? data) =>
+            var ticketService = scope.ServiceProvider.GetRequiredService<ITicketService>();
+
+            var tickets = await ticketService.GetPaginatedTickets(user.Id, currentPage * _ticketsPerPage, _ticketsPerPage);
+
+            var embed = new EmbedBuilder()
+                .WithTitle("Your tickets 📜")
+                .WithDescription("To see detailed status of your ticked use `/ticket status` with copied ID")
+                .WithThumbnailUrl(user.GetAvatarUrl())
+                .WithColor(Color.Orange)
+                .WithCurrentTimestamp();
+
+            foreach (var ticket in tickets)
             {
-                if (data is not IUser user) return null;
+                ticket.CreatedDate = DateTime.SpecifyKind(ticket.CreatedDate, DateTimeKind.Utc);
 
-                var ticketService = scope.ServiceProvider.GetRequiredService<ITicketService>();
+                StringBuilder sb = new();
+                sb.AppendLine($"> Ticked ID:`{ticket.Id}`");
+                sb.AppendLine($"> Created date: {TimestampTag.FromDateTime(ticket.CreatedDate)}");
+                sb.AppendLine($"> Status: {(ticket.IsClosed ? "`Closed`" : "`Open`")}");
+                sb.AppendLine($"> Topic: `{ticket.Topic}`");
 
-                var tickets = await ticketService.GetPaginatedTickets(user.Id, currentPage * TicketsPerPage, TicketsPerPage);
+                embed.AddField("📜 Ticket", sb.ToString());
+            }
 
-                var embed = new EmbedBuilder()
-                    .WithTitle("Your tickets 📜")
-                    .WithDescription("To see detailed status of your ticked use `/ticket status` with copied ID")
-                    .WithThumbnailUrl(user.GetAvatarUrl())
-                    .WithColor(Color.Orange)
-                    .WithCurrentTimestamp();
-
-                foreach (var ticket in tickets)
-                {
-                    ticket.CreatedDate = DateTime.SpecifyKind(ticket.CreatedDate, DateTimeKind.Utc);
-
-                    StringBuilder sb = new();
-                    sb.AppendLine($"> Ticked ID:`{ticket.Id}`");
-                    sb.AppendLine($"> Created date: {TimestampTag.FromDateTime(ticket.CreatedDate)}");
-                    sb.AppendLine($"> Status: {(ticket.IsClosed ? "`Closed`" : "`Open`")}");
-                    sb.AppendLine($"> Topic: `{ticket.Topic}`");
-
-                    embed.AddField("📜 Ticket", sb.ToString());
-                }
-
-                return new PaginatorPage()
-                {
-                    Embed = embed,
-                    Page = (ushort)currentPage
-                };
+            return new PaginatorPage()
+            {
+                Embed = embed,
+                Page = (ushort)currentPage
             };
-
-            if (page is not null) entry.Pages.Add(page!);
-        }
+        });
 
         await _paginatorService.SendPaginatedMessage(Context.Interaction, entry);
     }
