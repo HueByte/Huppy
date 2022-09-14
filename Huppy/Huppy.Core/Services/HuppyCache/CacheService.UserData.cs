@@ -4,9 +4,9 @@ public partial class CacheService
 {
     public Task AddCacheUser(ulong UserId, string? Username)
     {
-        CacheUsers.Add(UserId, Username);
+        _cacheUsers.Add(UserId, Username);
         return Task.CompletedTask;
     }
 
-    public List<string> GetUserNames() => CacheUsers.Values.ToList()!;
+    public List<string> GetUserNames() => _cacheUsers.Values.ToList()!;
 }

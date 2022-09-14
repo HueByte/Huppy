@@ -30,7 +30,7 @@ public class DebugCommands : InteractionModuleBase<ExtendedShardedInteractionCon
     }
 
     [SlashCommand("info", "Gets current resources statistics of Huppy")]
-    [RequireOwner]
+    [RequireDev]
     public async Task GetStatus()
     {
         var embed = new EmbedBuilder()
@@ -65,7 +65,7 @@ public class DebugCommands : InteractionModuleBase<ExtendedShardedInteractionCon
     }
 
     [SlashCommand("getmemory", "Gets memory usage of Huppy")]
-    [RequireOwner]
+    [RequireDev]
     public async Task GetMemoryUsage()
     {
         StringBuilder description = new();
