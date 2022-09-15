@@ -30,7 +30,7 @@ namespace Huppy.App.Middlewares
 
             CommandLog log = new()
             {
-                CommandName = commandInfo.Name,
+                CommandName = commandInfo.ToString(),
                 Date = DateTime.UtcNow,
                 IsSuccess = result.IsSuccess,
                 UserId = context.User.Id,
@@ -45,7 +45,7 @@ namespace Huppy.App.Middlewares
 
             if (result.IsSuccess)
             {
-                _logger.LogInformation("Command [{CommandName}] executed for [{Username}] in [{GuildName}] [{time} ms]", commandInfo.Name, context.User.Username, context.Guild.Name, string.Format("{0:n0}", watch.ElapsedMilliseconds));
+                _logger.LogInformation("Command [{CommandName}] executed for [{Username}] in [{GuildName}] [{time} ms]", commandInfo.ToString(), context.User.Username, context.Guild.Name, string.Format("{0:n0}", watch.ElapsedMilliseconds));
             }
             else
             {
