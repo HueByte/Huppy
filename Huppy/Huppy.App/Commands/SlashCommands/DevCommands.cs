@@ -54,18 +54,12 @@ public class DevCommands : InteractionModuleBase<ExtendedShardedInteractionConte
         var avgExecutionTime = await _resourceService.GetAverageExecutionTimeAsync();
 
         var upTime = _resourceService.GetUpTime();
-        var upTimeFormatted = string.Format(
-            @"{0}::{1}::{2}::{3}::{4}",
-            upTime.Days,
-            upTime.Hours,
-            upTime.Minutes,
-            upTime.Seconds,
-            upTime.Milliseconds);
+        var upTimeFormatted = upTime.ToString("d'd 'hh':'mm':'ss");
 
         embed.AddField("CPU", $"`{cpuUsage}`", true);
         embed.AddField("RAM", $"`{ramUsage}`", true);
         embed.AddField("Shard Count", $"`{shardCount}`", true);
-        embed.AddField("Bot Uptime (DD:HH:MM:SS:MS)", $"`{upTimeFormatted}`", true);
+        embed.AddField("Bot Uptime", $"`{upTimeFormatted}`", true);
         embed.AddField("Average command executon time", $"`{avgExecutionTime} ms`", true);
         embed.AddField("Bot Version", $"`v...`", true);
         embed.AddField("IsServerGC", $"`{GCSettings.IsServerGC}`", true);
