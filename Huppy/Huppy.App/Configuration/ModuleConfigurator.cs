@@ -7,6 +7,7 @@ using Huppy.Core.Interfaces.IRepositories;
 using Huppy.Core.Interfaces.IServices;
 using Huppy.Core.Services.Activity;
 using Huppy.Core.Services.AiStabilizer;
+using Huppy.Core.Services.App;
 using Huppy.Core.Services.CommandHandler;
 using Huppy.Core.Services.Event;
 using Huppy.Core.Services.GPT;
@@ -121,6 +122,7 @@ namespace Huppy.App.Configuration
             _services.AddSingleton<IPaginatorService, PaginatorService>();
             _services.AddSingleton<IEventService, EventService>();
             _services.AddSingleton<IActivityControlService, ActivityControlService>();
+            _services.AddSingleton<IAppMetadataService, AppMetadataService>();
 
             _services.AddScoped<IReminderService, ReminderService>();
             _services.AddScoped<ITicketService, TicketService>();

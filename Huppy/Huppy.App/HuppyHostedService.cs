@@ -35,10 +35,14 @@ public class HuppyHostedService : IHostedService
     private readonly IReminderService _reminderService;
     private readonly MiddlewareExecutorService _middlewareExecutor;
     private readonly IActivityControlService _activityControlService;
+    private readonly IAppMetadataService _appMetadataService;
     private bool isBotInitialized = false;
 
     #endregion
-    public HuppyHostedService(DiscordShardedClient client, AppSettings appSettings, InteractionService interactionService, ICommandHandlerService commandHandlerService, LoggingService loggingService, ILogger<HuppyHostedService> logger, HuppyDbContext dbContext, IServerInteractionService serverInteractionService, ITimedEventsService timedEventsService, CacheService cacheService, IPaginatorService paginatorService, IEventService eventService, IReminderService reminderService, MiddlewareExecutorService middlewareExecutorService, IActivityControlService activityControlService)
+    public HuppyHostedService(DiscordShardedClient client, AppSettings appSettings, InteractionService interactionService, ICommandHandlerService commandHandlerService,
+        LoggingService loggingService, ILogger<HuppyHostedService> logger, HuppyDbContext dbContext, IServerInteractionService serverInteractionService,
+        ITimedEventsService timedEventsService, CacheService cacheService, IPaginatorService paginatorService, IEventService eventService, IReminderService reminderService,
+        MiddlewareExecutorService middlewareExecutorService, IActivityControlService activityControlService, IAppMetadataService appMetadataService)
     {
         _client = client;
         _appSettings = appSettings;
@@ -55,11 +59,12 @@ public class HuppyHostedService : IHostedService
         _reminderService = reminderService;
         _middlewareExecutor = middlewareExecutorService;
         _activityControlService = activityControlService;
+        _appMetadataService = appMetadataService;
     }
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Starting Huppy");
+        _logger.LogInformation("Starting Huppy {version}", $"v{_appMetadataService.Version}");
         await CreateDatabase();
         await CreateCommands();
         await PopulateSingletons();
