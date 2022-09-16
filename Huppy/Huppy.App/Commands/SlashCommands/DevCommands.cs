@@ -25,10 +25,11 @@ public class DevCommands : InteractionModuleBase<ExtendedShardedInteractionConte
     private readonly DiscordShardedClient _client;
     private readonly ITicketService _ticketService;
     private readonly IPaginatorService _paginatorService;
+    private readonly IAppMetadataService _appMetadataService;
     private const int _ticketsPerPage = 10;
 
     public DevCommands(ILogger<DevCommands> logger, CacheService cacheService, IResourcesService resourceService, DiscordShardedClient client,
-        ITicketService ticketService, IPaginatorService paginatorService)
+        ITicketService ticketService, IPaginatorService paginatorService, IAppMetadataService appMetadataService)
     {
         _logger = logger;
         _cacheService = cacheService;
@@ -36,6 +37,7 @@ public class DevCommands : InteractionModuleBase<ExtendedShardedInteractionConte
         _client = client;
         _ticketService = ticketService;
         _paginatorService = paginatorService;
+        _appMetadataService = appMetadataService;
     }
 
     [SlashCommand("runtime", "Gets current runtime info of Huppy")]
@@ -61,7 +63,7 @@ public class DevCommands : InteractionModuleBase<ExtendedShardedInteractionConte
         embed.AddField("Shard Count", $"`{shardCount}`", true);
         embed.AddField("Bot Uptime", $"`{upTimeFormatted}`", true);
         embed.AddField("Average command executon time", $"`{avgExecutionTime} ms`", true);
-        embed.AddField("Bot Version", $"`v...`", true);
+        embed.AddField("Bot Version", $"`v{_appMetadataService.Version}`", true);
         embed.AddField("IsServerGC", $"`{GCSettings.IsServerGC}`", true);
 
         await ModifyOriginalResponseAsync((msg) => msg.Embed = embed.Build());
