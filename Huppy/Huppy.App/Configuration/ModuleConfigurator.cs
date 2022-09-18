@@ -9,7 +9,7 @@ using Huppy.Core.Services.Activity;
 using Huppy.Core.Services.AiStabilizer;
 using Huppy.Core.Services.App;
 using Huppy.Core.Services.CommandHandler;
-using Huppy.Core.Services.Event;
+using Huppy.Core.Services.EventLoop;
 using Huppy.Core.Services.GPT;
 using Huppy.Core.Services.HuppyCache;
 using Huppy.Core.Services.Logger;
