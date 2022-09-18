@@ -10,7 +10,7 @@ namespace Huppy.Core.Services.JobManager
         private readonly ILogger _logger;
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly ITimedEventsService _timedEventsService;
-        public Dictionary<Guid, string> RegisteredJobs = new();
+        private readonly Dictionary<Guid, TimedJob> _registeredJobs = new();
         private bool _isInitialized;
         public JobManagerService(ILogger<JobManagerService> logger, IServiceScopeFactory scopeFactory, ITimedEventsService timedEventsService)
         {
@@ -18,6 +18,8 @@ namespace Huppy.Core.Services.JobManager
             _scopeFactory = scopeFactory;
             _timedEventsService = timedEventsService;
         }
+
+        public List<TimedJob> GetTimedJobs() => _registeredJobs.Values.ToList();
 
         public Task StartEventLoop()
         {
@@ -41,7 +43,7 @@ namespace Huppy.Core.Services.JobManager
             };
 
             _timedEventsService.AddJob(job);
-            RegisteredJobs.Add(job.JobId, job.Name);
+            _registeredJobs.Add(job.JobId, job);
             return Task.CompletedTask;
         }
 
@@ -67,7 +69,7 @@ namespace Huppy.Core.Services.JobManager
             };
 
             _timedEventsService.AddJob(job);
-            RegisteredJobs.Add(job.JobId, job.Name);
+            _registeredJobs.Add(job.JobId, job);
             return Task.CompletedTask;
         }
 
@@ -93,7 +95,7 @@ namespace Huppy.Core.Services.JobManager
             };
 
             _timedEventsService.AddJob(job);
-            RegisteredJobs.Add(job.JobId, job.Name);
+            _registeredJobs.Add(job.JobId, job);
             return Task.CompletedTask;
         }
 
