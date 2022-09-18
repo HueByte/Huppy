@@ -23,7 +23,7 @@ namespace Huppy.Core.Services.JobManager
         {
             _logger.LogInformation("JobManager :: Starting event loop service job");
 
-            var scope = _scopeFactory.CreateAsyncScope();
+            using var scope = _scopeFactory.CreateAsyncScope();
             var eventLoopServiceTemp = scope.ServiceProvider.GetRequiredService<IEventLoopService>();
 
             TimedJob job = new()
@@ -49,7 +49,7 @@ namespace Huppy.Core.Services.JobManager
         {
             _logger.LogInformation("JobManager :: Starting reminder service job");
 
-            var scope = _scopeFactory.CreateAsyncScope();
+            using var scope = _scopeFactory.CreateAsyncScope();
             var reminderServiceTemp = scope.ServiceProvider.GetRequiredService<IReminderService>();
 
             TimedJob job = new()
@@ -75,7 +75,7 @@ namespace Huppy.Core.Services.JobManager
         {
             _logger.LogInformation("JobManager :: Starting activity control service job");
 
-            var scope = _scopeFactory.CreateAsyncScope();
+            using var scope = _scopeFactory.CreateAsyncScope();
             var activityControlServiceTemp = scope.ServiceProvider.GetRequiredService<IActivityControlService>();
 
             TimedJob job = new()

@@ -26,7 +26,7 @@ public class StaticPaginatorEntry : IPaginatorEntry
             throw new Exception("Page selected doesn't exist");
 
         // Fetch page content from registered static embeds in PaginatorService
-        var scope = _serviceScopeFactory.CreateAsyncScope();
+        using var scope = _serviceScopeFactory.CreateAsyncScope();
         var paginatorService = scope.ServiceProvider.GetService<IPaginatorService>();
 
         // fetch list of static embeds by key name
