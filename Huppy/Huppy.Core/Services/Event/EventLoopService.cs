@@ -1,23 +1,25 @@
 using System.Collections.Concurrent;
+using System.Diagnostics;
+using System.Reflection.Metadata;
 using Huppy.Core.Interfaces.IServices;
 using Microsoft.Extensions.Logging;
 
 namespace Huppy.Core.Services.Event
 {
     public record Event(object? Data, string Name, Func<object?, Task> Task);
-    public class EventService : IEventService
+    public class EventLoopService : IEventLoopService
     {
-        public event Func<string[], Task> OnEventsRemoved;
+        public event Func<string[], Task>? OnEventsRemoved;
         private readonly ILogger _logger;
-        public readonly ConcurrentDictionary<ulong, List<Event>> jobs = new();
+        private readonly ConcurrentDictionary<ulong, List<Event>> jobsQueue = new();
         private readonly SemaphoreSlim _semiphore = new(1, 1);
+        private readonly TimeSpan _ticker = TimeSpan.FromSeconds(10); // ticks
+        private readonly int _maxDegreeOfParallelism = Environment.ProcessorCount;
+        private readonly ConcurrentBag<string> _removedNames = new();
+        private const int TICKS_PER_SECOND = 10_000_000;
         private Timer? _timer;
-        private DateTime _startDate;
-        private readonly TimeSpan _ticker = TimeSpan.FromSeconds(5); // ticks
-        private const int TICKS_PER_SECOND = 10000000;
-        private const int _maxDegreeOfParallelism = 4;
 
-        public EventService(ILogger<EventService> logger)
+        public EventLoopService(ILogger<EventLoopService> logger)
         {
             _logger = logger;
         }
@@ -26,7 +28,6 @@ namespace Huppy.Core.Services.Event
         {
             _logger.LogInformation("Starting Event Loop Service");
 
-            _startDate = DateTime.Now;
             _timer = InitTimer();
         }
 
@@ -46,15 +47,16 @@ namespace Huppy.Core.Services.Event
             var targetTime = GetTargetTime(time);
             try
             {
-                if (jobs.ContainsKey(targetTime))
+                if (jobsQueue.TryGetValue(targetTime, out var value))
                 {
-                    jobs.TryGetValue(targetTime, out var value);
                     value ??= new();
                     value.AddRange(eventJobs);
+                    _logger.LogInformation("Appending {count} jobs to event loop", eventJobs.Count);
                 }
                 else
                 {
-                    jobs.TryAdd(targetTime, eventJobs.ToList());
+                    jobsQueue.TryAdd(targetTime, eventJobs.ToList());
+                    _logger.LogInformation("Adding {count} jobs to event loop", eventJobs.Count);
                 }
             }
             catch (Exception ex) { _logger.LogError("Event loop adding event error", ex); }
@@ -70,7 +72,7 @@ namespace Huppy.Core.Services.Event
 
         public Task Remove(ulong time, string eventName)
         {
-            jobs.TryGetValue(time, out var value);
+            jobsQueue.TryGetValue(time, out var value);
 
             if (value is null) return Task.CompletedTask;
 
@@ -143,8 +145,6 @@ namespace Huppy.Core.Services.Event
         //     return Task.CompletedTask;
         // }
 
-        public DateTime GetStartTime() => _startDate;
-
         private Timer InitTimer()
         {
             var timer = new Timer(async (e) =>
@@ -161,13 +161,15 @@ namespace Huppy.Core.Services.Event
 
             await _semiphore.WaitAsync();
             bool isSemiphoreReleased = false;
-            ConcurrentBag<string> removedNames = new();
-            var targetTime = GetTargetTime(DateTime.UtcNow);
+            Stopwatch watch = new();
+            watch.Start();
 
             try
             {
-                var queuedJobs = jobs.Where(job => job.Key < targetTime);
-                if (!queuedJobs.Any())
+                var jobs = jobsQueue.Where(job => job.Key < GetTargetTime(DateTime.UtcNow));
+                // ConcurrentBag<string> _removedNames = new();
+
+                if (!jobs.Any())
                 {
                     _semiphore.Release();
                     isSemiphoreReleased = true;
@@ -180,30 +182,31 @@ namespace Huppy.Core.Services.Event
                 };
 
                 // iterate in async parallel each queued jobs that met the condition 
-                await Parallel.ForEachAsync(queuedJobs, parallelOptions, async (queue, token) =>
+                await Parallel.ForEachAsync(jobs, parallelOptions, async (iteratedQueue, token) =>
                 {
                     // start all events that job contains and await it
-                    var tasks = queue.Value
+                    var tasks = iteratedQueue.Value
                         .Select(job => Task.Run(async () => await job.Task(job.Data)))
                         .ToList();
 
                     await Task.WhenAll(tasks);
 
-                    jobs.TryRemove(queue.Key, out var removed);
+                    jobsQueue.TryRemove(iteratedQueue.Key, out var removedJobs);
 
-                    if (removed is null) return;
-                    foreach (var name in removed.Select(e => e.Name)) removedNames.Add(name);
+                    if (removedJobs is null) return;
+                    foreach (var name in removedJobs.Select(e => e.Name)) _removedNames.Add(name);
                 });
 
-                OnEventsRemoved?.Invoke(removedNames.ToArray());
-
-                _logger.LogInformation("Executed {noEvents} events", removedNames.Count);
+                OnEventsRemoved?.Invoke(_removedNames.ToArray());
+                _logger.LogInformation("Executed {noEvents} event loop jobs in {time}", _removedNames.Count, watch.Elapsed);
             }
             catch (Exception ex) { _logger.LogError("Event loop error", ex); }
             finally
             {
-                _logger.LogDebug("Finished event loop execution");
+                watch.Stop();
+                _removedNames.Clear();
                 if (!isSemiphoreReleased) _semiphore.Release(1);
+                _logger.LogDebug("Finished event loop execution");
             }
         }
 

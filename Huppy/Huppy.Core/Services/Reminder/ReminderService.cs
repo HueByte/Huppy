@@ -14,14 +14,14 @@ public record ReminderInput(IUser User, string Message);
 public class ReminderService : IReminderService
 {
     private readonly ILogger<ReminderService> _logger;
-    private readonly IEventService _eventService;
+    private readonly IEventLoopService _eventService;
     private readonly IReminderRepository _reminderRepository;
     private readonly DiscordShardedClient _discord;
     private readonly InteractionService _interactionService;
     private readonly ITimedEventsService _timedEventsService;
     private readonly TimeSpan fetchPeriod = new(1, 0, 0);
     private DateTime FetchingDate => DateTime.UtcNow + fetchPeriod;
-    public ReminderService(IEventService eventService, ILogger<ReminderService> logger, DiscordShardedClient discord, IReminderRepository reminderRepository, InteractionService interactionService, ITimedEventsService timedEventsService)
+    public ReminderService(IEventLoopService eventService, ILogger<ReminderService> logger, DiscordShardedClient discord, IReminderRepository reminderRepository, InteractionService interactionService, ITimedEventsService timedEventsService)
     {
         _eventService = eventService;
         _logger = logger;

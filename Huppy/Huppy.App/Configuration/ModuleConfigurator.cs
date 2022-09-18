@@ -120,7 +120,7 @@ namespace Huppy.App.Configuration
             _services.AddSingleton<IServerInteractionService, ServerInteractionService>();
             _services.AddSingleton<ITimedEventsService, TimedEventsService>();
             _services.AddSingleton<IPaginatorService, PaginatorService>();
-            _services.AddSingleton<IEventService, EventService>();
+            _services.AddSingleton<IEventLoopService, EventLoopService>();
             _services.AddSingleton<IActivityControlService, ActivityControlService>();
             _services.AddSingleton<IAppMetadataService, AppMetadataService>();
 

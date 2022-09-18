@@ -31,7 +31,7 @@ public class HuppyHostedService : IHostedService
     private readonly ITimedEventsService _timedEventService;
     private readonly CacheService _cacheService;
     private readonly IPaginatorService _paginatorService;
-    private readonly IEventService _eventService;
+    private readonly IEventLoopService _eventService;
     private readonly IReminderService _reminderService;
     private readonly MiddlewareExecutorService _middlewareExecutor;
     private readonly IActivityControlService _activityControlService;
@@ -41,7 +41,7 @@ public class HuppyHostedService : IHostedService
     #endregion
     public HuppyHostedService(DiscordShardedClient client, AppSettings appSettings, InteractionService interactionService, ICommandHandlerService commandHandlerService,
         LoggingService loggingService, ILogger<HuppyHostedService> logger, HuppyDbContext dbContext, IServerInteractionService serverInteractionService,
-        ITimedEventsService timedEventsService, CacheService cacheService, IPaginatorService paginatorService, IEventService eventService, IReminderService reminderService,
+        ITimedEventsService timedEventsService, CacheService cacheService, IPaginatorService paginatorService, IEventLoopService eventService, IReminderService reminderService,
         MiddlewareExecutorService middlewareExecutorService, IActivityControlService activityControlService, IAppMetadataService appMetadataService)
     {
         _client = client;
