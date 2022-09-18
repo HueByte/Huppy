@@ -17,45 +17,16 @@ public class ReminderService : IReminderService
     private readonly ILogger _logger;
     private readonly IEventLoopService _eventService;
     private readonly IReminderRepository _reminderRepository;
-    // private readonly DiscordShardedClient _discord;
     private readonly InteractionService _interactionService;
-    // private readonly ITimedEventsService _timedEventsService;
-    // private readonly TimeSpan fetchPeriod = new(1, 0, 0);
-    // private DateTime fetchingDate => DateTime.UtcNow + fetchPeriod;
     private DateTime FetchingDate => DateTime.UtcNow + FetchPeriod;
     public TimeSpan FetchPeriod { get; } = new(1, 0, 0);
     public ReminderService(IEventLoopService eventService, ILogger<ReminderService> logger, DiscordShardedClient discord, IReminderRepository reminderRepository, InteractionService interactionService, ITimedEventsService timedEventsService)
     {
         _eventService = eventService;
         _logger = logger;
-        // _discord = discord;
         _reminderRepository = reminderRepository;
         _interactionService = interactionService;
-        // _timedEventsService = timedEventsService;
     }
-
-    // TODO
-    // guild.DownloadUsersAsync, and within DiscordSocketConfig there's alwaysdownloadusers 
-    // Will use bulk download method 
-    // public Task Initialize()
-    // {
-    //     // every {fetchingPeriod} register fresh bulk of reminders to save memory
-    //     _logger.LogInformation("Starting Reminder Service");
-
-    //     _timedEventsService.AddJob(
-    //         Guid.NewGuid(),
-    //         null,
-    //         new TimeSpan(0),
-    //         fetchPeriod,
-    //         async (scope, data) =>
-    //         {
-    //             var reminderService = scope.ServiceProvider.GetRequiredService<IReminderService>();
-    //             await reminderService.RegisterFreshReminders();
-    //         }
-    //     );
-
-    //     return Task.CompletedTask;
-    // }
 
     public async Task RegisterFreshReminders()
     {

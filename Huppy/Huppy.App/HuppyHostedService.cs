@@ -29,21 +29,19 @@ public class HuppyHostedService : IHostedService
     private readonly ILogger<HuppyHostedService> _logger;
     private readonly HuppyDbContext _dbContext;
     private readonly IServerInteractionService _serverInteractionService;
-    // private readonly ITimedEventsService _timedEventService;
     private readonly CacheService _cacheService;
     private readonly IPaginatorService _paginatorService;
     private readonly IEventLoopService _eventService;
     private readonly IReminderService _reminderService;
     private readonly MiddlewareExecutorService _middlewareExecutor;
-    // private readonly IActivityControlService _activityControlService;
     private readonly IAppMetadataService _appMetadataService;
     private bool isBotInitialized = false;
 
     #endregion
     public HuppyHostedService(DiscordShardedClient client, AppSettings appSettings, InteractionService interactionService, ICommandHandlerService commandHandlerService,
         LoggingService loggingService, ILogger<HuppyHostedService> logger, HuppyDbContext dbContext, IServerInteractionService serverInteractionService,
-        ITimedEventsService timedEventsService, CacheService cacheService, IPaginatorService paginatorService, IEventLoopService eventService, IReminderService reminderService,
-        MiddlewareExecutorService middlewareExecutorService, IActivityControlService activityControlService, IAppMetadataService appMetadataService,
+        CacheService cacheService, IPaginatorService paginatorService, IEventLoopService eventService, IReminderService reminderService,
+        MiddlewareExecutorService middlewareExecutorService, IAppMetadataService appMetadataService,
         IJobManagerService jobManagerService)
     {
         _client = client;
@@ -54,13 +52,11 @@ public class HuppyHostedService : IHostedService
         _logger = logger;
         _dbContext = dbContext;
         _serverInteractionService = serverInteractionService;
-        // _timedEventService = timedEventsService;
         _cacheService = cacheService;
         _paginatorService = paginatorService;
         _eventService = eventService;
         _reminderService = reminderService;
         _middlewareExecutor = middlewareExecutorService;
-        // _activityControlService = activityControlService;
         _appMetadataService = appMetadataService;
         _jobManager = jobManagerService;
     }
@@ -138,9 +134,6 @@ public class HuppyHostedService : IHostedService
     {
         if (isBotInitialized) return;
 
-        // await StartTimedEvents();
-        // await CreateReminders();
-        // await StartActivityControlService();
         _logger.LogInformation("Starting Job Manager");
 
         await _jobManager.StartEventLoop();
@@ -161,26 +154,6 @@ public class HuppyHostedService : IHostedService
 
         await _client.SetGameAsync("Hello World!", null, Discord.ActivityType.Playing);
     }
-
-    // private async Task StartTimedEvents()
-    // {
-    //     if (isBotInitialized) return;
-
-    //     // await _timedEventService.StartTimers();
-    //     // _eventService.Initialize();
-    // }
-
-    // private async Task CreateReminders()
-    // {
-    //     if (isBotInitialized) return;
-
-    //     // await _reminderService.Initialize();
-    // }
-
-    // private async Task StartActivityControlService()
-    // {
-    //     // await _activityControlService.Initialize();
-    // }
 
     private async Task CreateSlashCommands(DiscordSocketClient socketClient)
     {

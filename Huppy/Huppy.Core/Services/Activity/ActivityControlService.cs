@@ -10,7 +10,6 @@ namespace Huppy.Core.Services.Activity
 {
     public class ActivityControlService : IActivityControlService
     {
-        // private readonly ITimedEventsService _timedEventsService;
         private readonly ILogger _logger;
         private readonly List<Func<AsyncServiceScope, Task<IActivity>>> _activities = new();
         private readonly DiscordShardedClient _client;
@@ -19,31 +18,11 @@ namespace Huppy.Core.Services.Activity
 
         public ActivityControlService(ITimedEventsService timedEventsService, ILogger<ActivityControlService> logger, DiscordShardedClient client)
         {
-            // _timedEventsService = timedEventsService;
             _logger = logger;
             _client = client;
 
             AddActivities();
         }
-
-        // public Task Initialize()
-        // {
-        //     _logger.LogInformation("Starting Activity Control Service");
-
-        //     _timedEventsService.AddJob(
-        //         Guid.NewGuid(),
-        //         null,
-        //         new TimeSpan(0),
-        //         updateStatusFrequency,
-        //         async (scope, data) =>
-        //         {
-        //             await ChangeActivity(scope);
-        //         }
-        //     );
-
-
-        //     return Task.CompletedTask;
-        // }
 
         public async Task ChangeActivity(AsyncServiceScope scope)
         {

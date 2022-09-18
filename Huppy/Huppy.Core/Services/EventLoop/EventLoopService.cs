@@ -16,28 +16,11 @@ public class EventLoopService : IEventLoopService
     private readonly int _maxDegreeOfParallelism = Environment.ProcessorCount;
     private readonly ConcurrentBag<string> _removedNames = new();
     private const int TICKS_PER_SECOND = 10_000_000;
-    // private Timer? _timer;
 
     public EventLoopService(ILogger<EventLoopService> logger)
     {
         _logger = logger;
     }
-
-    // public void Initialize()
-    // {
-    //     _logger.LogInformation("Initializing Event Loop Service");
-    //     _timer = InitializeInternalTimer();
-    // }
-
-    // private Timer InitializeInternalTimer()
-    // {
-    //     var timer = new Timer(async (e) =>
-    //     {
-    //         await Execute();
-    //     }, null, new TimeSpan(0), _ticker);
-
-    //     return timer;
-    // }
 
     public async Task AddEvent(DateTime time, string Name, object? data, Func<object?, Task> job)
     {
@@ -90,68 +73,6 @@ public class EventLoopService : IEventLoopService
 
         return Task.CompletedTask;
     }
-
-    // To remake
-    // public Task RemovePrecise(DateTime? time, string name)
-    // {
-    //     if (string.IsNullOrEmpty(name) || time is null) return Task.CompletedTask;
-
-    //     var targetTime = GetTargetTime((DateTime)time);
-    //     if (events.ContainsKey(targetTime))
-    //     {
-    //         events.TryGetValue(targetTime, out var eventList);
-    //         if (eventList is null)
-    //         {
-    //             _logger.LogError("Precise remove error {time} <{name}>: event list was null", time, name);
-    //             return Task.CompletedTask;
-    //         }
-
-    //         var eventToRemove = eventList.FirstOrDefault(e => e.Name == name);
-    //         if (eventToRemove is null)
-    //         {
-    //             _logger.LogError("Precise remove error {time} <{name}>: didn't find event with provided name", time, name);
-    //             return Task.CompletedTask;
-    //         }
-
-    //         eventList.Remove(eventToRemove);
-
-    //         lock (_lockObj)
-    //         {
-    //             events[targetTime] = eventList;
-    //         }
-    //     }
-
-    //     return Task.CompletedTask;
-    // }
-
-    // public Task RemoveEventsByName(string name)
-    // {
-    //     if (string.IsNullOrEmpty(name)) return Task.CompletedTask;
-
-    //     var eventsToRemove = events.Where(e => e.Value.Any(e => e.Name == name));
-
-    //     foreach (var time in eventsToRemove)
-    //     {
-    //         events.Remove(time.Key);
-    //     }
-
-    //     return Task.CompletedTask;
-    // }
-
-    // public Task RemoveEventsByTime(DateTime time)
-    // {
-    //     var targetTime = GetTargetTime(time);
-    //     if (events.ContainsKey(targetTime))
-    //     {
-    //         lock (_lockObj)
-    //         {
-    //             if (!events.Remove(targetTime))
-    //                 _logger.LogError("Failed to removed events at {time}", targetTime);
-    //         }
-    //     }
-
-    //     return Task.CompletedTask;
-    // }
 
     public async Task Execute()
     {
