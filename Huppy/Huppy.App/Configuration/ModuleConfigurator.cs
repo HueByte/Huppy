@@ -12,6 +12,7 @@ using Huppy.Core.Services.CommandHandler;
 using Huppy.Core.Services.EventLoop;
 using Huppy.Core.Services.GPT;
 using Huppy.Core.Services.HuppyCache;
+using Huppy.Core.Services.JobManager;
 using Huppy.Core.Services.Logger;
 using Huppy.Core.Services.MiddlewareExecutor;
 using Huppy.Core.Services.Paginator;
