@@ -32,7 +32,7 @@ namespace Huppy.Core.Services.JobManager
                 Name = "Event Loop",
                 Data = null,
                 DueTime = new TimeSpan(0),
-                Period = eventLoopServiceTemp.Ticker,
+                Period = eventLoopServiceTemp.EventLoopExecutionFrequency,
                 Function = async (scope, data) =>
                 {
                     var eventLoopService = scope.ServiceProvider.GetRequiredService<IEventLoopService>();
@@ -58,7 +58,7 @@ namespace Huppy.Core.Services.JobManager
                 Name = "Reminder Fetcher",
                 Data = null,
                 DueTime = new TimeSpan(0),
-                Period = reminderServiceTemp.FetchPeriod,
+                Period = reminderServiceTemp.FetchReminderFrequency,
                 Function = async (scope, data) =>
                 {
                     var reminderService = scope.ServiceProvider.GetRequiredService<IReminderService>();

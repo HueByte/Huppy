@@ -18,8 +18,8 @@ public class ReminderService : IReminderService
     private readonly IEventLoopService _eventService;
     private readonly IReminderRepository _reminderRepository;
     private readonly InteractionService _interactionService;
-    private DateTime FetchingDate => DateTime.UtcNow + FetchPeriod;
-    public TimeSpan FetchPeriod { get; } = new(1, 0, 0);
+    private DateTime FetchingDate => DateTime.UtcNow + FetchReminderFrequency;
+    public TimeSpan FetchReminderFrequency { get; } = new(1, 0, 0);
     public ReminderService(IEventLoopService eventService, ILogger<ReminderService> logger, DiscordShardedClient discord, IReminderRepository reminderRepository, InteractionService interactionService, ITimedEventsService timedEventsService)
     {
         _eventService = eventService;

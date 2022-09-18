@@ -3,7 +3,7 @@ namespace Huppy.Core.Interfaces.IServices
     public interface IEventLoopService
     {
         event Func<string[], Task> OnEventsRemoved;
-        TimeSpan Ticker { get; }
+        TimeSpan EventLoopExecutionFrequency { get; }
         Task Execute();
         Task AddEvent(DateTime time, string Name, object? data, Func<object?, Task> job);
         Task Remove(DateTime time, string eventName);

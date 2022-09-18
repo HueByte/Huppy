@@ -5,7 +5,7 @@ namespace Huppy.Core.Interfaces.IServices
 {
     public interface IReminderService
     {
-        TimeSpan FetchPeriod { get; }
+        TimeSpan FetchReminderFrequency { get; }
         Task RegisterFreshReminders();
         Task<List<Reminder>> GetUserRemindersAsync(ulong userId);
         Task AddReminder(DateTime date, ulong userId, string message);

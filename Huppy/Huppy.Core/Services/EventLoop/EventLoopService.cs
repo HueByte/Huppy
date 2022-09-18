@@ -9,7 +9,7 @@ public record Event(object? Data, string Name, Func<object?, Task> Task);
 public class EventLoopService : IEventLoopService
 {
     public event Func<string[], Task>? OnEventsRemoved;
-    public TimeSpan Ticker { get; } = TimeSpan.FromSeconds(10); // ticks
+    public TimeSpan EventLoopExecutionFrequency { get; } = TimeSpan.FromSeconds(10); // ticks
     private readonly ILogger _logger;
     private readonly ConcurrentDictionary<ulong, List<Event>> jobsQueue = new();
     private readonly SemaphoreSlim _semiphore = new(1, 1);
