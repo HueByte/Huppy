@@ -14,6 +14,7 @@ namespace Huppy.Core.Services.News;
 /// <summary>
 /// No Longer supported
 /// </summary>
+[Obsolete("No longer supported")]
 public class NewsApiService : INewsApiService
 {
     private readonly ILogger _logger;
