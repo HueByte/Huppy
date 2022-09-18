@@ -1,17 +1,17 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using Huppy.Core.Entities;
 using Huppy.Core.Interfaces.IServices;
 using Microsoft.Extensions.Logging;
 
 namespace Huppy.Core.Services.EventLoop;
 
-public record Event(object? Data, string Name, Func<object?, Task> Task);
 public class EventLoopService : IEventLoopService
 {
     public event Func<string[], Task>? OnEventsRemoved;
     public TimeSpan EventLoopExecutionFrequency { get; } = TimeSpan.FromSeconds(10); // ticks
     private readonly ILogger _logger;
-    private readonly ConcurrentDictionary<ulong, List<Event>> jobsQueue = new();
+    private readonly ConcurrentDictionary<ulong, List<EventLoopEntry>> jobsQueue = new();
     private readonly SemaphoreSlim _semiphore = new(1, 1);
     private readonly int _maxDegreeOfParallelism = Environment.ProcessorCount;
     private readonly ConcurrentBag<string> _removedNames = new();
@@ -24,16 +24,21 @@ public class EventLoopService : IEventLoopService
 
     public async Task AddEvent(DateTime time, string Name, object? data, Func<object?, Task> job)
     {
-        Event evn = new(data, Name, job);
+        EventLoopEntry evn = new()
+        {
+            Data = data,
+            Name = Name,
+            Task = job
+        };
         await AddEvent(time, evn);
     }
 
-    public async Task AddEvent(DateTime time, Event job)
+    public async Task AddEvent(DateTime time, EventLoopEntry job)
     {
-        await AddRange(time, new List<Event>() { job });
+        await AddRange(time, new List<EventLoopEntry>() { job });
     }
 
-    public Task AddRange(DateTime time, ICollection<Event> eventJobs)
+    public Task AddRange(DateTime time, ICollection<EventLoopEntry> eventJobs)
     {
         var targetTime = GetTargetTime(time);
         try
