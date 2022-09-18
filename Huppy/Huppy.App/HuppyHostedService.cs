@@ -20,6 +20,7 @@ namespace Huppy.Core.Services.Huppy;
 public class HuppyHostedService : IHostedService
 {
     #region properties
+    private readonly IJobManagerService _jobManager;
     private readonly DiscordShardedClient _client;
     private readonly AppSettings _appSettings;
     private readonly InteractionService _interactionService;
@@ -28,13 +29,13 @@ public class HuppyHostedService : IHostedService
     private readonly ILogger<HuppyHostedService> _logger;
     private readonly HuppyDbContext _dbContext;
     private readonly IServerInteractionService _serverInteractionService;
-    private readonly ITimedEventsService _timedEventService;
+    // private readonly ITimedEventsService _timedEventService;
     private readonly CacheService _cacheService;
     private readonly IPaginatorService _paginatorService;
     private readonly IEventLoopService _eventService;
     private readonly IReminderService _reminderService;
     private readonly MiddlewareExecutorService _middlewareExecutor;
-    private readonly IActivityControlService _activityControlService;
+    // private readonly IActivityControlService _activityControlService;
     private readonly IAppMetadataService _appMetadataService;
     private bool isBotInitialized = false;
 
@@ -42,7 +43,8 @@ public class HuppyHostedService : IHostedService
     public HuppyHostedService(DiscordShardedClient client, AppSettings appSettings, InteractionService interactionService, ICommandHandlerService commandHandlerService,
         LoggingService loggingService, ILogger<HuppyHostedService> logger, HuppyDbContext dbContext, IServerInteractionService serverInteractionService,
         ITimedEventsService timedEventsService, CacheService cacheService, IPaginatorService paginatorService, IEventLoopService eventService, IReminderService reminderService,
-        MiddlewareExecutorService middlewareExecutorService, IActivityControlService activityControlService, IAppMetadataService appMetadataService)
+        MiddlewareExecutorService middlewareExecutorService, IActivityControlService activityControlService, IAppMetadataService appMetadataService,
+        IJobManagerService jobManagerService)
     {
         _client = client;
         _appSettings = appSettings;
@@ -52,14 +54,15 @@ public class HuppyHostedService : IHostedService
         _logger = logger;
         _dbContext = dbContext;
         _serverInteractionService = serverInteractionService;
-        _timedEventService = timedEventsService;
+        // _timedEventService = timedEventsService;
         _cacheService = cacheService;
         _paginatorService = paginatorService;
         _eventService = eventService;
         _reminderService = reminderService;
         _middlewareExecutor = middlewareExecutorService;
-        _activityControlService = activityControlService;
+        // _activityControlService = activityControlService;
         _appMetadataService = appMetadataService;
+        _jobManager = jobManagerService;
     }
 
     public async Task StartAsync(CancellationToken cancellationToken)
@@ -135,9 +138,15 @@ public class HuppyHostedService : IHostedService
     {
         if (isBotInitialized) return;
 
-        await StartTimedEvents();
-        await CreateReminders();
-        await StartActivityControlService();
+        // await StartTimedEvents();
+        // await CreateReminders();
+        // await StartActivityControlService();
+        _logger.LogInformation("Starting Job Manager");
+
+        await _jobManager.StartEventLoop();
+        await _jobManager.StartReminderJobs();
+        await _jobManager.StartActivityControlJobs();
+        _jobManager.MarkInitialized();
 
         isBotInitialized = true;
     }
@@ -153,25 +162,25 @@ public class HuppyHostedService : IHostedService
         await _client.SetGameAsync("Hello World!", null, Discord.ActivityType.Playing);
     }
 
-    private async Task StartTimedEvents()
-    {
-        if (isBotInitialized) return;
+    // private async Task StartTimedEvents()
+    // {
+    //     if (isBotInitialized) return;
 
-        await _timedEventService.StartTimers();
-        _eventService.Initialize();
-    }
+    //     // await _timedEventService.StartTimers();
+    //     // _eventService.Initialize();
+    // }
 
-    private async Task CreateReminders()
-    {
-        if (isBotInitialized) return;
+    // private async Task CreateReminders()
+    // {
+    //     if (isBotInitialized) return;
 
-        await _reminderService.Initialize();
-    }
+    //     // await _reminderService.Initialize();
+    // }
 
-    private async Task StartActivityControlService()
-    {
-        await _activityControlService.Initialize();
-    }
+    // private async Task StartActivityControlService()
+    // {
+    //     // await _activityControlService.Initialize();
+    // }
 
     private async Task CreateSlashCommands(DiscordSocketClient socketClient)
     {

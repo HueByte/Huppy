@@ -10,39 +10,40 @@ namespace Huppy.Core.Services.Activity
 {
     public class ActivityControlService : IActivityControlService
     {
-        private readonly ITimedEventsService _timedEventsService;
+        // private readonly ITimedEventsService _timedEventsService;
         private readonly ILogger _logger;
         private readonly List<Func<AsyncServiceScope, Task<IActivity>>> _activities = new();
         private readonly DiscordShardedClient _client;
         private int _lastIndex = 0;
-        private readonly TimeSpan updateStatusFrequency = new(0, 10, 0);
+        public TimeSpan UpdateStatusFrequency { get; } = new(0, 10, 0);
 
         public ActivityControlService(ITimedEventsService timedEventsService, ILogger<ActivityControlService> logger, DiscordShardedClient client)
         {
-            _timedEventsService = timedEventsService;
+            // _timedEventsService = timedEventsService;
             _logger = logger;
             _client = client;
-        }
-
-        public Task Initialize()
-        {
-            _logger.LogInformation("Starting Activity Control Service");
-
-            _timedEventsService.AddJob(
-                Guid.NewGuid(),
-                null,
-                new TimeSpan(0),
-                updateStatusFrequency,
-                async (scope, data) =>
-                {
-                    await ChangeActivity(scope);
-                }
-            );
 
             AddActivities();
-
-            return Task.CompletedTask;
         }
+
+        // public Task Initialize()
+        // {
+        //     _logger.LogInformation("Starting Activity Control Service");
+
+        //     _timedEventsService.AddJob(
+        //         Guid.NewGuid(),
+        //         null,
+        //         new TimeSpan(0),
+        //         updateStatusFrequency,
+        //         async (scope, data) =>
+        //         {
+        //             await ChangeActivity(scope);
+        //         }
+        //     );
+
+
+        //     return Task.CompletedTask;
+        // }
 
         public async Task ChangeActivity(AsyncServiceScope scope)
         {

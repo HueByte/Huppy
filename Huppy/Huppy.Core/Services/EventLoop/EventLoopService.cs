@@ -9,26 +9,35 @@ public record Event(object? Data, string Name, Func<object?, Task> Task);
 public class EventLoopService : IEventLoopService
 {
     public event Func<string[], Task>? OnEventsRemoved;
+    public TimeSpan Ticker { get; } = TimeSpan.FromSeconds(10); // ticks
     private readonly ILogger _logger;
     private readonly ConcurrentDictionary<ulong, List<Event>> jobsQueue = new();
     private readonly SemaphoreSlim _semiphore = new(1, 1);
-    private readonly TimeSpan _ticker = TimeSpan.FromSeconds(10); // ticks
     private readonly int _maxDegreeOfParallelism = Environment.ProcessorCount;
     private readonly ConcurrentBag<string> _removedNames = new();
     private const int TICKS_PER_SECOND = 10_000_000;
-    private Timer? _timer;
+    // private Timer? _timer;
 
     public EventLoopService(ILogger<EventLoopService> logger)
     {
         _logger = logger;
     }
 
-    public void Initialize()
-    {
-        _logger.LogInformation("Starting Event Loop Service");
+    // public void Initialize()
+    // {
+    //     _logger.LogInformation("Initializing Event Loop Service");
+    //     _timer = InitializeInternalTimer();
+    // }
 
-        _timer = InitTimer();
-    }
+    // private Timer InitializeInternalTimer()
+    // {
+    //     var timer = new Timer(async (e) =>
+    //     {
+    //         await Execute();
+    //     }, null, new TimeSpan(0), _ticker);
+
+    //     return timer;
+    // }
 
     public async Task AddEvent(DateTime time, string Name, object? data, Func<object?, Task> job)
     {
@@ -144,17 +153,7 @@ public class EventLoopService : IEventLoopService
     //     return Task.CompletedTask;
     // }
 
-    private Timer InitTimer()
-    {
-        var timer = new Timer(async (e) =>
-        {
-            await Execute();
-        }, null, new TimeSpan(0), _ticker);
-
-        return timer;
-    }
-
-    private async Task Execute()
+    public async Task Execute()
     {
         _logger.LogDebug("Starting event loop execution");
 

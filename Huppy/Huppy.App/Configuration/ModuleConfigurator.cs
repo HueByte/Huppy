@@ -115,6 +115,7 @@ namespace Huppy.App.Configuration
 
         public ModuleConfigurator AddServices()
         {
+            // singleton services
             _services.AddSingleton<CacheService>();
             _services.AddSingleton<IAiStabilizerService, AiStabilizerService>();
             _services.AddSingleton<IServerInteractionService, ServerInteractionService>();
@@ -123,11 +124,15 @@ namespace Huppy.App.Configuration
             _services.AddSingleton<IEventLoopService, EventLoopService>();
             _services.AddSingleton<IActivityControlService, ActivityControlService>();
             _services.AddSingleton<IAppMetadataService, AppMetadataService>();
+            _services.AddSingleton<IJobManagerService, JobManagerService>();
 
+            // scoped services
             _services.AddScoped<IReminderService, ReminderService>();
             _services.AddScoped<ITicketService, TicketService>();
             _services.AddScoped<IScopedDataService, ScopedDataService>();
+            _services.AddScoped<IResourcesService, ResourcesService>();
 
+            // http clients
             _services.AddScoped<IGPTService, GPTService>();
             _services.AddScoped<IUrbanService, UrbanService>();
 
@@ -137,7 +142,6 @@ namespace Huppy.App.Configuration
             _services.AddScoped<ICommandLogRepository, CommandLogRepository>();
             _services.AddScoped<IReminderRepository, ReminderRepository>();
             _services.AddScoped<ITicketRepository, TicketRepository>();
-            _services.AddScoped<IResourcesService, ResourcesService>();
 
             return this;
         }
