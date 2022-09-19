@@ -3,7 +3,7 @@ using Discord.Interactions;
 using Discord.WebSocket;
 using Huppy.Core.Attributes;
 using Huppy.Core.Interfaces.IServices;
-using Huppy.Core.Services.HuppyCache;
+using Huppy.Core.Services.HuppyCacheStorage;
 using Huppy.Core.Services.Logger;
 using Huppy.Core.Services.MiddlewareExecutor;
 using Huppy.Core.Services.Paginator;
@@ -29,7 +29,7 @@ public class HuppyHostedService : IHostedService
     private readonly ILogger<HuppyHostedService> _logger;
     private readonly HuppyDbContext _dbContext;
     private readonly IServerInteractionService _serverInteractionService;
-    private readonly CacheService _cacheService;
+    private readonly CacheStorageService _cacheService;
     private readonly IPaginatorService _paginatorService;
     private readonly IEventLoopService _eventService;
     private readonly IReminderService _reminderService;
@@ -40,7 +40,7 @@ public class HuppyHostedService : IHostedService
     #endregion
     public HuppyHostedService(DiscordShardedClient client, AppSettings appSettings, InteractionService interactionService, ICommandHandlerService commandHandlerService,
         LoggingService loggingService, ILogger<HuppyHostedService> logger, HuppyDbContext dbContext, IServerInteractionService serverInteractionService,
-        CacheService cacheService, IPaginatorService paginatorService, IEventLoopService eventService, IReminderService reminderService,
+        CacheStorageService cacheService, IPaginatorService paginatorService, IEventLoopService eventService, IReminderService reminderService,
         MiddlewareExecutorService middlewareExecutorService, IAppMetadataService appMetadataService,
         IJobManagerService jobManagerService)
     {
