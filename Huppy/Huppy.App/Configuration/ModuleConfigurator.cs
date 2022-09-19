@@ -9,9 +9,10 @@ using Huppy.Core.Services.Activity;
 using Huppy.Core.Services.AiStabilizer;
 using Huppy.Core.Services.App;
 using Huppy.Core.Services.CommandHandler;
-using Huppy.Core.Services.Event;
+using Huppy.Core.Services.EventLoop;
 using Huppy.Core.Services.GPT;
 using Huppy.Core.Services.HuppyCache;
+using Huppy.Core.Services.JobManager;
 using Huppy.Core.Services.Logger;
 using Huppy.Core.Services.MiddlewareExecutor;
 using Huppy.Core.Services.Paginator;
@@ -115,19 +116,24 @@ namespace Huppy.App.Configuration
 
         public ModuleConfigurator AddServices()
         {
+            // singleton services
             _services.AddSingleton<CacheService>();
             _services.AddSingleton<IAiStabilizerService, AiStabilizerService>();
             _services.AddSingleton<IServerInteractionService, ServerInteractionService>();
             _services.AddSingleton<ITimedEventsService, TimedEventsService>();
             _services.AddSingleton<IPaginatorService, PaginatorService>();
-            _services.AddSingleton<IEventService, EventService>();
+            _services.AddSingleton<IEventLoopService, EventLoopService>();
             _services.AddSingleton<IActivityControlService, ActivityControlService>();
             _services.AddSingleton<IAppMetadataService, AppMetadataService>();
+            _services.AddSingleton<IJobManagerService, JobManagerService>();
 
+            // scoped services
             _services.AddScoped<IReminderService, ReminderService>();
             _services.AddScoped<ITicketService, TicketService>();
             _services.AddScoped<IScopedDataService, ScopedDataService>();
+            _services.AddScoped<IResourcesService, ResourcesService>();
 
+            // http clients
             _services.AddScoped<IGPTService, GPTService>();
             _services.AddScoped<IUrbanService, UrbanService>();
 
@@ -137,7 +143,6 @@ namespace Huppy.App.Configuration
             _services.AddScoped<ICommandLogRepository, CommandLogRepository>();
             _services.AddScoped<IReminderRepository, ReminderRepository>();
             _services.AddScoped<ITicketRepository, TicketRepository>();
-            _services.AddScoped<IResourcesService, ResourcesService>();
 
             return this;
         }

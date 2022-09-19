@@ -7,6 +7,7 @@ using Discord.WebSocket;
 using Huppy.Core.Attributes;
 using Huppy.Core.Interfaces.IServices;
 using Huppy.Core.Services.HuppyCache;
+using Huppy.Core.Services.JobManager;
 using Huppy.Core.Services.Paginator.Entities;
 using Huppy.Kernel.Constants;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,6 +21,7 @@ namespace Huppy.App.Commands.SlashCommands;
 public class DevCommands : InteractionModuleBase<ExtendedShardedInteractionContext>
 {
     private readonly ILogger<DevCommands> _logger;
+    private readonly IJobManagerService _jobManager;
     private readonly CacheService _cacheService;
     private readonly IResourcesService _resourceService;
     private readonly DiscordShardedClient _client;
@@ -29,10 +31,11 @@ public class DevCommands : InteractionModuleBase<ExtendedShardedInteractionConte
     private const int _ticketsPerPage = 10;
 
     public DevCommands(ILogger<DevCommands> logger, CacheService cacheService, IResourcesService resourceService, DiscordShardedClient client,
-        ITicketService ticketService, IPaginatorService paginatorService, IAppMetadataService appMetadataService)
+        ITicketService ticketService, IPaginatorService paginatorService, IAppMetadataService appMetadataService, IJobManagerService jobManagerService)
     {
         _logger = logger;
         _cacheService = cacheService;
+        _jobManager = jobManagerService;
         _resourceService = resourceService;
         _client = client;
         _ticketService = ticketService;
@@ -65,6 +68,12 @@ public class DevCommands : InteractionModuleBase<ExtendedShardedInteractionConte
         embed.AddField("Average command executon time", $"`{avgExecutionTime} ms`", true);
         embed.AddField("Bot Version", $"`v{_appMetadataService.Version}`", true);
         embed.AddField("IsServerGC", $"`{GCSettings.IsServerGC}`", true);
+
+        StringBuilder sb = new();
+        foreach (var job in _jobManager.GetTimedJobs())
+            sb.AppendLine($"> ID: `{job.JobId}`\n> Name: `{job.Name}`\n> Frequency: `{job.Period}`\n");
+
+        embed.AddField("Jobs", sb.ToString());
 
         await ModifyOriginalResponseAsync((msg) => msg.Embed = embed.Build());
     }

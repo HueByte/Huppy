@@ -1,57 +1,31 @@
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
+using Huppy.Core.Entities;
 using Huppy.Core.Interfaces.IRepositories;
 using Huppy.Core.Interfaces.IServices;
 using Huppy.Kernel.Constants;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Huppy.Core.Services.Reminder;
 
-public record ReminderInput(IUser User, string Message);
+// public record ReminderInput(IUser User, string Message);
+
 public class ReminderService : IReminderService
 {
-    private readonly ILogger<ReminderService> _logger;
-    private readonly IEventService _eventService;
+    private readonly ILogger _logger;
+    private readonly IEventLoopService _eventService;
     private readonly IReminderRepository _reminderRepository;
-    private readonly DiscordShardedClient _discord;
     private readonly InteractionService _interactionService;
-    private readonly ITimedEventsService _timedEventsService;
-    private readonly TimeSpan fetchPeriod = new(1, 0, 0);
-    private DateTime FetchingDate => DateTime.UtcNow + fetchPeriod;
-    public ReminderService(IEventService eventService, ILogger<ReminderService> logger, DiscordShardedClient discord, IReminderRepository reminderRepository, InteractionService interactionService, ITimedEventsService timedEventsService)
+    private DateTime FetchingDate => DateTime.UtcNow + FetchReminderFrequency;
+    public TimeSpan FetchReminderFrequency { get; } = new(1, 0, 0);
+    public ReminderService(IEventLoopService eventService, ILogger<ReminderService> logger, DiscordShardedClient discord, IReminderRepository reminderRepository, InteractionService interactionService, ITimedEventsService timedEventsService)
     {
         _eventService = eventService;
         _logger = logger;
-        _discord = discord;
         _reminderRepository = reminderRepository;
         _interactionService = interactionService;
-        _timedEventsService = timedEventsService;
-    }
-
-    // TODO
-    // guild.DownloadUsersAsync, and within DiscordSocketConfig there's alwaysdownloadusers 
-    // Will use bulk download method 
-    public Task Initialize()
-    {
-        // every {fetchingPeriod} register fresh bulk of reminders to save memory
-        _logger.LogInformation("Starting Reminder Service");
-
-        _timedEventsService.AddJob(
-            Guid.NewGuid(),
-            null,
-            new TimeSpan(0),
-            fetchPeriod,
-            async (scope, data) =>
-            {
-                var reminderService = scope.ServiceProvider.GetRequiredService<IReminderService>();
-                await reminderService.RegisterFreshReminders();
-            }
-        );
-
-        return Task.CompletedTask;
     }
 
     public async Task RegisterFreshReminders()
@@ -74,17 +48,18 @@ public class ReminderService : IReminderService
             var user = await GetUser(reminder.UserId);
 
             // add reminder
-            ReminderInput reminderInput = new(user, reminder.Message);
+            ReminderInput reminderInput = new() { User = user, Message = reminder.Message };
             await _eventService.AddEvent(reminder.RemindDate, reminder.Id.ToString(), reminderInput, async (input) =>
             {
                 if (input is ReminderInput data)
                 {
-                    await StandardReminder(data.User, data.Message);
+                    await StandardReminder(data.User, data.Message!);
                 }
             });
         })).ToList();
 
         await Task.WhenAll(jobs);
+
         _logger.LogInformation("Enqueued {count} of reminders to execute until {time}", reminders.Count, FetchingDate);
     }
 
@@ -116,7 +91,7 @@ public class ReminderService : IReminderService
 
         if (!result) throw new Exception("Failed to create reminder");
 
-        ReminderInput reminderInput = new(user, message);
+        ReminderInput reminderInput = new() { User = user, Message = reminder.Message };
 
         _logger.LogInformation("Added reminder for [{user}] at [{date}] UTC", user.Username, reminder.RemindDate);
 
@@ -126,6 +101,7 @@ public class ReminderService : IReminderService
             {
                 if (input is ReminderInput data)
                 {
+                    data.Message ??= "";
                     await StandardReminder(data.User, data.Message);
                 }
             });
