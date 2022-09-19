@@ -4,9 +4,9 @@ using Huppy.Core.Interfaces.IRepositories;
 using Huppy.Kernel;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Huppy.Core.Services.HuppyCache;
+namespace Huppy.Core.Services.HuppyCacheStorage;
 
-public partial class CacheService
+public partial class CacheStorageService
 {
     private const int MessageCacheSize = 1000;
     private readonly IServiceScopeFactory _serviceFactory;
@@ -26,7 +26,7 @@ public partial class CacheService
 
     public OrderedDictionary PaginatorEntries { get; private set; } = null!;
 
-    public CacheService(IServiceScopeFactory serviceScopeFactory)
+    public CacheStorageService(IServiceScopeFactory serviceScopeFactory)
     {
         _serviceFactory = serviceScopeFactory;
     }
@@ -40,10 +40,9 @@ public partial class CacheService
         var appSettings = scope.ServiceProvider.GetRequiredService<AppSettings>();
 
         _cacheUsers = new(await userRepository.GetUsersForCacheAsync());
-        _userAiUsage  = new(await commandRepository.GetAiUsage());
+        _userAiUsage = new(await commandRepository.GetAiUsage());
         _registeredGuildsIds = new((await serverRepository.GetAllAsync()).Select(guild => guild.Id).ToHashSet());
         _developerIds = appSettings.Developers!.Split(';').Where(sId => !string.IsNullOrEmpty(sId)).Select(sId => ulong.Parse(sId)).ToHashSet();
-
         PaginatorEntries = new();
 
         // TODO: configurable in appsettings

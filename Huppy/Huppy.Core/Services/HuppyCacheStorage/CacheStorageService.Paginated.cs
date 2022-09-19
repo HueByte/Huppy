@@ -1,10 +1,8 @@
-using System.Diagnostics;
-using Huppy.Core.Entities;
 using Huppy.Core.Interfaces;
 
-namespace Huppy.Core.Services.HuppyCache;
+namespace Huppy.Core.Services.HuppyCacheStorage;
 
-public partial class CacheService
+public partial class CacheStorageService
 {
     private int _maxCacheMessageSize;
 

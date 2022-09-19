@@ -1,7 +1,7 @@
 using Discord.Interactions;
 using Discord.WebSocket;
 using Huppy.Core.Interfaces.IServices;
-using Huppy.Core.Services.HuppyCache;
+using Huppy.Core.Services.HuppyCacheStorage;
 using Microsoft.Extensions.Logging;
 
 namespace Huppy.App.Commands.ComponentInteractions;
@@ -9,9 +9,9 @@ namespace Huppy.App.Commands.ComponentInteractions;
 public class PaginatorInteractions : InteractionModuleBase<ExtendedShardedInteractionContext>
 {
     private readonly ILogger _logger;
-    private readonly CacheService _cacheService;
+    private readonly CacheStorageService _cacheService;
     private readonly IPaginatorService _paginatorService;
-    public PaginatorInteractions(ILogger<PaginatorInteractions> logger, CacheService cacheService, IPaginatorService paginatorService)
+    public PaginatorInteractions(ILogger<PaginatorInteractions> logger, CacheStorageService cacheService, IPaginatorService paginatorService)
     {
         _logger = logger;
         _cacheService = cacheService;

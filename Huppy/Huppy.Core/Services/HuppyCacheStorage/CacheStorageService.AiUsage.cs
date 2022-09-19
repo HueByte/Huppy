@@ -1,8 +1,8 @@
 using Huppy.Core.Entities;
 
-namespace Huppy.Core.Services.HuppyCache;
+namespace Huppy.Core.Services.HuppyCacheStorage;
 
-public partial class CacheService
+public partial class CacheStorageService
 {
     public async Task LogUsageAsync(string Username, ulong UserId)
     {

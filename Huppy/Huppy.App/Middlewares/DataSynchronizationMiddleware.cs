@@ -1,7 +1,7 @@
 using Discord.Interactions;
 using Huppy.Core.Interfaces;
 using Huppy.Core.Interfaces.IRepositories;
-using Huppy.Core.Services.HuppyCache;
+using Huppy.Core.Services.HuppyCacheStorage;
 using Huppy.Kernel;
 using Microsoft.Extensions.Logging;
 
@@ -9,11 +9,11 @@ namespace Huppy.App.Middlewares
 {
     public class DataSynchronizationMiddleware : IMiddleware
     {
-        private readonly CacheService _cacheService;
+        private readonly CacheStorageService _cacheService;
         private readonly IServerRepository _serverRepository;
         private readonly IUserRepository _userRepository;
         private readonly ILogger _logger;
-        public DataSynchronizationMiddleware(CacheService cacheService, IServerRepository serverRepository, IUserRepository userRepository, ILogger<DataSynchronizationMiddleware> logger)
+        public DataSynchronizationMiddleware(CacheStorageService cacheService, IServerRepository serverRepository, IUserRepository userRepository, ILogger<DataSynchronizationMiddleware> logger)
         {
             _cacheService = cacheService;
             _serverRepository = serverRepository;

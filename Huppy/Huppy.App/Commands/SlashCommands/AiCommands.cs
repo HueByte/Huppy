@@ -2,7 +2,7 @@ using System.Text;
 using Discord;
 using Discord.Interactions;
 using Huppy.Core.Interfaces.IServices;
-using Huppy.Core.Services.HuppyCache;
+using Huppy.Core.Services.HuppyCacheStorage;
 using Huppy.Kernel;
 using Huppy.Kernel.Constants;
 
@@ -12,8 +12,8 @@ namespace Huppy.App.Commands.SlashCommands;
 public class AiCommands : InteractionModuleBase<ExtendedShardedInteractionContext>
 {
     private readonly IGPTService _aiService;
-    private readonly CacheService _cacheService;
-    public AiCommands(IGPTService aiService, CacheService cacheService)
+    private readonly CacheStorageService _cacheService;
+    public AiCommands(IGPTService aiService, CacheStorageService cacheService)
     {
         _aiService = aiService;
         _cacheService = cacheService;

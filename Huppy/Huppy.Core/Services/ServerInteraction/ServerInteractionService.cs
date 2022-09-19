@@ -3,7 +3,7 @@ using Discord.WebSocket;
 using Huppy.Core.Interfaces.IRepositories;
 using Huppy.Core.Interfaces.IServices;
 using Huppy.Core.Models;
-using Huppy.Core.Services.HuppyCache;
+using Huppy.Core.Services.HuppyCacheStorage;
 using Huppy.Kernel.Constants;
 using Microsoft.EntityFrameworkCore.Query.Internal;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,8 +15,8 @@ public class ServerInteractionService : IServerInteractionService
 {
     private readonly ILogger _logger;
     private readonly IServiceScopeFactory _serviceFactory;
-    private readonly CacheService _cacheService;
-    public ServerInteractionService(ILogger<ServerInteractionService> logger, IServiceScopeFactory serviceScopeFactory, CacheService cacheService)
+    private readonly CacheStorageService _cacheService;
+    public ServerInteractionService(ILogger<ServerInteractionService> logger, IServiceScopeFactory serviceScopeFactory, CacheStorageService cacheService)
     {
         _logger = logger;
         _serviceFactory = serviceScopeFactory;

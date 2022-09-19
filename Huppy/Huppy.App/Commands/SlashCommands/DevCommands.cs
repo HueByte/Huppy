@@ -6,7 +6,7 @@ using Discord.Interactions;
 using Discord.WebSocket;
 using Huppy.Core.Attributes;
 using Huppy.Core.Interfaces.IServices;
-using Huppy.Core.Services.HuppyCache;
+using Huppy.Core.Services.HuppyCacheStorage;
 using Huppy.Core.Services.JobManager;
 using Huppy.Core.Services.Paginator.Entities;
 using Huppy.Kernel.Constants;
@@ -22,7 +22,7 @@ public class DevCommands : InteractionModuleBase<ExtendedShardedInteractionConte
 {
     private readonly ILogger<DevCommands> _logger;
     private readonly IJobManagerService _jobManager;
-    private readonly CacheService _cacheService;
+    private readonly CacheStorageService _cacheService;
     private readonly IResourcesService _resourceService;
     private readonly DiscordShardedClient _client;
     private readonly ITicketService _ticketService;
@@ -30,7 +30,7 @@ public class DevCommands : InteractionModuleBase<ExtendedShardedInteractionConte
     private readonly IAppMetadataService _appMetadataService;
     private const int _ticketsPerPage = 10;
 
-    public DevCommands(ILogger<DevCommands> logger, CacheService cacheService, IResourcesService resourceService, DiscordShardedClient client,
+    public DevCommands(ILogger<DevCommands> logger, CacheStorageService cacheService, IResourcesService resourceService, DiscordShardedClient client,
         ITicketService ticketService, IPaginatorService paginatorService, IAppMetadataService appMetadataService, IJobManagerService jobManagerService)
     {
         _logger = logger;

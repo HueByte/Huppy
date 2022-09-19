@@ -2,7 +2,7 @@ using Discord;
 using Discord.Interactions;
 using Huppy.Core.Interfaces.IRepositories;
 using Huppy.Core.Interfaces.IServices;
-using Huppy.Core.Services.HuppyCache;
+using Huppy.Core.Services.HuppyCacheStorage;
 using Huppy.Core.Services.Paginator.Entities;
 using Huppy.Kernel;
 using Huppy.Kernel.Constants;
@@ -17,10 +17,10 @@ public class GeneralCommands : InteractionModuleBase<ExtendedShardedInteractionC
     private readonly ILogger _logger;
     private readonly ICommandLogRepository _commandRepository;
     private readonly IServiceScopeFactory _scopeFactory;
-    private readonly CacheService _cacheService;
+    private readonly CacheStorageService _cacheService;
     private readonly InteractionService _interactionService;
     private readonly IPaginatorService _paginatorService;
-    public GeneralCommands(ILogger<GeneralCommands> logger, CacheService cacheService, ICommandLogRepository commandLogRepository, InteractionService interactionService, IPaginatorService paginatorService, IServiceScopeFactory scopeFactory)
+    public GeneralCommands(ILogger<GeneralCommands> logger, CacheStorageService cacheService, ICommandLogRepository commandLogRepository, InteractionService interactionService, IPaginatorService paginatorService, IServiceScopeFactory scopeFactory)
     {
         _logger = logger;
         _commandRepository = commandLogRepository;

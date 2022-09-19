@@ -1,6 +1,6 @@
-namespace Huppy.Core.Services.HuppyCache;
+namespace Huppy.Core.Services.HuppyCacheStorage;
 
-public partial class CacheService
+public partial class CacheStorageService
 {
     public Task AddCacheUser(ulong UserId, string? Username)
     {

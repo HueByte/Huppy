@@ -11,7 +11,7 @@ using Huppy.Core.Services.App;
 using Huppy.Core.Services.CommandHandler;
 using Huppy.Core.Services.EventLoop;
 using Huppy.Core.Services.GPT;
-using Huppy.Core.Services.HuppyCache;
+using Huppy.Core.Services.HuppyCacheStorage;
 using Huppy.Core.Services.JobManager;
 using Huppy.Core.Services.Logger;
 using Huppy.Core.Services.MiddlewareExecutor;
@@ -117,7 +117,7 @@ namespace Huppy.App.Configuration
         public ModuleConfigurator AddServices()
         {
             // singleton services
-            _services.AddSingleton<CacheService>();
+            _services.AddSingleton<CacheStorageService>();
             _services.AddSingleton<IAiStabilizerService, AiStabilizerService>();
             _services.AddSingleton<IServerInteractionService, ServerInteractionService>();
             _services.AddSingleton<ITimedEventsService, TimedEventsService>();

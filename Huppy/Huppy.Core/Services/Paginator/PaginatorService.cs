@@ -3,7 +3,7 @@ using Discord.Interactions;
 using Discord.WebSocket;
 using Huppy.Core.Interfaces;
 using Huppy.Core.Interfaces.IServices;
-using Huppy.Core.Services.HuppyCache;
+using Huppy.Core.Services.HuppyCacheStorage;
 using Huppy.Core.Services.Paginator.Entities;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -12,12 +12,12 @@ namespace Huppy.Core.Services.Paginator;
 
 public class PaginatorService : IPaginatorService
 {
-    private readonly CacheService _cacheService;
+    private readonly CacheStorageService _cacheService;
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly ILogger<PaginatorService> _logger;
     private Dictionary<string, List<PaginatorPage>> _staticEmbeds;
 
-    public PaginatorService(ILogger<PaginatorService> logger, CacheService cacheService, InteractionService interactionService, IServiceScopeFactory scopeFactory)
+    public PaginatorService(ILogger<PaginatorService> logger, CacheStorageService cacheService, InteractionService interactionService, IServiceScopeFactory scopeFactory)
     {
         _logger = logger;
         _cacheService = cacheService;
@@ -78,7 +78,7 @@ public class PaginatorService : IPaginatorService
         for (int i = 0; i < pages; i++)
         {
             int currentPage = i;
-            var page = async Task<PaginatorPage?> (AsyncServiceScope scope, object? data) => 
+            var page = async Task<PaginatorPage?> (AsyncServiceScope scope, object? data) =>
                 await generatePageCallback(currentPage, scope, data);
 
             if (page is not null)
