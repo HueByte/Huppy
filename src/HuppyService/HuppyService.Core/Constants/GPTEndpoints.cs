@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HuppyService.Kernel.Constants
+namespace HuppyService.Core.Constants
 {
     public class GPTEndpoints
     {

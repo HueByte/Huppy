@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HuppyService.Service", "Hup
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HuppyService.Infrastructure", "HuppyService\HuppyService.Infrastructure\HuppyService.Infrastructure.csproj", "{E330C21B-3443-4DD0-8313-34777CD4BD11}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HuppyService.Kernel", "HuppyService\HuppyService.Kernel\HuppyService.Kernel.csproj", "{E376D7A3-F2FE-4ABD-9FAD-9024E606AC29}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HuppyService.Core", "HuppyService\HuppyService.Core\HuppyService.Core.csproj", "{E376D7A3-F2FE-4ABD-9FAD-9024E606AC29}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -13,6 +13,7 @@ namespace Huppy.Kernel
         public Logger? Logger { get; set; }
         public GPTSettings? GPT { get; set; }
         public UrbanApi? UrbanApi { get; set; }
+        public Microservices? Microservices { get; set; }
 
         [JsonIgnore]
         private readonly static string FILE_NAME = AppContext.BaseDirectory + "appsettings.json";
@@ -67,7 +68,8 @@ namespace Huppy.Kernel
                     BaseUrl = "https://mashape-community-urban-dictionary.p.rapidapi.com/define",
                     Host = "mashape-community-urban-dictionary.p.rapidapi.com",
                     Key = ""
-                }
+                },
+                Microservices = new()
             };
 
             JsonSerializerOptions options = new()
@@ -85,6 +87,11 @@ namespace Huppy.Kernel
             if (!Directory.Exists(Path.Combine(AppContext.BaseDirectory, "save")))
                 Directory.CreateDirectory(Path.Combine(AppContext.BaseDirectory, "save"));
         }
+    }
+
+    public class Microservices
+    {
+        public string? HuppyCoreUrl { get; set; }
     }
 
     public class Logger

@@ -1,7 +1,9 @@
 ﻿using Grpc.Core;
-using HuppyService.Kernel.Constants;
-using HuppyService.Service.Entities;
+using HuppyService.Core.Constants;
+using HuppyService.Core.Entities;
+using HuppyService.Core.Entities.Options;
 using HuppyService.Service.Protos;
+using Microsoft.Extensions.Options;
 
 namespace HuppyService.Service.Services
 {
@@ -9,10 +11,12 @@ namespace HuppyService.Service.Services
     {
         private readonly IHttpClientFactory _clientFactory;
         private readonly ILogger _logger;
-        public GPTService(IHttpClientFactory clientFactory, ILogger<GPTService> logger)
+        private readonly GPTOptions _gptConfig;
+        public GPTService(IHttpClientFactory clientFactory, IOptions<GPTOptions> options, ILogger<GPTService> logger)
         {
             _clientFactory = clientFactory;
             _logger = logger;
+            _gptConfig = new GPTOptions();
         }
 
         public override async Task<GPTOutputResponse> DavinciCompletion(GPTInputRequest request, ServerCallContext context)
@@ -21,7 +25,7 @@ namespace HuppyService.Service.Services
                 throw new Exception("request.Prompt for GPT was empty");
 
             //var aiContext = _settings?.GPT?.AiContextMessage;
-            var aiContext = "";
+            var aiContext = _gptConfig.AiContextMessage;
 
             if (string.IsNullOrEmpty(aiContext)) aiContext = "";
             if (!(request.Prompt.EndsWith('?') || request.Prompt.EndsWith('.'))) request.Prompt += '.';
@@ -53,8 +57,6 @@ namespace HuppyService.Service.Services
 
                 throw new Exception("GPT request wasn't successful");
             }
-
-            //return base.DavinciCompletion(request, context);
         }
     }
 }

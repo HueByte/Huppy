@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace HuppyService.Service.Entities
+namespace HuppyService.Core.Entities
 {
     public class Choice
     {

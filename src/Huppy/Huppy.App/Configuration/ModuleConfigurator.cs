@@ -56,21 +56,11 @@ namespace Huppy.App.Configuration
 
         public ModuleConfigurator AddGRPCServices()
         {
-            //var channel = GrpcChannel.ForAddress("https://localhost:9001");
-            //var client = new HuppyService.Service.Protos.GPT.GPTClient(channel);
-
-            //_services.AddSingleton(client);
-
             _services.AddGrpcClient<GPT.GPTClient>((services, options) =>
             {
-                //var basketApi = services.GetRequiredService<IOptions<UrlsConfig>>().Value.GrpcBasket;
-                options.Address = new Uri("https://localhost:9001");
+                //var basketApi = services.GetRequiredService<IOptions<UrlsConfig>>().Value.HuppyCoreUrl;
+                options.Address = new Uri(_appSettings?.Microservices?.HuppyCoreUrl!);
             });
-                //.AddInterceptor<GrpcExceptionInterceptor>();
-            //var client = new Huppy.Core;
-            //var client = new GPT.GPTClient(channel);
-
-            //_services.AddSingleton(client);
 
             return this;
         }
