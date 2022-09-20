@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+option csharp_namespace = "HuppyService.Service.Protos";
+
+service GPT {
+	rpc DavinciCompletion(GPTInputRequest) returns (GPTOutputResponse);
+}
+
+message GPTInputRequest {
+	string prompt = 1;
+}
+
+message GPTOutputResponse {
+	string answer = 1;
+}

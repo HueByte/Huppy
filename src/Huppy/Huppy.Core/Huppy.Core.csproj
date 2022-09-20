@@ -5,6 +5,12 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Google.Protobuf" Version="3.18.0" />
+    <PackageReference Include="Grpc.Net.ClientFactory" Version="2.40.0" />
+    <PackageReference Include="Grpc.Tools" Version="2.40.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Serilog" Version="2.10.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
     <PackageReference Include="Serilog.Sinks.Async" Version="1.5.0" />
@@ -17,5 +23,10 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Huppy.Kernel\Huppy.Kernel.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Protobuf Include="..\..\HuppyService\HuppyService.Service\Protos\gpt.proto" GrpcServices="Client">
+      <Link>Protos\gpt.proto</Link>
+    </Protobuf>
   </ItemGroup>
 </Project>

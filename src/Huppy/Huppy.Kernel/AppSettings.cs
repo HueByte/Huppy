@@ -11,7 +11,7 @@ namespace Huppy.Kernel
         public string? BetaTestingGuilds { get; set; }
         public string? ConnectionString { get; set; }
         public Logger? Logger { get; set; }
-        public GPT? GPT { get; set; }
+        public GPTSettings? GPT { get; set; }
         public UrbanApi? UrbanApi { get; set; }
 
         [JsonIgnore]
@@ -93,7 +93,7 @@ namespace Huppy.Kernel
         public string? TimeInterval { get; set; }
     }
 
-    public class GPT
+    public class GPTSettings
     {
         public string? BaseUrl { get; set; }
         public string? ApiKey { get; set; }

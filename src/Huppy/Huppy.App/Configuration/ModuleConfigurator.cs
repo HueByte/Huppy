@@ -1,6 +1,7 @@
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
+using Grpc.Net.Client;
 using Huppy.App.Middlewares;
 using Huppy.Core.Extensions;
 using Huppy.Core.Interfaces.IRepositories;
@@ -25,7 +26,9 @@ using Huppy.Core.Services.TimedEvents;
 using Huppy.Core.Services.Urban;
 using Huppy.Infrastructure;
 using Huppy.Infrastructure.Repositories;
+using HuppyService.Service.Protos;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Serilog;
 
 namespace Huppy.App.Configuration
@@ -47,6 +50,27 @@ namespace Huppy.App.Configuration
                 : AppSettings.Create());
 
             _services.AddSingleton(_appSettings);
+
+            return this;
+        }
+
+        public ModuleConfigurator AddGRPCServices()
+        {
+            //var channel = GrpcChannel.ForAddress("https://localhost:9001");
+            //var client = new HuppyService.Service.Protos.GPT.GPTClient(channel);
+
+            //_services.AddSingleton(client);
+
+            _services.AddGrpcClient<GPT.GPTClient>((services, options) =>
+            {
+                //var basketApi = services.GetRequiredService<IOptions<UrlsConfig>>().Value.GrpcBasket;
+                options.Address = new Uri("https://localhost:9001");
+            });
+                //.AddInterceptor<GrpcExceptionInterceptor>();
+            //var client = new Huppy.Core;
+            //var client = new GPT.GPTClient(channel);
+
+            //_services.AddSingleton(client);
 
             return this;
         }

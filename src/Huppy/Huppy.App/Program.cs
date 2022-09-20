@@ -24,6 +24,7 @@ await Host.CreateDefaultBuilder(args)
     .ConfigureServices(services =>
     {
         _ = new ModuleConfigurator(services)
+        .AddGRPCServices()
         .AddAppSettings(appSettings)
         .AddLogger(Log.Logger)
         .AddDiscord()
