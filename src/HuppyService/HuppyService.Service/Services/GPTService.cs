@@ -24,7 +24,6 @@ namespace HuppyService.Service.Services
             if (string.IsNullOrEmpty(request.Prompt))
                 throw new Exception("request.Prompt for GPT was empty");
 
-            //var aiContext = _settings?.GPT?.AiContextMessage;
             var aiContext = _gptConfig.AiContextMessage;
 
             if (string.IsNullOrEmpty(aiContext)) aiContext = "";
