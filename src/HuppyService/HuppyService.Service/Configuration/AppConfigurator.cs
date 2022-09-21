@@ -35,6 +35,7 @@ namespace HuppyService.Service.Configuration
         {
             _app?.MapGrpcService<GreeterService>();
             _app?.MapGrpcService<GPTService>();
+            _app?.MapGrpcService<CommandLogService>();
         }
     }
 }

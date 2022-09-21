@@ -10,7 +10,8 @@ builder.Host.ConfigureServices(services =>
     .AddAppConfigurator()
     .AddGrpc()
     .AddHttpClients()
-    .AddDatabase();
+    .AddDatabase()
+    .AddRepositories();
 });
 
 var app = builder.Build();
