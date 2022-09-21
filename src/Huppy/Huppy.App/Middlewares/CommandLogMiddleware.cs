@@ -2,19 +2,22 @@ using System.Diagnostics;
 using Discord.Interactions;
 using Huppy.Core.Interfaces;
 using Huppy.Core.Interfaces.IRepositories;
+using Huppy.Core.Interfaces.IServices;
+using Huppy.Core.Utilities;
 using Huppy.Kernel;
+using HuppyService.Service.Protos;
 using Microsoft.Extensions.Logging;
 
 namespace Huppy.App.Middlewares
 {
     public class CommandLogMiddleware : IMiddleware
     {
-        private readonly ICommandLogRepository _commandRepository;
+        private readonly ICommandLogService _commandLogService;
         private readonly ILogger _logger;
         private readonly Stopwatch watch = new();
-        public CommandLogMiddleware(ICommandLogRepository commandLogRepository, ILogger<CommandLogMiddleware> logger)
+        public CommandLogMiddleware(ICommandLogService commandLogService, ILogger<CommandLogMiddleware> logger)
         {
-            _commandRepository = commandLogRepository;
+            _commandLogService = commandLogService;
             _logger = logger;
         }
 
@@ -28,20 +31,19 @@ namespace Huppy.App.Middlewares
         {
             watch.Stop();
 
-            CommandLog log = new()
+            CommandLogModel log = new()
             {
                 CommandName = commandInfo.ToString(),
-                Date = DateTime.UtcNow,
+                UnixTime = Miscellaneous.DateTimeToUnixTimestamp(DateTime.UtcNow),
                 IsSuccess = result.IsSuccess,
                 UserId = context.User.Id,
                 ExecutionTimeMs = watch.ElapsedMilliseconds,
                 ChannelId = context.Channel.Id,
-                ErrorMessage = result.ErrorReason,
+                ErrorMessage = !string.IsNullOrEmpty(result.ErrorReason) ? result.ErrorReason : "",
                 GuildId = context.Guild.Id
             };
 
-            await _commandRepository.AddAsync(log);
-            await _commandRepository.SaveChangesAsync();
+            await _commandLogService.AddCommand(log);
 
             if (result.IsSuccess)
             {
