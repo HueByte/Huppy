@@ -11,9 +11,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HuppyService", "HuppyServic
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HuppyService.Service", "HuppyService\HuppyService.Service\HuppyService.Service.csproj", "{0E63AA9F-116E-40DB-AC1F-21B51B322F94}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HuppyService.Infrastructure", "HuppyService\HuppyService.Infrastructure\HuppyService.Infrastructure.csproj", "{E330C21B-3443-4DD0-8313-34777CD4BD11}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HuppyService.Infrastructure", "HuppyService\HuppyService.Infrastructure\HuppyService.Infrastructure.csproj", "{E330C21B-3443-4DD0-8313-34777CD4BD11}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HuppyService.Core", "HuppyService\HuppyService.Core\HuppyService.Core.csproj", "{E376D7A3-F2FE-4ABD-9FAD-9024E606AC29}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HuppyService.Core", "HuppyService\HuppyService.Core\HuppyService.Core.csproj", "{E376D7A3-F2FE-4ABD-9FAD-9024E606AC29}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
