@@ -1,4 +1,4 @@
-using Huppy.Core.Entities;
+using HuppyService.Service.Protos;
 
 namespace Huppy.Core.Services.HuppyCacheStorage;
 

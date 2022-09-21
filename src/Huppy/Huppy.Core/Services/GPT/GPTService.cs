@@ -34,43 +34,8 @@ namespace Huppy.Core.Services.GPT
 
         public async Task<string> DavinciCompletion(string prompt)
         {
-            var result = await _gptClient.DavinciCompletionAsync(new GPTInputRequest() {Prompt = prompt });
+            var result = await _gptClient.DavinciCompletionAsync(new GPTInputRequest() { Prompt = prompt });
             return result.Answer;
-            //if (string.IsNullOrEmpty(prompt))
-            //    throw new Exception("Prompt for GPT was empty");
-
-            //var aiContext = _settings?.GPT?.AiContextMessage;
-
-            //if (string.IsNullOrEmpty(aiContext)) aiContext = "";
-            //if (!(prompt.EndsWith('?') || prompt.EndsWith('.'))) prompt += '.';
-
-            //aiContext += prompt + "\n[Huppy]:";
-
-            //GPTRequest model = new()
-            //{
-            //    MaxTokens = 200,
-            //    Prompt = aiContext,
-            //    Temperature = 0.6,
-            //    FrequencyPenalty = 0.5,
-            //    N = 1
-            //};
-
-            //var client = _clientFactory.CreateClient("GPT");
-
-            //var response = await client.PostAsJsonAsync(GPTEndpoints.TextDavinciCompletions, model);
-
-            //if (response.IsSuccessStatusCode)
-            //{
-            //    var result = await response.Content!.ReadFromJsonAsync<GPTResponse>();
-            //    return result!.Choices!.First()!.Text!;
-            //}
-            //else
-            //{
-            //    var failedResponse = await response.Content.ReadAsStringAsync();
-            //    _logger.LogError("{response}", failedResponse);
-
-            //    throw new Exception("GPT request wasn't successful");
-            //}
         }
     }
 }

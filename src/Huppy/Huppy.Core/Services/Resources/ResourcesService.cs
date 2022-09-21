@@ -9,11 +9,11 @@ namespace Huppy.Core.Services.Resources;
 public class ResourcesService : IResourcesService
 {
     private readonly DiscordShardedClient _client;
-    private readonly ICommandLogRepository _commandRepository;
-    public ResourcesService(DiscordShardedClient client, ICommandLogRepository commandRepository)
+    private readonly ICommandLogService _commandLogService;
+    public ResourcesService(DiscordShardedClient client, ICommandLogService commandLogService)
     {
         _client = client;
-        _commandRepository = commandRepository;
+        _commandLogService = commandLogService;
     }
 
     public Task<string> GetBotVersionAsync()
@@ -40,10 +40,9 @@ public class ResourcesService : IResourcesService
     public async Task<double> GetAverageExecutionTimeAsync()
     {
         // TODO don't include debug commands
-        var commandsQuery = await _commandRepository.GetAllAsync();
-        var avgTime = await commandsQuery.AverageAsync(e => e.ExecutionTimeMs);
+        var averageTime = await _commandLogService.GetAverageExecutionTime();
 
-        return Math.Round(avgTime, 2);
+        return Math.Round(averageTime, 2);
     }
 
     public string GetRamUsage()

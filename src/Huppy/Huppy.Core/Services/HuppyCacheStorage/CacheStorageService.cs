@@ -1,7 +1,9 @@
 using System.Collections.Specialized;
-using Huppy.Core.Entities;
+//using Huppy.Core.Entities;
 using Huppy.Core.Interfaces.IRepositories;
+using Huppy.Core.Interfaces.IServices;
 using Huppy.Kernel;
+using HuppyService.Service.Protos;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Huppy.Core.Services.HuppyCacheStorage;
@@ -14,8 +16,8 @@ public partial class CacheStorageService
     public IReadOnlyDictionary<ulong, string?> CacheUsers => _cacheUsers;
     private Dictionary<ulong, string?> _cacheUsers = null!;
 
-    public IReadOnlyDictionary<ulong, AiUser> UserAiUsage => _userAiUsage;
-    private Dictionary<ulong, AiUser> _userAiUsage = null!;
+    public IReadOnlyDictionary<ulong, AiUser> UserAiUsage => (IReadOnlyDictionary<ulong, AiUser>)_userAiUsage;
+    private IDictionary<ulong, AiUser> _userAiUsage = null!;
 
     // Switch to IReadOnlySet<ulong>
     public HashSet<ulong> RegisteredGuildsIds => _registeredGuildsIds;
@@ -34,13 +36,15 @@ public partial class CacheStorageService
     public async Task Initialize()
     {
         using var scope = _serviceFactory.CreateAsyncScope();
-        var commandRepository = scope.ServiceProvider.GetRequiredService<ICommandLogRepository>();
+        var commandLogService = scope.ServiceProvider.GetRequiredService<ICommandLogService>();
         var userRepository = scope.ServiceProvider.GetRequiredService<IUserRepository>();
         var serverRepository = scope.ServiceProvider.GetRequiredService<IServerRepository>();
         var appSettings = scope.ServiceProvider.GetRequiredService<AppSettings>();
 
+        var aiUsage = await commandLogService.GetAiUsage();
+
         _cacheUsers = new(await userRepository.GetUsersForCacheAsync());
-        _userAiUsage = new(await commandRepository.GetAiUsage());
+        _userAiUsage = aiUsage;
         _registeredGuildsIds = new((await serverRepository.GetAllAsync()).Select(guild => guild.Id).ToHashSet());
         _developerIds = appSettings.Developers!.Split(';').Where(sId => !string.IsNullOrEmpty(sId)).Select(sId => ulong.Parse(sId)).ToHashSet();
         PaginatorEntries = new();

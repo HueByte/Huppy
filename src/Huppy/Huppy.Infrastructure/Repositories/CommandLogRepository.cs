@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Huppy.Infrastructure.Repositories
 {
+    [Obsolete]
     public class CommandLogRepository : BaseRepository<int, CommandLog, HuppyDbContext>, ICommandLogRepository
     {
         public CommandLogRepository(HuppyDbContext context) : base(context) { }

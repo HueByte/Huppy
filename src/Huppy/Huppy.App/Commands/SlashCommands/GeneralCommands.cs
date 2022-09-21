@@ -15,15 +15,15 @@ namespace Huppy.App.Commands.SlashCommands;
 public class GeneralCommands : InteractionModuleBase<ExtendedShardedInteractionContext>
 {
     private readonly ILogger _logger;
-    private readonly ICommandLogRepository _commandRepository;
+    private readonly ICommandLogService _commandLogService;
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly CacheStorageService _cacheService;
     private readonly InteractionService _interactionService;
     private readonly IPaginatorService _paginatorService;
-    public GeneralCommands(ILogger<GeneralCommands> logger, CacheStorageService cacheService, ICommandLogRepository commandLogRepository, InteractionService interactionService, IPaginatorService paginatorService, IServiceScopeFactory scopeFactory)
+    public GeneralCommands(ILogger<GeneralCommands> logger, ICommandLogService commandLogService, CacheStorageService cacheService, InteractionService interactionService, IPaginatorService paginatorService, IServiceScopeFactory scopeFactory)
     {
         _logger = logger;
-        _commandRepository = commandLogRepository;
+        _commandLogService = commandLogService;
         _cacheService = cacheService;
         _interactionService = interactionService;
         _paginatorService = paginatorService;
@@ -86,7 +86,7 @@ public class GeneralCommands : InteractionModuleBase<ExtendedShardedInteractionC
                                       .WithCurrentTimestamp();
 
         embed.AddField("Users", _cacheService.GetUserNames().Count, true);
-        embed.AddField("Commands Used", await _commandRepository.GetCount(), true);
+        embed.AddField("Commands Used", await _commandLogService.GetCount(), true);
 
         await ModifyOriginalResponseAsync((msg) => msg.Embed = embed.Build());
     }
