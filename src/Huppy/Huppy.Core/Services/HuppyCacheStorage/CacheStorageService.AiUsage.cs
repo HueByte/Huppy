@@ -9,19 +9,19 @@ public partial class CacheStorageService
         await AddToCache(UserId, Username);
     }
 
-    public Task<AiUser> GetUserUsage(ulong UserId)
+    public Task<int> GetUserUsage(ulong UserId)
     {
-        _userAiUsage.TryGetValue(UserId, out var user);
-        return Task.FromResult(user!);
+        _userAiUsage.TryGetValue(UserId, out var userUsage);
+        return Task.FromResult(userUsage!);
     }
 
     public Task<int> GetCurrentMessageCount()
     {
-        var count = _userAiUsage.Sum(e => e.Value.Count);
+        var count = _userAiUsage.Sum(e => e.Value);
         return Task.FromResult(count);
     }
 
-    public Task<Dictionary<ulong, AiUser>> GetAiStatistics()
+    public Task<Dictionary<ulong, int>> GetAiStatistics()
     {
         return Task.FromResult(_userAiUsage.ToDictionary(p => p.Key, p => p.Value));
     }
@@ -30,11 +30,11 @@ public partial class CacheStorageService
     {
         if (_userAiUsage.TryGetValue(UserId, out var currentValue))
         {
-            _userAiUsage[UserId].Count = currentValue.Count + 1;
+            _userAiUsage[UserId] = currentValue + 1;
         }
         else
         {
-            _userAiUsage.TryAdd(UserId, new AiUser { Username = Username, Count = 1 });
+            _userAiUsage.TryAdd(UserId, 1);
         }
 
         return Task.CompletedTask;

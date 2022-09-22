@@ -36,7 +36,6 @@ namespace HuppyService.Service.Configuration
 
         public ModuleConfiguration AddRepositories()
         {
-            _services.AddScoped<IUserRepository, UserRepository>();
             _services.AddScoped<IServerRepository, ServerRepository>();
             _services.AddScoped<ICommandLogRepository, CommandLogRepository>();
             _services.AddScoped<IReminderRepository, ReminderRepository>();

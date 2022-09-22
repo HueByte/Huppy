@@ -15,8 +15,8 @@ namespace HuppyService.Core.Models
         public DateTime CreatedDate { get; set; }
         public DateTime? ClosedDate { get; set; }
 
-        [ForeignKey("UserId")]
+        //[ForeignKey("UserId")]
         public ulong UserId { get; set; }
-        public virtual User User { get; set; } = null!;
+        //public virtual User User { get; set; } = null!;
     }
 }

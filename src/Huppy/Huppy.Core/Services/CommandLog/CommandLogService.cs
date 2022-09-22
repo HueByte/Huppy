@@ -20,7 +20,7 @@ namespace Huppy.Core.Services.CommandLog
             return result;
         }
 
-        public async Task<MapField<ulong, AiUser>> GetAiUsage()
+        public async Task<MapField<ulong, int>> GetAiUsage()
         {
             // implement single instance of empty?
             var result = await _commandLogClient.GetAiUsageAsync(new Empty());

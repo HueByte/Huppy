@@ -15,9 +15,9 @@ public class CommandLog : DbModel<int>
     public long ExecutionTimeMs { get; set; }
     public ulong ChannelId { get; set; }
 
-    [ForeignKey("UserId")]
+    //[ForeignKey("UserId")]
     public ulong UserId { get; set; }
-    public virtual User? User { get; set; }
+    //public virtual User? User { get; set; }
 
     [ForeignKey("GuildId")]
     public ulong? GuildId { get; set; }

@@ -22,13 +22,8 @@ message AverageTimeResponse {
     double AverageTime = 1;
 }
 
-message AiUser {
-    string Username = 1;
-    int32 Count = 2;
-}
-
 message AiUsageResponse {
-    map<uint64, AiUser> AiUsers = 1;
+    map<uint64, int32> AiUsers = 1;
 }
 
 message CommandLogModel {

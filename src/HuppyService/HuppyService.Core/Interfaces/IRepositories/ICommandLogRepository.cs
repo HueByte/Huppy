@@ -6,7 +6,6 @@ namespace HuppyService.Core.Interfaces.IRepositories
 {
     public interface ICommandLogRepository : IRepository<int, CommandLog>
     {
-        Task<int> GetCount();
-        Task<Dictionary<ulong, AiUser>> GetAiUsage();
+
     }
 }

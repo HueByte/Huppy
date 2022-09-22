@@ -10,8 +10,8 @@ namespace HuppyService.Core.Models
         public DateTime RemindDate { get; set; }
         public string Message { get; set; } = null!;
 
-        [ForeignKey("UserId")]
+        //[ForeignKey("UserId")]
         public ulong UserId { get; set; }
-        public virtual User? User { get; set; } = null!;
+        //public virtual User? User { get; set; } = null!;
     }
 }

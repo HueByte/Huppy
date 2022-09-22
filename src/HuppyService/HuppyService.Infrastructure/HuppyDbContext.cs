@@ -17,9 +17,14 @@ namespace HuppyService.Infrastructure
                    .WithOne(e => e.Server)
                    .HasForeignKey<ServerRooms>(k => k.Id)
                    .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<Server>()
+                .HasMany(e => e.CommangLogs)
+                .WithOne(e => e.Guild)
+                .OnDelete(DeleteBehavior.Cascade);
         }
 
-        public DbSet<User> Users { get; set; }
+        //public DbSet<User> Users { get; set; }
         public DbSet<CommandLog> CommandLogs { get; set; }
         public DbSet<Server> Servers { get; set; }
         public DbSet<Reminder> Reminders { get; set; }

@@ -16,8 +16,8 @@ public partial class CacheStorageService
     public IReadOnlyDictionary<ulong, string?> CacheUsers => _cacheUsers;
     private Dictionary<ulong, string?> _cacheUsers = null!;
 
-    public IReadOnlyDictionary<ulong, AiUser> UserAiUsage => (IReadOnlyDictionary<ulong, AiUser>)_userAiUsage;
-    private IDictionary<ulong, AiUser> _userAiUsage = null!;
+    public IReadOnlyDictionary<ulong, int> UserAiUsage => (IReadOnlyDictionary<ulong, int>)_userAiUsage;
+    private IDictionary<ulong, int> _userAiUsage = null!;
 
     // Switch to IReadOnlySet<ulong>
     public HashSet<ulong> RegisteredGuildsIds => _registeredGuildsIds;

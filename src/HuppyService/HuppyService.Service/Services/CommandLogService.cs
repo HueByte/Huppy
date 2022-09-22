@@ -25,11 +25,10 @@ namespace HuppyService.Service.Services
 
         public override async Task<AiUsageResponse> GetAiUsage(Empty request, ServerCallContext context)
         {
-            Dictionary<ulong, AiUser> result = new();
+            Dictionary<ulong, int> result = new();
 
             var query = await _commandLogRepository.GetAllAsync();
-            var commandLogs = await query.Include(commandLog => commandLog.User)
-                .ToListAsync();
+            var commandLogs = await query.ToListAsync();
 
             var uniqueUsers = commandLogs.GroupBy(e => e.UserId)
                                          .Select(e => e.First())
@@ -37,12 +36,7 @@ namespace HuppyService.Service.Services
 
             foreach (var user in uniqueUsers)
             {
-                result.TryAdd(user.UserId, new AiUser
-                {
-                    Username = user.User!.Username,
-                    Count = commandLogs.Where(x => x.UserId == user.UserId)
-                                       .Count()
-                });
+                result.TryAdd(user.UserId, commandLogs.Where(x => x.UserId == user.UserId).Count());
             }
 
             var response = new AiUsageResponse();
