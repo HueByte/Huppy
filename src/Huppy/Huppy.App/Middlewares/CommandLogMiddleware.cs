@@ -1,11 +1,7 @@
 using System.Diagnostics;
 using Discord.Interactions;
-using Huppy.Core.Interfaces;
-using Huppy.Core.Interfaces.IRepositories;
 using Huppy.Core.Interfaces.IServices;
 using Huppy.Core.Utilities;
-using Huppy.Kernel;
-using HuppyService.Service.Protos;
 using Microsoft.Extensions.Logging;
 
 namespace Huppy.App.Middlewares

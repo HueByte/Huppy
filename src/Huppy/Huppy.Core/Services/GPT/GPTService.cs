@@ -15,8 +15,8 @@ namespace Huppy.Core.Services.GPT
         private readonly IHttpClientFactory _clientFactory;
         private readonly ILogger _logger;
         private readonly AppSettings _settings;
-        private readonly HuppyService.Service.Protos.GPT.GPTClient _gptClient;
-        public GPTService(HuppyService.Service.Protos.GPT.GPTClient gptClient, IHttpClientFactory clientFactory, ILogger<GPTService> logger, AppSettings settings)
+        private readonly HuppyService.Service.Protos.GPTProto.GPTProtoClient _gptClient;
+        public GPTService(HuppyService.Service.Protos.GPTProto.GPTProtoClient gptClient, IHttpClientFactory clientFactory, ILogger<GPTService> logger, AppSettings settings)
         {
             _gptClient = gptClient;
             _clientFactory = clientFactory;

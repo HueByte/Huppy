@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+option csharp_namespace = "HuppyService.Service.Protos.Models";
+
+package database.models;
+
+message CommandLogModel {
+    int32 Id = 1;
+    string CommandName = 2;
+    uint64 UnixTime = 3;
+    bool IsSuccess = 4;
+    uint64 UserId = 5;
+    int64 ExecutionTimeMs = 6;
+    uint64 ChannelId = 7;
+    string ErrorMessage = 8;
+    uint64 GuildId = 9;
+}
+
+message ServerModel {
+    uint64 Id = 1;
+    string ServerName = 2;
+    bool UseGreet = 3;
+    string GreetMessage = 4;
+    uint64 RoleId = 5;
+    uint64 ServerRommsId = 6;
+    ServerRoomsModel Rooms = 7;
+}
+
+message ServerRoomsModel {
+    uint64 Id = 1;
+    uint64 OutputRoom = 2;
+    uint64 GreetingRoom = 3;
+    uint64 ServerId = 4;
+}

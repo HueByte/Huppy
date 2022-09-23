@@ -7,16 +7,16 @@ namespace Huppy.Core.Services.CommandLog
 {
     public class CommandLogService : ICommandLogService
     {
-        private readonly HuppyService.Service.Protos.CommandLog.CommandLogClient _commandLogClient;
-        public CommandLogService(HuppyService.Service.Protos.CommandLog.CommandLogClient commandLogClient)
+        private readonly HuppyService.Service.Protos.CommandLogProto.CommandLogProtoClient _commandLogClient;
+        public CommandLogService(HuppyService.Service.Protos.CommandLogProto.CommandLogProtoClient commandLogClient)
         {
             _commandLogClient = commandLogClient;
         }
 
-        public async Task<CommandLogModelResponse> AddCommand(CommandLogModel commandLog)
+        public async Task<CommandLogModel> AddCommand(CommandLogModel commandLog)
         {
             var result = await _commandLogClient.AddCommandAsync(commandLog);
-            
+
             return result;
         }
 
@@ -24,21 +24,21 @@ namespace Huppy.Core.Services.CommandLog
         {
             // implement single instance of empty?
             var result = await _commandLogClient.GetAiUsageAsync(new Empty());
-            
+
             return result.AiUsers;
         }
 
         public async Task<double> GetAverageExecutionTime()
         {
             var result = await _commandLogClient.GetAverageExecutionTimeAsync(new Empty());
-            
+
             return result.AverageTime;
         }
 
         public async Task<int> GetCount()
         {
             var result = await _commandLogClient.GetCountAsync(new Empty());
-            
+
             return result.Count;
         }
 

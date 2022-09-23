@@ -1,7 +1,6 @@
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
-using Grpc.Net.Client;
 using Huppy.App.Middlewares;
 using Huppy.Core.Extensions;
 using Huppy.Core.Interfaces.IRepositories;
@@ -27,11 +26,8 @@ using Huppy.Core.Services.TimedEvents;
 using Huppy.Core.Services.Urban;
 using Huppy.Infrastructure;
 using Huppy.Infrastructure.Repositories;
-using HuppyService.Service.Protos;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Serilog;
-using CommandLog = HuppyService.Service.Protos.CommandLog;
 
 namespace Huppy.App.Configuration
 {
@@ -58,13 +54,13 @@ namespace Huppy.App.Configuration
 
         public ModuleConfigurator AddGRPCServices()
         {
-            _services.AddGrpcClient<GPT.GPTClient>((services, options) =>
+            _services.AddGrpcClient<GPTProto.GPTProtoClient>((services, options) =>
             {
                 //var basketApi = services.GetRequiredService<IOptions<UrlsConfig>>().Value.HuppyCoreUrl;
                 options.Address = new Uri(_appSettings?.Microservices?.HuppyCoreUrl!);
             });
 
-            _services.AddGrpcClient<CommandLog.CommandLogClient>((services, options) =>
+            _services.AddGrpcClient<CommandLogProto.CommandLogProtoClient>((services, options) =>
             {
                 options.Address = new Uri(_appSettings?.Microservices?.HuppyCoreUrl!);
             });

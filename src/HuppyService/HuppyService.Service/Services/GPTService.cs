@@ -7,7 +7,7 @@ using Microsoft.Extensions.Options;
 
 namespace HuppyService.Service.Services
 {
-    public class GPTService : GPT.GPTBase
+    public class GPTService : GPTProto.GPTProtoBase
     {
         private readonly IHttpClientFactory _clientFactory;
         private readonly ILogger _logger;

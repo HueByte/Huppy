@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+option csharp_namespace = "HuppyService.Service.Protos";
+
+import "google/protobuf/empty.proto";
+import "Protos/models/database.proto";
+
+package ServerProto;
+
+service ServerProto {
+    rpc GetOrCreate(GetOrCreateServerInput) returns (database.models.ServerModel);
+    rpc UpdateAsync(database.models.ServerModel) returns(ServerProtoDefaultResponse);
+    rpc GetAll(google.protobuf.Empty) returns (ServerModelCollection);
+}
+
+message ServerModelCollection {
+    repeated database.models.ServerModel ServerModel= 1;
+}
+
+message GetOrCreateServerInput {
+	uint64 Id = 1;
+	string ServerName = 2;
+    uint64 DefaultChannel = 3;
+}
+
+message ServerProtoDefaultResponse {
+    bool IsSuccess = 1;
+}

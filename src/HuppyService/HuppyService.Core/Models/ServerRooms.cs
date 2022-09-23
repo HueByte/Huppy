@@ -13,7 +13,7 @@ namespace HuppyService.Core.Models
         public ulong GreetingRoom { get; set; }
 
         [ForeignKey("ServerId")]
-        public ulong? ServerID { get; set; }
+        public ulong? ServerId { get; set; }
         public virtual Server? Server { get; set; } = null!;
     }
 }

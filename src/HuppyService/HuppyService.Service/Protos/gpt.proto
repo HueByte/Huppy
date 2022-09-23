@@ -2,9 +2,9 @@ syntax = "proto3";
 
 option csharp_namespace = "HuppyService.Service.Protos";
 
-package GPT;
+package GPTProto;
 
-service GPT {
+service GPTProto {
 	rpc DavinciCompletion(GPTInputRequest) returns (GPTOutputResponse);
 }
 

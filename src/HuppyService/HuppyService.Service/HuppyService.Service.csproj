@@ -10,6 +10,8 @@
     <Protobuf Include="Protos\commandLog.proto" GrpcServices="Server" />
     <Protobuf Include="Protos\gpt.proto" GrpcServices="Server" />
     <Protobuf Include="Protos\greet.proto" GrpcServices="Server" />
+    <Protobuf Include="Protos\models\database.proto" GrpcServices="Server" />
+    <Protobuf Include="Protos\server.proto" GrpcServices="Server" />
   </ItemGroup>
 
   <ItemGroup>

@@ -3,11 +3,12 @@ using Grpc.Core;
 using HuppyService.Core.Interfaces.IRepositories;
 using HuppyService.Core.Utilities;
 using HuppyService.Service.Protos;
+using HuppyService.Service.Protos.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace HuppyService.Service.Services
 {
-    public class CommandLogService : CommandLog.CommandLogBase
+    public class CommandLogService : CommandLogProto.CommandLogProtoBase
     {
         private readonly ICommandLogRepository _commandLogRepository;
         public CommandLogService(ICommandLogRepository commandLogRepository)
@@ -53,7 +54,7 @@ namespace HuppyService.Service.Services
             return new AverageTimeResponse() { AverageTime = avgTime };
         }
 
-        public override async Task<CommandLogModelResponse> AddCommand(CommandLogModel request, ServerCallContext context)
+        public override async Task<CommandLogModel> AddCommand(CommandLogModel request, ServerCallContext context)
         {
             Core.Models.CommandLog commandLog = new()
             {
@@ -72,18 +73,8 @@ namespace HuppyService.Service.Services
 
             if (result)
             {
-                return new CommandLogModelResponse()
-                {
-                    Id = commandLog.Id,
-                    ChannelId = commandLog.ChannelId,
-                    CommandName = commandLog.CommandName,
-                    ErrorMessage = commandLog.ErrorMessage,
-                    ExecutionTimeMs = commandLog.ExecutionTimeMs,
-                    GuildId = (ulong)commandLog.GuildId,
-                    IsSuccess = commandLog.IsSuccess,
-                    UnixTime = request.UnixTime,
-                    UserId = commandLog.UserId
-                };
+                request.Id = commandLog.Id;
+                return request;
             }
 
             return null!;

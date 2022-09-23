@@ -8,7 +8,7 @@ namespace Huppy.Core.Interfaces.IServices
         Task<int> GetCount();
         Task<double> GetAverageExecutionTime();
         Task<MapField<ulong, int>> GetAiUsage();
-        Task<CommandLogModelResponse> AddCommand(CommandLogModel model);
+        Task<CommandLogModel> AddCommand(CommandLogModel model);
         Task<bool> RemoveCommand(CommandLogModel model);
     }
 }
