@@ -5,6 +5,7 @@ using HuppyService.Core.Models;
 using HuppyService.Service.Protos;
 using HuppyService.Service.Protos.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Net.WebSockets;
 
 namespace HuppyService.Service.Services
 {
@@ -14,6 +15,26 @@ namespace HuppyService.Service.Services
         public ServerService(IServerRepository serverRepository)
         {
             _serverRepository = serverRepository;
+        }
+
+        public override async Task<ServerModel> Get(ServerIdInput request, ServerCallContext context)
+        {
+            var server = await _serverRepository.GetAsync(request.Id);
+            
+            return new ServerModel()
+            {
+                Id = server.Id,
+                GreetMessage = server.GreetMessage,
+                RoleId = server.RoleID,
+                ServerName = server.ServerName,
+                UseGreet = server.UseGreet,
+                Rooms = new()
+                {
+                    GreetingRoom = server.Rooms.GreetingRoom,
+                    OutputRoom = server.Rooms.OutputRoom,
+                    ServerId = server.Id
+                }
+            };
         }
 
         public override async Task<ServerModelCollection> GetAll(Empty request, ServerCallContext context)
@@ -111,7 +132,7 @@ namespace HuppyService.Service.Services
             };
         }
 
-        public override async Task<CommonResponse> UpdateAsync(ServerModel request, ServerCallContext context)
+        public override async Task<CommonResponse> Update(ServerModel request, ServerCallContext context)
         {
             Server server = new()
             {

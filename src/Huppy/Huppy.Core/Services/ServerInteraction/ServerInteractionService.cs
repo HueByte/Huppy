@@ -25,46 +25,46 @@ public class ServerInteractionService : IServerInteractionService
 
     public async Task HuppyJoined(SocketGuild guild)
     {
-        var embed = new EmbedBuilder().WithTitle("✨ Hello I'm Huppy! ✨")
-                                      .WithColor(Color.Teal)
-                                      .WithDescription(HuppyBasicMessages.AboutMe)
-                                      .WithThumbnailUrl(Icons.Huppy1)
-                                      .WithCurrentTimestamp();
+        //var embed = new EmbedBuilder().WithTitle("✨ Hello I'm Huppy! ✨")
+        //                              .WithColor(Color.Teal)
+        //                              .WithDescription(HuppyBasicMessages.AboutMe)
+        //                              .WithThumbnailUrl(Icons.Huppy1)
+        //                              .WithCurrentTimestamp();
 
-        if (!_cacheService.RegisteredGuildsIds.Contains(guild.Id))
-        {
-            using var scope = _serviceFactory.CreateAsyncScope();
-            var serverRepository = scope.ServiceProvider.GetRequiredService<IServerRepository>();
+        //if (!_cacheService.RegisteredGuildsIds.Contains(guild.Id))
+        //{
+        //    using var scope = _serviceFactory.CreateAsyncScope();
+        //    var serverRepository = scope.ServiceProvider.GetRequiredService<IServerRepository>();
 
-            Server server = new()
-            {
-                Id = guild.Id,
-                GreetMessage = "Welcome {username}!",
-                Rooms = new()
-                {
-                    OutputRoom = guild.DefaultChannel.Id,
-                    GreetingRoom = 0
-                },
-                ServerName = guild.Name,
-                RoleID = 0,
-                UseGreet = false,
-            };
+        //    Server server = new()
+        //    {
+        //        Id = guild.Id,
+        //        GreetMessage = "Welcome {username}!",
+        //        Rooms = new()
+        //        {
+        //            OutputRoom = guild.DefaultChannel.Id,
+        //            GreetingRoom = 0
+        //        },
+        //        ServerName = guild.Name,
+        //        RoleID = 0,
+        //        UseGreet = false,
+        //    };
 
-            await serverRepository.AddAsync(server);
-            await serverRepository.SaveChangesAsync();
-        }
+        //    await serverRepository.AddAsync(server);
+        //    await serverRepository.SaveChangesAsync();
+        //}
 
-        await guild.DefaultChannel.SendMessageAsync(null, false, embed.Build());
+        //await guild.DefaultChannel.SendMessageAsync(null, false, embed.Build());
     }
 
     public async Task OnUserJoined(SocketGuildUser user)
     {
         using var scope = _serviceFactory.CreateAsyncScope();
-        var serverRepository = scope.ServiceProvider.GetRequiredService<IServerRepository>();
+        var serverService = scope.ServiceProvider.GetRequiredService<IServerService>();
 
         _logger.LogInformation("New user joined [{Username}] at [{ServerName}]", user.Username, user.Guild.Name);
 
-        var server = await serverRepository.GetAsync(user.Guild.Id);
+        var server = await serverService.GetAsync(user.Guild.Id);
         if (server is not null)
         {
             if (server.UseGreet)
@@ -84,20 +84,19 @@ public class ServerInteractionService : IServerInteractionService
                 await channel.SendMessageAsync(null, false, embed.Build());
             }
 
-            if (server.RoleID > 0)
+            if (server.RoleId > 0)
             {
-                var role = user.Guild.GetRole(server.RoleID);
+                var role = user.Guild.GetRole(server.RoleId);
                 if (role is null)
                 {
-                    _logger.LogWarning("Role with [{RoleID}] ID on [{ServerName}] is not found. Updating default role to none", server.RoleID, user.Guild.Name);
-                    server.RoleID = default;
+                    _logger.LogWarning("Role with [{RoleID}] ID on [{ServerName}] is not found. Updating default role to none", server.RoleId, user.Guild.Name);
+                    server.RoleId = default;
 
-                    await serverRepository.UpdateAsync(server);
-                    await serverRepository.SaveChangesAsync();
+                    await serverService.UpdateAsync(server);
                     return;
                 }
 
-                await (user as IGuildUser).AddRoleAsync(server.RoleID);
+                await (user as IGuildUser).AddRoleAsync(server.RoleId);
             }
         }
 

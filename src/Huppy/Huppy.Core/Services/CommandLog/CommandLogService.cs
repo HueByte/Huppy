@@ -1,7 +1,6 @@
-﻿using Google.Protobuf.Collections;
-using Google.Protobuf.WellKnownTypes;
+﻿using Google.Protobuf.WellKnownTypes;
 using Huppy.Core.Interfaces.IServices;
-using HuppyService.Service.Protos;
+using HuppyService.Service.Protos.Models;
 
 namespace Huppy.Core.Services.CommandLog
 {
@@ -20,7 +19,7 @@ namespace Huppy.Core.Services.CommandLog
             return result;
         }
 
-        public async Task<MapField<ulong, int>> GetAiUsage()
+        public async Task<IDictionary<ulong, int>> GetAiUsage()
         {
             // implement single instance of empty?
             var result = await _commandLogClient.GetAiUsageAsync(new Empty());

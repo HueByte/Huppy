@@ -14,15 +14,15 @@ namespace Huppy.App.Commands.SlashCommands;
 public class ServerCommands : InteractionModuleBase<ExtendedShardedInteractionContext>
 {
     private readonly ILogger _logger;
-    private readonly IServerRepository _serverRepository;
+    private readonly IServerService _serverService;
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly IPaginatorService _paginatorService;
-    public ServerCommands(ILogger<ServerCommands> logger, IServerRepository serverRepository, IServiceScopeFactory scopeFactory, IPaginatorService paginatorService)
+    public ServerCommands(ILogger<ServerCommands> logger, IServiceScopeFactory scopeFactory, IPaginatorService paginatorService, IServerService serverService)
     {
         _logger = logger;
-        _serverRepository = serverRepository;
         _scopeFactory = scopeFactory;
         _paginatorService = paginatorService;
+        _serverService = serverService;
     }
 
     [SlashCommand("info", "Get current configuration for this server")]
@@ -40,9 +40,9 @@ public class ServerCommands : InteractionModuleBase<ExtendedShardedInteractionCo
 
         var page1 = async Task<PaginatorPage> (AsyncServiceScope scope, object? data) =>
         {
-            var serverRepository = scope.ServiceProvider.GetRequiredService<IServerRepository>();
+            var serverRepository = scope.ServiceProvider.GetRequiredService<IServerService>();
 
-            var server = await serverRepository.GetOrCreateAsync(Context);
+            var server = await _serverService.GetOrCreateAsync(Context.Guild.Id, Context.Guild.Name, Context.Guild.DefaultChannel.Id);
 
             var embed = new EmbedBuilder().WithAuthor(Context.User)
                       .WithColor(Color.DarkPurple)
@@ -56,7 +56,7 @@ public class ServerCommands : InteractionModuleBase<ExtendedShardedInteractionCo
             embed.AddField("Use Greet", server.UseGreet, true);
             embed.AddField("Greet message", string.IsNullOrEmpty(server.GreetMessage) ? "`empty`" : server.GreetMessage);
 
-            var defaultRole = Context.Guild.GetRole(server.RoleID);
+            var defaultRole = Context.Guild.GetRole(server.RoleId);
             if (defaultRole is not null)
                 embed.AddField("Default role", defaultRole.Mention, true);
 
@@ -69,9 +69,9 @@ public class ServerCommands : InteractionModuleBase<ExtendedShardedInteractionCo
 
         var page2 = async Task<PaginatorPage> (AsyncServiceScope scope, object? data) =>
         {
-            var serverRepository = scope.ServiceProvider.GetRequiredService<IServerRepository>();
+            var serverRepository = scope.ServiceProvider.GetRequiredService<IServerService>();
 
-            var server = await serverRepository.GetOrCreateAsync(Context);
+            var server = await _serverService.GetOrCreateAsync(Context.Guild.Id, Context.Guild.Name, Context.Guild.DefaultChannel.Id);
 
             var embed = new EmbedBuilder().WithAuthor(Context.User)
                       .WithColor(Color.DarkPurple)
@@ -100,7 +100,7 @@ public class ServerCommands : InteractionModuleBase<ExtendedShardedInteractionCo
     [RequireUserPermission(GuildPermission.Administrator)]
     public async Task ConfigureHuppy(bool? UseGreet = null, string? GreetingMessage = null, IRole? DefaultRole = null, bool? EnableNews = false, SocketGuildChannel? HuppyRoom = null, SocketGuildChannel? NewsRoom = null, SocketGuildChannel? GreetingRoom = null)
     {
-        var server = await _serverRepository.GetOrCreateAsync(Context);
+        var server = await _serverService.GetOrCreateAsync(Context.Guild.Id, Context.Guild.Name, Context.Guild.DefaultChannel.Id);
 
         server.ServerName = Context.Guild.Name;
 
@@ -111,7 +111,7 @@ public class ServerCommands : InteractionModuleBase<ExtendedShardedInteractionCo
             server.GreetMessage = GreetingMessage;
 
         if (DefaultRole is not null)
-            server.RoleID = DefaultRole.Id;
+            server.RoleId = DefaultRole.Id;
 
         if (server.Rooms is not null)
         {
@@ -122,8 +122,7 @@ public class ServerCommands : InteractionModuleBase<ExtendedShardedInteractionCo
                 server.Rooms.GreetingRoom = GreetingRoom.Id;
         }
 
-        await _serverRepository.UpdateAsync(server);
-        await _serverRepository.SaveChangesAsync();
+        await _serverService.UpdateAsync(server);
 
         var embed = new EmbedBuilder().WithDescription("Updated your server settings\nUse `/server info` command to see current configuration")
                                       .WithThumbnailUrl(Icons.Huppy1)

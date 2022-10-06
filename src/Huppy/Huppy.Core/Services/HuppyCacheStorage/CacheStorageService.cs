@@ -1,4 +1,5 @@
 using System.Collections.Specialized;
+using Google.Protobuf.WellKnownTypes;
 //using Huppy.Core.Entities;
 using Huppy.Core.Interfaces.IRepositories;
 using Huppy.Core.Interfaces.IServices;
@@ -38,14 +39,14 @@ public partial class CacheStorageService
         using var scope = _serviceFactory.CreateAsyncScope();
         var commandLogService = scope.ServiceProvider.GetRequiredService<ICommandLogService>();
         var userRepository = scope.ServiceProvider.GetRequiredService<IUserRepository>();
-        var serverRepository = scope.ServiceProvider.GetRequiredService<IServerRepository>();
+        var serverService = scope.ServiceProvider.GetRequiredService<IServerService>();
         var appSettings = scope.ServiceProvider.GetRequiredService<AppSettings>();
 
         var aiUsage = await commandLogService.GetAiUsage();
 
         _cacheUsers = new(await userRepository.GetUsersForCacheAsync());
         _userAiUsage = aiUsage;
-        _registeredGuildsIds = new((await serverRepository.GetAllAsync()).Select(guild => guild.Id).ToHashSet());
+        _registeredGuildsIds = (await serverService.GetAllAsync(new Empty())).ServerModel.Select(guild => guild.Id).ToHashSet();
         _developerIds = appSettings.Developers!.Split(';').Where(sId => !string.IsNullOrEmpty(sId)).Select(sId => ulong.Parse(sId)).ToHashSet();
         PaginatorEntries = new();
 

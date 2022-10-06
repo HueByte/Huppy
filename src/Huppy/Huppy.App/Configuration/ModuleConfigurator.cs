@@ -20,12 +20,14 @@ using Huppy.Core.Services.Paginator;
 using Huppy.Core.Services.Reminder;
 using Huppy.Core.Services.Resources;
 using Huppy.Core.Services.ScopedData;
+using Huppy.Core.Services.Server;
 using Huppy.Core.Services.ServerInteraction;
 using Huppy.Core.Services.Ticket;
 using Huppy.Core.Services.TimedEvents;
 using Huppy.Core.Services.Urban;
 using Huppy.Infrastructure;
 using Huppy.Infrastructure.Repositories;
+using HuppyService.Service.Protos;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 
@@ -56,11 +58,17 @@ namespace Huppy.App.Configuration
         {
             _services.AddGrpcClient<GPTProto.GPTProtoClient>((services, options) =>
             {
+                // TODO remake to this
                 //var basketApi = services.GetRequiredService<IOptions<UrlsConfig>>().Value.HuppyCoreUrl;
                 options.Address = new Uri(_appSettings?.Microservices?.HuppyCoreUrl!);
             });
 
             _services.AddGrpcClient<CommandLogProto.CommandLogProtoClient>((services, options) =>
+            {
+                options.Address = new Uri(_appSettings?.Microservices?.HuppyCoreUrl!);
+            });
+
+            _services.AddGrpcClient<ServerProto.ServerProtoClient>((services, options) =>
             {
                 options.Address = new Uri(_appSettings?.Microservices?.HuppyCoreUrl!);
             });
@@ -150,8 +158,9 @@ namespace Huppy.App.Configuration
             _services.AddScoped<IScopedDataService, ScopedDataService>();
             _services.AddScoped<IResourcesService, ResourcesService>();
             _services.AddScoped<ICommandLogService, CommandLogService>();
+            _services.AddScoped<IServerService, ServerService>();
 
-            // http clients
+            // externals
             _services.AddScoped<IGPTService, GPTService>();
             _services.AddScoped<IUrbanService, UrbanService>();
 

@@ -2,6 +2,7 @@ using System.Diagnostics;
 using Discord.Interactions;
 using Huppy.Core.Interfaces.IServices;
 using Huppy.Core.Utilities;
+using HuppyService.Service.Protos.Models;
 using Microsoft.Extensions.Logging;
 
 namespace Huppy.App.Middlewares
