@@ -3,14 +3,19 @@ syntax = "proto3";
 option csharp_namespace = "HuppyService.Service.Protos";
 
 import "google/protobuf/empty.proto";
-import "Protos/models/database.proto";
+import "Protos/database.proto";
 
 package ServerProto;
 
 service ServerProto {
+    rpc Get(ServerIdInput) returns (database.models.ServerModel);
     rpc GetOrCreate(GetOrCreateServerInput) returns (database.models.ServerModel);
-    rpc UpdateAsync(database.models.ServerModel) returns(ServerProtoDefaultResponse);
+    rpc Update(database.models.ServerModel) returns(database.models.CommonResponse);
     rpc GetAll(google.protobuf.Empty) returns (ServerModelCollection);
+}
+
+message ServerIdInput {
+    uint64 Id = 1;
 }
 
 message ServerModelCollection {
@@ -21,8 +26,4 @@ message GetOrCreateServerInput {
 	uint64 Id = 1;
 	string ServerName = 2;
     uint64 DefaultChannel = 3;
-}
-
-message ServerProtoDefaultResponse {
-    bool IsSuccess = 1;
 }

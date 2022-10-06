@@ -22,7 +22,7 @@ message ServerModel {
     bool UseGreet = 3;
     string GreetMessage = 4;
     uint64 RoleId = 5;
-    uint64 ServerRommsId = 6;
+    uint64 ServerRoomsId = 6;
     ServerRoomsModel Rooms = 7;
 }
 
@@ -31,4 +31,8 @@ message ServerRoomsModel {
     uint64 OutputRoom = 2;
     uint64 GreetingRoom = 3;
     uint64 ServerId = 4;
+}
+
+message CommonResponse {
+    bool IsSuccess = 1;
 }
