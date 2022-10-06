@@ -5,6 +5,5 @@ namespace HuppyService.Core.Interfaces.IRepositories
 {
     public interface IServerRepository : IRepository<ulong, Server>
     {
-        Task<Server> GetOrCreateAsync(ulong guildId, ulong defaultChannel, string guildName);
     }
 }

@@ -80,7 +80,7 @@ namespace HuppyService.Service.Services
             return null!;
         }
 
-        public override async Task<CommandLogResponse> RemoveCommand(CommandLogModel request, ServerCallContext context)
+        public override async Task<CommonResponse> RemoveCommand(CommandLogModel request, ServerCallContext context)
         {
             Core.Models.CommandLog commandLog = new()
             {
@@ -97,7 +97,7 @@ namespace HuppyService.Service.Services
             await _commandLogRepository.RemoveAsync(commandLog);
             await _commandLogRepository.SaveChangesAsync();
 
-            return new CommandLogResponse() { IsSuccess = true };
+            return new CommonResponse() { IsSuccess = true };
         }
     }
 }

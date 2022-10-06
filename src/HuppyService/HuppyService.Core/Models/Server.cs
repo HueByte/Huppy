@@ -14,7 +14,7 @@ namespace HuppyService.Core.Models
         public ulong RoleID { get; set; }
 
         [ForeignKey("ServerRoomsId")]
-        public ulong? ServerRommsId { get; set; }
+        public ulong ServerRoomsId { get; set; }
         public virtual ServerRooms? Rooms { get; set; }
         public virtual IList<CommandLog>? CommangLogs { get; set; }
     }
