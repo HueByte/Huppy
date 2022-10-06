@@ -36,3 +36,21 @@ message ServerRoomsModel {
 message CommonResponse {
     bool IsSuccess = 1;
 }
+
+message ReminderModel {
+    int32 Id = 1;
+    uint64 UnixTime = 2;
+    string Message = 3;
+    uint64 UserId = 4;
+}
+
+message TicketModel {
+    int32 Id = 1;
+    string Topic = 2;
+    string Description = 3;
+    bool IsClosed = 4;
+    string TicketAnswer = 5;
+    uint64 CreatedDate = 6;
+    uint64 ClosedDate = 7;
+    uint64 UserId = 8;
+}
