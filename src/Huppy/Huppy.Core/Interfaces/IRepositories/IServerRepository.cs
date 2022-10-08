@@ -4,6 +4,7 @@ using Huppy.Kernel;
 
 namespace Huppy.Core.Interfaces.IRepositories
 {
+    [Obsolete]
     public interface IServerRepository : IRepository<ulong, Server>
     {
         Task<Server> GetOrCreateAsync(ShardedInteractionContext DiscordContext);

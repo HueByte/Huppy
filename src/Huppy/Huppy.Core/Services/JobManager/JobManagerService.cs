@@ -64,7 +64,7 @@ namespace Huppy.Core.Services.JobManager
                 Function = async (scope, data) =>
                 {
                     var reminderService = scope.ServiceProvider.GetRequiredService<IReminderService>();
-                    await reminderService.RegisterFreshReminders();
+                    await reminderService.RegisterFreshRemindersAsync();
                 }
             };
 

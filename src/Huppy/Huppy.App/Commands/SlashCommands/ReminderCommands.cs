@@ -4,6 +4,9 @@ using Huppy.Core.Attributes;
 using Huppy.Core.Interfaces.IRepositories;
 using Huppy.Core.Interfaces.IServices;
 using Huppy.Core.Services.Paginator.Entities;
+using Huppy.Core.Services.Reminder;
+using Huppy.Core.Utilities;
+using HuppyService.Service.Protos;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -13,18 +16,15 @@ namespace Huppy.App.Commands.SlashCommands;
 [Group("reminder", "reminder commands")]
 public class ReminderCommands : InteractionModuleBase<ExtendedShardedInteractionContext>
 {
-    private readonly ILogger<ReminderCommands> _logger;
     private readonly IReminderService _reminderService;
     private readonly IPaginatorService _paginatorService;
     private readonly IServiceScopeFactory _serviceScopeFactory;
-    private readonly IReminderRepository _reminderRepository;
     private const int RemindersPerPage = 5;
-    public ReminderCommands(IReminderService reminderService, IPaginatorService paginatorService, IServiceScopeFactory serviceScopeFactory, IReminderRepository reminderRepository)
+    public ReminderCommands(IReminderService reminderService, IPaginatorService paginatorService, IServiceScopeFactory serviceScopeFactory)
     {
         _reminderService = reminderService;
         _paginatorService = paginatorService;
         _serviceScopeFactory = serviceScopeFactory;
-        _reminderRepository = reminderRepository;
     }
 
     [SlashCommand("date", "Add reminder by date (format: dd/mm/yyyy hh:mm:ss)")]
@@ -56,7 +56,7 @@ public class ReminderCommands : InteractionModuleBase<ExtendedShardedInteraction
         }
         else
         {
-            await _reminderService.AddReminder(date, Context.User, message);
+            await _reminderService.AddReminderAsync(date, Context.User, message);
 
             embed = new EmbedBuilder()
                 .WithTitle("RemindMe result")
@@ -75,7 +75,7 @@ public class ReminderCommands : InteractionModuleBase<ExtendedShardedInteraction
     [Ephemeral]
     public async Task RemoveReminder(int reminderId)
     {
-        var reminder = await _reminderRepository.GetAsync(Context.User.Id, reminderId);
+        var reminder = await _reminderService.GetReminderAsync(Context.User.Id, reminderId);
 
         var embed = new EmbedBuilder().WithColor(Color.LightOrange)
             .WithCurrentTimestamp();
@@ -93,11 +93,11 @@ public class ReminderCommands : InteractionModuleBase<ExtendedShardedInteraction
             return;
         }
 
-        await _reminderService.RemoveReminder(reminder);
+        await _reminderService.RemoveReminderAsync(reminder);
 
         embed.WithTitle("Success")
              .WithDescription($"Reminder with `{reminderId}` ID got removed")
-             .AddField("Date", TimestampTag.FromDateTime(DateTime.SpecifyKind(reminder.RemindDate, DateTimeKind.Utc)))
+             .AddField("Date", TimestampTag.FromDateTime(DateTime.SpecifyKind(Miscellaneous.UnixTimeStampToDateTime(reminder.UnixTime), DateTimeKind.Utc)))
              .AddField("Message", $"```vb\n{reminder.Message}\n```");
 
         await ModifyOriginalResponseAsync((msg) =>
@@ -119,10 +119,9 @@ public class ReminderCommands : InteractionModuleBase<ExtendedShardedInteraction
             Data = Context.User
         };
 
-        var reminders = await _reminderRepository.GetAllAsync();
-        var reminderCount = await reminders.Where(entry => entry.UserId == Context.User.Id).CountAsync();
+        var remindersCount = await _reminderService.GetRemindersCount(Context.User.Id);
 
-        if (!(reminderCount > 0))
+        if (!(remindersCount > 0))
         {
             var page = Task<PaginatorPage> (AsyncServiceScope scope, object? data) =>
             {
@@ -149,7 +148,7 @@ public class ReminderCommands : InteractionModuleBase<ExtendedShardedInteraction
         }
         else
         {
-            int pages = Convert.ToInt32(Math.Ceiling((decimal)reminderCount / RemindersPerPage));
+            int pages = Convert.ToInt32(Math.Ceiling((decimal)remindersCount / RemindersPerPage));
             for (int i = 0; i < pages; i++)
             {
                 int currentPage = i;
@@ -157,15 +156,8 @@ public class ReminderCommands : InteractionModuleBase<ExtendedShardedInteraction
                 {
                     if (data is not IUser user) return null!;
 
-                    var reminderRepository = scope.ServiceProvider.GetRequiredService<IReminderRepository>();
-
-                    var reminders = await reminderRepository.GetAllAsync();
-                    var pageReminders = await reminders
-                        .Where(reminder => reminder.UserId == user.Id)
-                        .OrderBy(e => e.RemindDate)
-                        .Skip(currentPage * RemindersPerPage)
-                        .Take(RemindersPerPage)
-                        .ToListAsync();
+                    var reminderService = scope.ServiceProvider.GetRequiredService<IReminderService>();
+                    var reminders = await reminderService.GetSortedUserReminders(Context.User.Id, currentPage * RemindersPerPage, RemindersPerPage);
 
                     var embed = new EmbedBuilder()
                         .WithAuthor(user)
@@ -174,9 +166,9 @@ public class ReminderCommands : InteractionModuleBase<ExtendedShardedInteraction
                         .WithColor(Color.Orange)
                         .WithCurrentTimestamp();
 
-                    foreach (var reminder in pageReminders)
+                    foreach (var reminder in reminders)
                     {
-                        TimestampTag timestamp = TimestampTag.FromDateTime(DateTime.SpecifyKind(reminder.RemindDate, DateTimeKind.Utc));
+                        TimestampTag timestamp = TimestampTag.FromDateTime(DateTime.SpecifyKind(Miscellaneous.UnixTimeStampToDateTime(reminder.UnixTime), DateTimeKind.Utc));
                         embed.AddField(
                             $"✨ Reminder at {timestamp} | ID: {reminder.Id}",
                             $"```vb\n{reminder.Message}```",

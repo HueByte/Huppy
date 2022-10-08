@@ -124,7 +124,7 @@ public class HuppyHostedService : IHostedService
         _interactionService.Log += _loggingService.OnLogAsync;
 
         // others
-        _eventService.OnEventsRemoved += _reminderService.RemoveReminderRange;
+        _eventService.OnEventsRemoved += _reminderService.RemoveReminderRangeAsync;
         _middlewareExecutor.OnLogAsync += _loggingService.OnMiddlewareLog;
 
         return Task.CompletedTask;

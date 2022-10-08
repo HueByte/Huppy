@@ -12,14 +12,12 @@ namespace Huppy.App.Middlewares
     public class DataSynchronizationMiddleware : IMiddleware
     {
         private readonly CacheStorageService _cacheService;
-        //private readonly IServerRepository _serverRepository;
         private readonly IServerService _serverService;
         private readonly IUserRepository _userRepository;
         private readonly ILogger _logger;
         public DataSynchronizationMiddleware(CacheStorageService cacheService, IUserRepository userRepository, ILogger<DataSynchronizationMiddleware> logger, IServerService serverService)
         {
             _cacheService = cacheService;
-            //_serverRepository = serverRepository;
             _userRepository = userRepository;
             _logger = logger;
             _serverService = serverService;
@@ -71,9 +69,7 @@ namespace Huppy.App.Middlewares
             if (ctx.Guild is not null && !_cacheService.RegisteredGuildsIds.Contains(ctx.Guild.Id))
             {
                 await _serverService.GetOrCreateAsync(ctx.Guild.Id, ctx.Guild.Name, ctx.Guild.DefaultChannel.Id);
-                
-                //await _serverRepository.GetOrCreateAsync(ctx);
-                //await _serverRepository.SaveChangesAsync();
+
                 _cacheService.RegisteredGuildsIds.Add(ctx.Guild.Id);
             }
         }

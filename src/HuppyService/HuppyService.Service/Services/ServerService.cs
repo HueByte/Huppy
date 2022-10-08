@@ -43,7 +43,7 @@ namespace HuppyService.Service.Services
             var servers = await query.Include(e => e.Rooms).ToListAsync();
 
             ServerModelCollection result = new();
-            result.ServerModel.AddRange(servers.Select(server => new ServerModel()
+            result.ServerModels.AddRange(servers.Select(server => new ServerModel()
             {
                 Id = server.Id,
                 ServerName = server.ServerName,

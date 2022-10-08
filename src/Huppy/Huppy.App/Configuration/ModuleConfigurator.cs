@@ -56,21 +56,29 @@ namespace Huppy.App.Configuration
 
         public ModuleConfigurator AddGRPCServices()
         {
+            Uri huppyCoreUrl = new(_appSettings?.Microservices?.HuppyCoreUrl!);
+            Log.Logger.Information("HuppyCore address: {address}", huppyCoreUrl);
+
             _services.AddGrpcClient<GPTProto.GPTProtoClient>((services, options) =>
             {
                 // TODO remake to this
                 //var basketApi = services.GetRequiredService<IOptions<UrlsConfig>>().Value.HuppyCoreUrl;
-                options.Address = new Uri(_appSettings?.Microservices?.HuppyCoreUrl!);
+                options.Address = huppyCoreUrl;
             });
 
             _services.AddGrpcClient<CommandLogProto.CommandLogProtoClient>((services, options) =>
             {
-                options.Address = new Uri(_appSettings?.Microservices?.HuppyCoreUrl!);
+                options.Address = huppyCoreUrl;
             });
 
             _services.AddGrpcClient<ServerProto.ServerProtoClient>((services, options) =>
             {
-                options.Address = new Uri(_appSettings?.Microservices?.HuppyCoreUrl!);
+                options.Address = huppyCoreUrl;
+            });
+
+            _services.AddGrpcClient<ReminderProto.ReminderProtoClient>((services, options) =>
+            {
+                options.Address = huppyCoreUrl;
             });
 
             return this;
@@ -166,7 +174,6 @@ namespace Huppy.App.Configuration
 
             // repositories
             _services.AddScoped<IUserRepository, UserRepository>();
-            _services.AddScoped<IServerRepository, ServerRepository>();
             _services.AddScoped<IReminderRepository, ReminderRepository>();
             _services.AddScoped<ITicketRepository, TicketRepository>();
 

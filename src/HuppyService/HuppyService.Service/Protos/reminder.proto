@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+option csharp_namespace = "HuppyService.Service.Protos";
+
+import "Protos/database.proto"; 
+
+package ReminderProto;
+
+service ReminderProto {
+	rpc GetReminder(GetReminderInput) returns (database.models.ReminderModel);
+	rpc GetReminderBatch(ReminderBatchInput) returns (ReminderModelCollection);
+	rpc GetUserReminders(ReminderUserInput) returns (ReminderModelCollection);
+	rpc GetSortedUserReminders(SortedUserRemindersInput) returns (ReminderModelCollection);
+	rpc GetRemindersCount(GetReminderCountInput) returns (GetReminderCountResponse);
+	rpc AddReminder(database.models.ReminderModel) returns (database.models.ReminderModel);
+	rpc RemoveReminder(database.models.ReminderModel) returns (database.models.CommonResponse);
+	rpc RemoveReminderRange(RemoveReminderRangeInput) returns (database.models.CommonResponse);
+}
+
+message SortedUserRemindersInput {
+	uint64 UserId = 1;
+	int32 Skip = 2;
+	int32 Take = 3;
+}
+
+message GetReminderCountInput {
+	uint64 UserId = 1;
+}
+
+message GetReminderCountResponse {
+	int32 Count = 1;
+}
+
+message GetReminderInput {
+	uint64 UserId = 1;
+	int32 ReminderId = 2;
+}
+
+message ReminderBatchInput {
+	uint64 StartDate = 1;
+	uint64 EndDate = 2;
+}
+
+message ReminderUserInput {
+	uint64 UserId = 1;
+}
+
+message ReminderModelCollection {
+	repeated database.models.ReminderModel ReminderModels = 1;
+}
+
+message RemoveReminderRangeInput {
+	repeated int32 Ids = 1;
+}
+
+message RemoveReminderRangeInputString {
+	repeated string Ids = 1;
+}

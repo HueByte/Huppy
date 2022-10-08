@@ -4,8 +4,12 @@ using Discord.WebSocket;
 using Huppy.Core.Entities;
 using Huppy.Core.Interfaces.IRepositories;
 using Huppy.Core.Interfaces.IServices;
+using Huppy.Core.Utilities;
 using Huppy.Kernel.Constants;
+using HuppyService.Service.Protos;
+using HuppyService.Service.Protos.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Logging;
 
 namespace Huppy.Core.Services.Reminder;
@@ -16,40 +20,56 @@ public class ReminderService : IReminderService
 {
     private readonly ILogger _logger;
     private readonly IEventLoopService _eventService;
-    private readonly IReminderRepository _reminderRepository;
     private readonly InteractionService _interactionService;
     private DateTime FetchingDate => DateTime.UtcNow + FetchReminderFrequency;
     public TimeSpan FetchReminderFrequency { get; } = new(1, 0, 0);
-    public ReminderService(IEventLoopService eventService, ILogger<ReminderService> logger, DiscordShardedClient discord, IReminderRepository reminderRepository, InteractionService interactionService, ITimedEventsService timedEventsService)
+    private readonly ReminderProto.ReminderProtoClient _reminderClient;
+    public ReminderService(IEventLoopService eventService, ILogger<ReminderService> logger, DiscordShardedClient discord, InteractionService interactionService, ITimedEventsService timedEventsService, ReminderProto.ReminderProtoClient reminderClient)
     {
         _eventService = eventService;
         _logger = logger;
-        _reminderRepository = reminderRepository;
         _interactionService = interactionService;
+        _reminderClient = reminderClient;
     }
 
-    public async Task RegisterFreshReminders()
+    public async Task<IList<ReminderModel>> GetSortedUserReminders(ulong userId, int skip, int take)
     {
+        var result = await _reminderClient.GetSortedUserRemindersAsync(new() { UserId = userId, Skip = skip, Take = take });
+        return result.ReminderModels;
+    }
+
+    public async Task<int> GetRemindersCount(ulong userId)
+    {
+        var result = await _reminderClient.GetRemindersCountAsync(new GetReminderCountInput() { UserId = userId });
+        return result.Count;
+    }
+
+    public async Task<ReminderModel> GetReminderAsync(ulong userId, int reminderId)
+    {
+        return await _reminderClient.GetReminderAsync(new GetReminderInput() { ReminderId = reminderId, UserId = userId });
+    }
+
+    public async Task RegisterFreshRemindersAsync()
+    {
+        var reminders = await _reminderClient.GetReminderBatchAsync(new ReminderBatchInput()
+        {
+            StartDate = Miscellaneous.DateTimeToUnixTimestamp(DateTime.UtcNow),
+            EndDate = Miscellaneous.DateTimeToUnixTimestamp(DateTime.UtcNow + FetchReminderFrequency)
+        });
+
         _logger.LogInformation("Registering fresh bulk of reminders");
 
-        // fetch reminders before fetchPeriod date
-        var remindersQueryable = await _reminderRepository.GetAllAsync();
-
-        var reminders = await remindersQueryable
-            .Where(reminder => reminder.RemindDate < FetchingDate)
-            .ToListAsync();
-
-        if (!reminders.Any()) return;
+        if (!reminders.ReminderModels.Any()) return;
 
         // start adding reminder in async parallel manner
-        var jobs = reminders.Select(reminder => Task.Run(async () =>
+        var jobs = reminders.ReminderModels.Select(reminder => Task.Run(async () =>
         {
             // fetch user
             var user = await GetUser(reminder.UserId);
 
             // add reminder
             ReminderInput reminderInput = new() { User = user, Message = reminder.Message };
-            await _eventService.AddEvent(reminder.RemindDate, reminder.Id.ToString(), reminderInput, async (input) =>
+            await _eventService.AddEvent(Miscellaneous.UnixTimeStampToDateTime(reminder.UnixTime), reminder.Id.ToString(), reminderInput, async (input) =>
             {
                 if (input is ReminderInput data)
                 {
@@ -60,40 +80,36 @@ public class ReminderService : IReminderService
 
         await Task.WhenAll(jobs);
 
-        _logger.LogInformation("Enqueued {count} of reminders to execute until {time}", reminders.Count, FetchingDate);
+        _logger.LogInformation("Enqueued {count} of reminders to execute until {time}", reminders.ReminderModels.Count, FetchingDate);
     }
 
-    public async Task<List<Models.Reminder>> GetUserRemindersAsync(ulong userId)
+    public async Task<IList<ReminderModel>> GetUserRemindersAsync(ulong userId)
     {
-        var reminders = await _reminderRepository.GetAllAsync();
-
-        return await reminders.Where(reminder => reminder.UserId == userId)
-                              .ToListAsync();
+        return (await _reminderClient.GetUserRemindersAsync(new ReminderUserInput() { UserId = userId })).ReminderModels;
     }
 
-    public async Task AddReminder(DateTime date, ulong userId, string message)
+    public async Task AddReminderAsync(DateTime date, ulong userId, string message)
     {
-        await AddReminder(date, await GetUser(userId), message);
+        await AddReminderAsync(date, await GetUser(userId), message);
     }
 
-    public async Task AddReminder(DateTime date, IUser user, string message)
+    public async Task AddReminderAsync(DateTime date, IUser user, string message)
     {
         date = date.ToUniversalTime();
-        Models.Reminder reminder = new()
+        ReminderModel reminder = new()
         {
             Message = message,
-            RemindDate = date,
+            UnixTime = Miscellaneous.DateTimeToUnixTimestamp(date),
             UserId = user.Id
         };
 
-        var result = await _reminderRepository.AddAsync(reminder);
-        await _reminderRepository.SaveChangesAsync();
+        reminder = await _reminderClient.AddReminderAsync(reminder);
 
-        if (!result) throw new Exception("Failed to create reminder");
+        if (reminder.Id == 0) throw new Exception("Failed to create reminder");
 
         ReminderInput reminderInput = new() { User = user, Message = reminder.Message };
 
-        _logger.LogInformation("Added reminder for [{user}] at [{date}] UTC", user.Username, reminder.RemindDate);
+        _logger.LogInformation("Added reminder for [{user}] at [{date}] UTC", user.Username, date);
 
         if (date < FetchingDate)
         {
@@ -108,25 +124,29 @@ public class ReminderService : IReminderService
         }
     }
 
-    public async Task RemoveReminder(Models.Reminder reminder)
+    public async Task RemoveReminderAsync(ReminderModel reminder)
     {
-        await _reminderRepository.RemoveAsync(reminder);
-        await _reminderRepository.SaveChangesAsync();
-        await _eventService.Remove(reminder.RemindDate, reminder.Id.ToString());
+        var result = await _reminderClient.RemoveReminderAsync(reminder);
+
+        if (result.IsSuccess) throw new Exception($"Failed to remove reminder {reminder.Id}");
+
+        await _eventService.Remove(Miscellaneous.UnixTimeStampToDateTime(reminder.UnixTime), reminder.Id.ToString());
     }
 
-    public async Task RemoveReminderRange(string[] ids)
+    public async Task RemoveReminderRangeAsync(string[] ids)
     {
+        if (ids.Length <= 0) return;
+
         int[] castedIds = ids.Select(int.Parse).ToArray();
-        await RemoveReminderRange(castedIds);
+        await RemoveReminderRangeAsync(castedIds);
     }
 
-    public async Task RemoveReminderRange(int[] ids)
+    public async Task RemoveReminderRangeAsync(int[] ids)
     {
-        if (!(ids.Length > 0)) return;
+        RemoveReminderRangeInput request = new();
+        request.Ids.AddRange(ids);
 
-        await _reminderRepository.RemoveRangeAsync(ids);
-        await _reminderRepository.SaveChangesAsync();
+        await _reminderClient.RemoveReminderRangeAsync(request);
     }
 
     private async Task StandardReminder(IUser user, string message)

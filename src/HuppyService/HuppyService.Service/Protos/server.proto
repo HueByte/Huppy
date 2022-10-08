@@ -19,7 +19,7 @@ message ServerIdInput {
 }
 
 message ServerModelCollection {
-    repeated database.models.ServerModel ServerModel= 1;
+    repeated database.models.ServerModel ServerModels = 1;
 }
 
 message GetOrCreateServerInput {

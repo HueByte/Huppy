@@ -46,7 +46,7 @@ public partial class CacheStorageService
 
         _cacheUsers = new(await userRepository.GetUsersForCacheAsync());
         _userAiUsage = aiUsage;
-        _registeredGuildsIds = (await serverService.GetAllAsync(new Empty())).ServerModel.Select(guild => guild.Id).ToHashSet();
+        _registeredGuildsIds = (await serverService.GetAllAsync(new Empty())).ServerModels.Select(guild => guild.Id).ToHashSet();
         _developerIds = appSettings.Developers!.Split(';').Where(sId => !string.IsNullOrEmpty(sId)).Select(sId => ulong.Parse(sId)).ToHashSet();
         PaginatorEntries = new();
 

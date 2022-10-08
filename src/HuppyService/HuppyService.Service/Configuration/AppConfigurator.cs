@@ -33,10 +33,14 @@ namespace HuppyService.Service.Configuration
 
         public void MapGrpcServices()
         {
-            _app?.MapGrpcService<GreeterService>();
-            _app?.MapGrpcService<GPTService>();
-            _app?.MapGrpcService<CommandLogService>();
-            _app?.MapGrpcService<ServerService>();
+            if (_app is not null)
+            {
+                _app.MapGrpcService<GreeterService>();
+                _app.MapGrpcService<GPTService>();
+                _app.MapGrpcService<CommandLogService>();
+                _app.MapGrpcService<ServerService>();
+                _app.MapGrpcService<ReminderService>();
+            }
         }
     }
 }
