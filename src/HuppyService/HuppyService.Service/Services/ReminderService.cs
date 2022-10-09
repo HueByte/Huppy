@@ -2,6 +2,7 @@
 using HuppyService.Core.Interfaces.IRepositories;
 using HuppyService.Core.Models;
 using HuppyService.Core.Utilities;
+using HuppyService.Infrastructure.Repositories;
 using HuppyService.Service.Protos;
 using HuppyService.Service.Protos.Models;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +17,28 @@ namespace HuppyService.Service.Services
         {
             _reminderRepository = reminderRepository;
             _logger = logger;
+        }
+
+        public override async Task<ReminderModelCollection> GetSortedUserReminders(SortedUserRemindersInput request, ServerCallContext context)
+        {
+            var query = await _reminderRepository.GetAllAsync();
+            var reminders = await query
+                .Where(reminder => reminder.UserId == request.UserId)
+                .OrderBy(e => e.RemindDate)
+                .Skip(request.Skip)
+                .Take(request.Take)
+                .ToListAsync();
+
+            ReminderModelCollection? result = new();
+            result.ReminderModels.AddRange(reminders.Select(reminder => new ReminderModel
+            {
+                Id = reminder.Id,
+                Message = reminder.Message,
+                UserId = reminder.UserId,
+                UnixTime = Miscellaneous.DateTimeToUnixTimeStamp(reminder.RemindDate)
+            }).ToList());
+
+            return result;
         }
 
         public override async Task<GetReminderCountResponse> GetRemindersCount(GetReminderCountInput request, ServerCallContext context)
@@ -55,21 +78,7 @@ namespace HuppyService.Service.Services
 
             if (!result) throw new Exception("Failed to create reminder");
 
-            //ReminderInput reminderInput = new() { User = user, Message = reminder.Message };
-
             _logger.LogInformation("Added reminder for [{user}] at [{date}] UTC", request.UserId, reminder.RemindDate);
-
-            //if (date < FetchingDate)
-            //{
-            //    await _eventService.AddEvent(date, reminder.Id.ToString()!, reminderInput, async (input) =>
-            //    {
-            //        if (input is ReminderInput data)
-            //        {
-            //            data.Message ??= "";
-            //            await StandardReminder(data.User, data.Message);
-            //        }
-            //    });
-            //}
 
             return new ReminderModel() { Id = reminder.Id, Message = reminder.Message, UnixTime = request.UnixTime, UserId = reminder.UserId };
         }
@@ -88,7 +97,7 @@ namespace HuppyService.Service.Services
                 .Where(reminder => remindDateStart < remindDateEnd)
                 .ToListAsync();
 
-            if (!reminders.Any()) return null;
+            if (!reminders.Any()) return new();
 
             ReminderModelCollection? result = new();
             result.ReminderModels.AddRange(reminders.Select(reminder => new ReminderModel

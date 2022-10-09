@@ -2,14 +2,11 @@ using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Huppy.Core.Entities;
-using Huppy.Core.Interfaces.IRepositories;
 using Huppy.Core.Interfaces.IServices;
 using Huppy.Core.Utilities;
 using Huppy.Kernel.Constants;
 using HuppyService.Service.Protos;
 using HuppyService.Service.Protos.Models;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Logging;
 
 namespace Huppy.Core.Services.Reminder;
