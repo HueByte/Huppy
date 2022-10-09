@@ -12,8 +12,6 @@ using Microsoft.Extensions.Logging;
 
 namespace Huppy.Core.Services.Reminder;
 
-// public record ReminderInput(IUser User, string Message);
-
 public class ReminderService : IReminderService
 {
     private readonly ILogger _logger;

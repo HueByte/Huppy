@@ -87,7 +87,6 @@ namespace HuppyService.Service.Services
         {
             _logger.LogInformation("Registering fresh bulk of reminders");
 
-            // fetch reminders between dates
             var remindDateEnd = Miscellaneous.UnixTimeStampToUtcDateTime(request.EndDate);
 
             var remindersQueryable = await _reminderRepository.GetAllAsync();
@@ -108,28 +107,6 @@ namespace HuppyService.Service.Services
             }).ToList());
 
             return result;
-
-            // on client side?
-            // start adding reminder in async parallel manner
-            //var jobs = reminders.Select(reminder => Task.Run(async () =>
-            //{
-            //    // fetch user
-            //    var user = await GetUser(reminder.UserId);
-
-            //    // add reminder
-            //    ReminderInput reminderInput = new() { User = user, Message = reminder.Message };
-            //    await _eventService.AddEvent(reminder.RemindDate, reminder.Id.ToString(), reminderInput, async (input) =>
-            //    {
-            //        if (input is ReminderInput data)
-            //        {
-            //            await StandardReminder(data.User, data.Message!);
-            //        }
-            //    });
-            //})).ToList();
-
-            //await Task.WhenAll(jobs);
-
-            //_logger.LogInformation("Enqueued {count} of reminders to execute until {time}", reminders.Count, FetchingDate);
         }
 
         public override async Task<ReminderModelCollection> GetUserReminders(ReminderUserInput request, ServerCallContext context)
@@ -162,7 +139,6 @@ namespace HuppyService.Service.Services
 
             await _reminderRepository.RemoveAsync(reminder);
             await _reminderRepository.SaveChangesAsync();
-            //await _eventService.Remove(reminder.RemindDate, reminder.Id.ToString());
 
             return new CommonResponse() { IsSuccess = true };
         }
@@ -176,22 +152,5 @@ namespace HuppyService.Service.Services
 
             return new CommonResponse() { IsSuccess = true };
         }
-
-        //public override async Task<CommonResponse> RemoveReminderRangeString(RemoveReminderRangeInputString request, ServerCallContext context)
-        //{
-        //    if (!(request.Ids.Count > 0)) return new CommonResponse() {  IsSuccess = true};
-
-        //    //await _reminderRepository.RemoveRangeAsync(ids);
-        //    if (request.Ids is null) return new CommonResponse() { IsSuccess = true };
-
-        //    var remindersQuery = await _reminderRepository.RemoveRangeAsync(request.Ids);
-        //    var reminders = await _context.Reminders
-        //        .Where(reminder => reminderIds.Contains(reminder.Id))
-        //        .ToListAsync();
-
-        //    _context.Reminders.RemoveRange(reminders);
-        //    await _context.SaveChangesAsync();
-        //    await _reminderRepository.SaveChangesAsync();
-        //}
     }
 }
