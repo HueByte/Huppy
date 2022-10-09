@@ -19,7 +19,7 @@ public class ReminderService : IReminderService
     private readonly IEventLoopService _eventService;
     private readonly InteractionService _interactionService;
     private DateTime FetchingDate => DateTime.UtcNow + FetchReminderFrequency;
-    public TimeSpan FetchReminderFrequency { get; } = new(1, 0, 0);
+    public TimeSpan FetchReminderFrequency { get; } = new(0, 0, 30);
     private readonly ReminderProto.ReminderProtoClient _reminderClient;
     public ReminderService(IEventLoopService eventService, ILogger<ReminderService> logger, DiscordShardedClient discord, InteractionService interactionService, ITimedEventsService timedEventsService, ReminderProto.ReminderProtoClient reminderClient)
     {
@@ -50,7 +50,6 @@ public class ReminderService : IReminderService
     {
         var reminders = await _reminderClient.GetReminderBatchAsync(new ReminderBatchInput()
         {
-            StartDate = Miscellaneous.DateTimeToUnixTimestamp(DateTime.UtcNow),
             EndDate = Miscellaneous.DateTimeToUnixTimestamp(DateTime.UtcNow + FetchReminderFrequency)
         });
 

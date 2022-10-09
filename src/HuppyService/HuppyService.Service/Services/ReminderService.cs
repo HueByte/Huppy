@@ -88,13 +88,13 @@ namespace HuppyService.Service.Services
             _logger.LogInformation("Registering fresh bulk of reminders");
 
             // fetch reminders between dates
-            var remindDateStart = Miscellaneous.UnixTimeStampToDateTime(request.StartDate);
+            //var remindDateStart = Miscellaneous.UnixTimeStampToDateTime(request.StartDate);
             var remindDateEnd = Miscellaneous.UnixTimeStampToDateTime(request.EndDate);
 
             var remindersQueryable = await _reminderRepository.GetAllAsync();
 
             var reminders = await remindersQueryable
-                .Where(reminder => remindDateStart < remindDateEnd)
+                .Where(reminder => reminder.RemindDate < remindDateEnd)
                 .ToListAsync();
 
             if (!reminders.Any()) return new();

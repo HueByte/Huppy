@@ -37,8 +37,7 @@ message GetReminderInput {
 }
 
 message ReminderBatchInput {
-	uint64 StartDate = 1;
-	uint64 EndDate = 2;
+	uint64 EndDate = 1;
 }
 
 message ReminderUserInput {
