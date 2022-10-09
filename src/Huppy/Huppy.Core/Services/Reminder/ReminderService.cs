@@ -19,10 +19,10 @@ public class ReminderService : IReminderService
     private readonly ILogger _logger;
     private readonly IEventLoopService _eventService;
     private readonly InteractionService _interactionService;
-    private DateTime FetchingDate => DateTime.UtcNow + FetchReminderFrequency;
-    public TimeSpan FetchReminderFrequency { get; } = new(0, 0, 30);
     private readonly ReminderProto.ReminderProtoClient _reminderClient;
     private readonly CacheStorageService _cacheStorage;
+    private DateTime FetchingDate => DateTime.UtcNow + FetchReminderFrequency;
+    public TimeSpan FetchReminderFrequency { get; } = new(0, 0, 30);
     public ReminderService(IEventLoopService eventService, ILogger<ReminderService> logger, DiscordShardedClient discord, InteractionService interactionService, ITimedEventsService timedEventsService, ReminderProto.ReminderProtoClient reminderClient, CacheStorageService cacheStorage)
     {
         _eventService = eventService;
@@ -113,10 +113,9 @@ public class ReminderService : IReminderService
 
         _logger.LogInformation("Added reminder for [{user}] at [{date}] UTC", user.Username, date);
 
-        // date - error margin
+        // with error margin
         if (date < _cacheStorage.NextReminderFetchingDate - new TimeSpan(0, 0, 5))
         {
-            _logger.LogInformation("Adding reminder before refresh");
             await _eventService.AddEvent(date, reminder.Id.ToString()!, reminderInput, async (input) =>
             {
                 if (input is ReminderInput data)
