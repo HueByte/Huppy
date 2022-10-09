@@ -65,7 +65,7 @@ namespace HuppyService.Service.Services
 
         public override async Task<ReminderModel> AddReminder(ReminderModel request, ServerCallContext context)
         {
-            var reminderDate = Miscellaneous.UnixTimeStampToDateTime(request.UnixTime).ToUniversalTime();
+            var reminderDate = Miscellaneous.UnixTimeStampToUtcDateTime(request.UnixTime).ToUniversalTime();
             Reminder reminder = new()
             {
                 Message = request.Message,
@@ -88,8 +88,7 @@ namespace HuppyService.Service.Services
             _logger.LogInformation("Registering fresh bulk of reminders");
 
             // fetch reminders between dates
-            //var remindDateStart = Miscellaneous.UnixTimeStampToDateTime(request.StartDate);
-            var remindDateEnd = Miscellaneous.UnixTimeStampToDateTime(request.EndDate);
+            var remindDateEnd = Miscellaneous.UnixTimeStampToUtcDateTime(request.EndDate);
 
             var remindersQueryable = await _reminderRepository.GetAllAsync();
 
@@ -157,7 +156,7 @@ namespace HuppyService.Service.Services
             Reminder reminder = new()
             {
                 Message = request.Message,
-                RemindDate = Miscellaneous.UnixTimeStampToDateTime(request.UnixTime),
+                RemindDate = Miscellaneous.UnixTimeStampToUtcDateTime(request.UnixTime),
                 UserId = request.UserId
             };
 

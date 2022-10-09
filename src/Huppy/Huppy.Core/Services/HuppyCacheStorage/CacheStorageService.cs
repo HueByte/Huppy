@@ -29,6 +29,9 @@ public partial class CacheStorageService
 
     public OrderedDictionary PaginatorEntries { get; private set; } = null!;
 
+    public DateTime NextReminderFetchingDate => _nextReminderFetchingDate;
+    private DateTime _nextReminderFetchingDate = default;
+
     public CacheStorageService(IServiceScopeFactory serviceScopeFactory)
     {
         _serviceFactory = serviceScopeFactory;
@@ -49,6 +52,7 @@ public partial class CacheStorageService
         _registeredGuildsIds = (await serverService.GetAllAsync(new Empty())).ServerModels.Select(guild => guild.Id).ToHashSet();
         _developerIds = appSettings.Developers!.Split(';').Where(sId => !string.IsNullOrEmpty(sId)).Select(sId => ulong.Parse(sId)).ToHashSet();
         PaginatorEntries = new();
+        _nextReminderFetchingDate = DateTime.UtcNow;
 
         // TODO: configurable in appsettings
         SetMaxMessageCacheSize(MessageCacheSize);

@@ -9,7 +9,7 @@ namespace HuppyService.Core.Utilities
 {
     public static class Miscellaneous
     {
-        public static DateTime UnixTimeStampToDateTime(ulong unixTimeStamp)
+        public static DateTime UnixTimeStampToUtcDateTime(ulong unixTimeStamp)
         {
             // Unix timestamp is seconds past epoch
             DateTime dateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
