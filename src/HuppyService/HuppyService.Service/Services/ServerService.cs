@@ -17,7 +17,7 @@ namespace HuppyService.Service.Services
             _serverRepository = serverRepository;
         }
 
-        public override async Task<ServerModel> Get(ServerIdInput request, ServerCallContext context)
+        public override async Task<ServerModel> Get(Protos.ServerId request, ServerCallContext context)
         {
             var server = await _serverRepository.GetAsync(request.Id);
             
@@ -37,7 +37,7 @@ namespace HuppyService.Service.Services
             };
         }
 
-        public override async Task<ServerModelCollection> GetAll(Empty request, ServerCallContext context)
+        public override async Task<ServerModelCollection> GetAll(Protos.Void request, ServerCallContext context)
         {
             var query = await _serverRepository.GetAllAsync();
             var servers = await query.Include(e => e.Rooms).ToListAsync();

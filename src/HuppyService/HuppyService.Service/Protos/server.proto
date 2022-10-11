@@ -2,20 +2,16 @@ syntax = "proto3";
 
 option csharp_namespace = "HuppyService.Service.Protos";
 
-import "google/protobuf/empty.proto";
 import "Protos/database.proto";
+import "Protos/shared.proto";
 
 package ServerProto;
 
 service ServerProto {
-    rpc Get(ServerIdInput) returns (database.models.ServerModel);
+    rpc Get(shared.ServerId) returns (database.models.ServerModel);
     rpc GetOrCreate(GetOrCreateServerInput) returns (database.models.ServerModel);
-    rpc Update(database.models.ServerModel) returns(database.models.CommonResponse);
-    rpc GetAll(google.protobuf.Empty) returns (ServerModelCollection);
-}
-
-message ServerIdInput {
-    uint64 Id = 1;
+    rpc Update(database.models.ServerModel) returns(shared.CommonResponse);
+    rpc GetAll(shared.Void) returns (ServerModelCollection);
 }
 
 message ServerModelCollection {

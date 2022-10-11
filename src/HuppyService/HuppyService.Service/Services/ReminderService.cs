@@ -41,10 +41,10 @@ namespace HuppyService.Service.Services
             return result;
         }
 
-        public override async Task<GetReminderCountResponse> GetRemindersCount(GetReminderCountInput request, ServerCallContext context)
+        public override async Task<Protos.Int32> GetRemindersCount(Protos.UserId request, ServerCallContext context)
         {
             var query = await _reminderRepository.GetAllAsync();
-            return new GetReminderCountResponse() { Count = await query.Where(e => e.UserId == request.UserId).CountAsync() };
+            return new Protos.Int32 () { Number = await query.Where(e => e.UserId == request.Id).CountAsync() };
         }
 
         public override async Task<ReminderModel?> GetReminder(GetReminderInput request, ServerCallContext context)
@@ -109,11 +109,11 @@ namespace HuppyService.Service.Services
             return result;
         }
 
-        public override async Task<ReminderModelCollection> GetUserReminders(ReminderUserInput request, ServerCallContext context)
+        public override async Task<ReminderModelCollection> GetUserReminders(Protos.UserId request, ServerCallContext context)
         {
             var remindersQuery = await _reminderRepository.GetAllAsync();
 
-            var reminders = await remindersQuery.Where(reminder => reminder.UserId == request.UserId)
+            var reminders = await remindersQuery.Where(reminder => reminder.UserId == request.Id)
                                   .ToListAsync();
 
             ReminderModelCollection result = new();

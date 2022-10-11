@@ -1,5 +1,7 @@
-﻿using Google.Protobuf.WellKnownTypes;
+﻿using System.Security.Authentication.ExtendedProtection;
+using Google.Protobuf.WellKnownTypes;
 using Huppy.Core.Interfaces.IServices;
+using HuppyService.Service;
 using HuppyService.Service.Protos.Models;
 
 namespace Huppy.Core.Services.CommandLog
@@ -22,23 +24,23 @@ namespace Huppy.Core.Services.CommandLog
         public async Task<IDictionary<ulong, int>> GetAiUsage()
         {
             // implement single instance of empty?
-            var result = await _commandLogClient.GetAiUsageAsync(new Empty());
+            var result = await _commandLogClient.GetAiUsageAsync(new HuppyService.Service.Protos.Void());
 
             return result.AiUsers;
         }
 
         public async Task<double> GetAverageExecutionTime()
         {
-            var result = await _commandLogClient.GetAverageExecutionTimeAsync(new Empty());
+            var result = await _commandLogClient.GetAverageExecutionTimeAsync(new HuppyService.Service.Protos.Void());
 
             return result.AverageTime;
         }
 
         public async Task<int> GetCount()
         {
-            var result = await _commandLogClient.GetCountAsync(new Empty());
+            var result = await _commandLogClient.GetCountAsync(new HuppyService.Service.Protos.Void());
 
-            return result.Count;
+            return result.Number;
         }
 
         public async Task<bool> RemoveCommand(CommandLogModel commandLog)

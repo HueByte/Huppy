@@ -2,21 +2,17 @@ syntax = "proto3";
 
 option csharp_namespace = "HuppyService.Service.Protos";
 
-import "google/protobuf/empty.proto";
 import "Protos/database.proto"; 
+import "Protos/shared.proto";
 
 package CommandLogProto;
 
 service CommandLogProto {
-    rpc GetCount(google.protobuf.Empty) returns (CommandLogCount);
-	rpc GetAverageExecutionTime(google.protobuf.Empty) returns (AverageTimeResponse);
-    rpc GetAiUsage(google.protobuf.Empty) returns (AiUsageResponse);
+    rpc GetCount(shared.Void) returns (shared.Int32);
+	rpc GetAverageExecutionTime(shared.Void) returns (AverageTimeResponse);
+    rpc GetAiUsage(shared.Void) returns (AiUsageResponse);
     rpc AddCommand(database.models.CommandLogModel) returns (database.models.CommandLogModel);
-    rpc RemoveCommand(database.models.CommandLogModel) returns (database.models.CommonResponse);
-}
-
-message CommandLogCount {
-    int32 Count = 1;
+    rpc RemoveCommand(database.models.CommandLogModel) returns (shared.CommonResponse);
 }
 
 message AverageTimeResponse {

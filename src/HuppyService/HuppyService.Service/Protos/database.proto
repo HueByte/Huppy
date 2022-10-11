@@ -33,10 +33,6 @@ message ServerRoomsModel {
     uint64 ServerId = 4;
 }
 
-message CommonResponse {
-    bool IsSuccess = 1;
-}
-
 message ReminderModel {
     int32 Id = 1;
     uint64 UnixTime = 2;

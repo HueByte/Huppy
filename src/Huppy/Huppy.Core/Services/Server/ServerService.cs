@@ -15,13 +15,13 @@ namespace Huppy.Core.Services.Server
 
         public async Task<ServerModelCollection> GetAllAsync(Empty empty)
         {
-            var result = await _serverClient.GetAllAsync(new Empty());
+            var result = await _serverClient.GetAllAsync(new HuppyService.Service.Protos.Void());
             return result;
         }
 
         public async Task<ServerModel> GetAsync(ulong serverId)
         {
-            var result = await _serverClient.GetAsync(new ServerIdInput() { Id = serverId });
+            var result = await _serverClient.GetAsync(new HuppyService.Service.Protos.ServerId() { Id = serverId });
             return result;
         }
 
@@ -40,7 +40,7 @@ namespace Huppy.Core.Services.Server
         public async Task<CommonResponse> UpdateAsync(ServerModel server)
         {
             var updateResult = await _serverClient.UpdateAsync(server);
-            
+
             return updateResult;
         }
     }

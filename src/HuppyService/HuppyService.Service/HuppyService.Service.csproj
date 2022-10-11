@@ -8,6 +8,8 @@
 
   <ItemGroup>
     <None Remove="Protos\reminder.proto" />
+    <None Remove="Protos\shared.proto" />
+    <None Remove="Protos\ticket.proto" />
   </ItemGroup>
 
   <ItemGroup>
@@ -17,6 +19,8 @@
     <Protobuf Include="Protos\database.proto" GrpcServices="Server" />
     <Protobuf Include="Protos\reminder.proto" GrpcServices="Server" />
     <Protobuf Include="Protos\server.proto" GrpcServices="Server" />
+    <Protobuf Include="Protos\shared.proto" GrpcServices="Server" />
+    <Protobuf Include="Protos\ticket.proto" GrpcServices="Server" />
   </ItemGroup>
 
   <ItemGroup>

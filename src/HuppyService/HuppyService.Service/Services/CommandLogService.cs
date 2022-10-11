@@ -16,15 +16,15 @@ namespace HuppyService.Service.Services
             _commandLogRepository = commandLogRepository;
         }
 
-        public override async Task<CommandLogCount> GetCount(Empty request, ServerCallContext context)
+        public override async Task<Protos.Int32> GetCount(Protos.Void request, ServerCallContext context)
         {
             var query = await _commandLogRepository.GetAllAsync();
             var count = await query.CountAsync();
 
-            return new CommandLogCount() { Count = count };
+            return new Protos.Int32() { Number = count };
         }
 
-        public override async Task<AiUsageResponse> GetAiUsage(Empty request, ServerCallContext context)
+        public override async Task<AiUsageResponse> GetAiUsage(Protos.Void request, ServerCallContext context)
         {
             Dictionary<ulong, int> result = new();
 
@@ -46,7 +46,7 @@ namespace HuppyService.Service.Services
             return response;
         }
 
-        public override async Task<AverageTimeResponse> GetAverageExecutionTime(Empty request, ServerCallContext context)
+        public override async Task<AverageTimeResponse> GetAverageExecutionTime(Protos.Void request, ServerCallContext context)
         {
             var query = await _commandLogRepository.GetAllAsync();
             var avgTime = await query.AverageAsync(e => e.ExecutionTimeMs);

@@ -38,8 +38,8 @@ public class ReminderService : IReminderService
 
     public async Task<int> GetRemindersCount(ulong userId)
     {
-        var result = await _reminderClient.GetRemindersCountAsync(new GetReminderCountInput() { UserId = userId });
-        return result.Count;
+        var result = await _reminderClient.GetRemindersCountAsync(new HuppyService.Service.Protos.UserId() { Id = userId });
+        return result.Number;
     }
 
     public async Task<ReminderModel> GetReminderAsync(ulong userId, int reminderId)
@@ -85,7 +85,7 @@ public class ReminderService : IReminderService
 
     public async Task<IList<ReminderModel>> GetUserRemindersAsync(ulong userId)
     {
-        return (await _reminderClient.GetUserRemindersAsync(new() { UserId = userId })).ReminderModels;
+        return (await _reminderClient.GetUserRemindersAsync(new HuppyService.Service.Protos.UserId() { Id = userId })).ReminderModels;
     }
 
     public async Task AddReminderAsync(DateTime date, ulong userId, string message)
