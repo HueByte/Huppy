@@ -151,6 +151,7 @@ namespace HuppyService.Service.Services
             };
 
             await _serverRepository.UpdateAsync(server);
+            await _serverRepository.SaveChangesAsync();
             return new CommonResponse() { IsSuccess = true };
         }
     }

@@ -98,7 +98,7 @@ public class ServerCommands : InteractionModuleBase<ExtendedShardedInteractionCo
 
     [SlashCommand("configure", "Configure Huppy for your server")]
     [RequireUserPermission(GuildPermission.Administrator)]
-    public async Task ConfigureHuppy(bool? UseGreet = null, string? GreetingMessage = null, IRole? DefaultRole = null, bool? EnableNews = false, SocketGuildChannel? HuppyRoom = null, SocketGuildChannel? NewsRoom = null, SocketGuildChannel? GreetingRoom = null)
+    public async Task ConfigureHuppy(bool? UseGreet = null, string? GreetingMessage = null, IRole? DefaultRole = null, SocketGuildChannel? HuppyRoom = null, SocketGuildChannel? GreetingRoom = null)
     {
         var server = await _serverService.GetOrCreateAsync(Context.Guild.Id, Context.Guild.Name, Context.Guild.DefaultChannel.Id);
 
