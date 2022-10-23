@@ -20,4 +20,8 @@ message Int32 {
     int32 Number = 1;
 }
 
+message StringId {
+    string Id = 1;
+}
+
 message Void { }

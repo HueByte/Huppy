@@ -15,13 +15,9 @@ service TicketProto {
     rpc GetUserPaginatedTickets(GetUserPaginatedTicketsInput) returns (TicketModelCollection);
     rpc GetTicket(GetTicketInput) returns (database.models.TicketModel);
     rpc AddTicket(AddTicketInput) returns (database.models.TicketModel);
-    rpc RemoveTicketAsync(TicketRemoveInput) returns (shared.CommonResponse);
+    rpc RemoveTicketAsync(shared.StringId) returns (shared.CommonResponse);
     rpc UpdateTicketAsync(TicketUpdateInput) returns (shared.CommonResponse);
     rpc CloseTicket(CloseTicketInput) returns (shared.CommonResponse);
-}
-
-message TicketRemoveInput {
-    string TicketId = 1;
 }
 
 message TicketUpdateInput {
