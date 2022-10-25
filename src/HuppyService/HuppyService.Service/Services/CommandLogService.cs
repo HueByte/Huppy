@@ -1,6 +1,7 @@
 ﻿using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using HuppyService.Core.Interfaces.IRepositories;
+using HuppyService.Core.Models;
 using HuppyService.Core.Utilities;
 using HuppyService.Service.Protos;
 using HuppyService.Service.Protos.Models;
@@ -56,6 +57,8 @@ namespace HuppyService.Service.Services
 
         public override async Task<CommandLogModel> AddCommand(CommandLogModel request, ServerCallContext context)
         {
+            var test = ReflectionMapper.Map<CommandLogModel, CommandLog>(request);
+            //ReflectionMapper
             Core.Models.CommandLog commandLog = new()
             {
                 ChannelId = request.ChannelId,

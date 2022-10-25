@@ -41,7 +41,7 @@ message ReminderModel {
 }
 
 message TicketModel {
-    int32 Id = 1;
+    string Id = 1;
     string Topic = 2;
     string Description = 3;
     bool IsClosed = 4;
