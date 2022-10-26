@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Huppy.Infrastructure
 {
+    [Obsolete]
     public class HuppyDbContext : DbContext
     {
         public HuppyDbContext() { }
