@@ -31,7 +31,7 @@ namespace Huppy.App.Middlewares
             CommandLogModel log = new()
             {
                 CommandName = commandInfo.ToString(),
-                UnixTime = Miscellaneous.DateTimeToUnixTimestamp(DateTime.UtcNow),
+                Date = Miscellaneous.DateTimeToUnixTimestamp(DateTime.UtcNow),
                 IsSuccess = result.IsSuccess,
                 UserId = context.User.Id,
                 ExecutionTimeMs = watch.ElapsedMilliseconds,

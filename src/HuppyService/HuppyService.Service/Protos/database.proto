@@ -7,7 +7,7 @@ package database.models;
 message CommandLogModel {
     int32 Id = 1;
     string CommandName = 2;
-    uint64 UnixTime = 3;
+    uint64 Date = 3;
     bool IsSuccess = 4;
     uint64 UserId = 5;
     int64 ExecutionTimeMs = 6;

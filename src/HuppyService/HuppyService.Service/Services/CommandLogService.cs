@@ -57,14 +57,14 @@ namespace HuppyService.Service.Services
 
         public override async Task<CommandLogModel> AddCommand(CommandLogModel request, ServerCallContext context)
         {
-            var test = ReflectionMapper.Map<CommandLogModel, CommandLog>(request);
-            //ReflectionMapper
+            var q = ReflectionMapper.Map<CommandLog>(request);
+
             Core.Models.CommandLog commandLog = new()
             {
                 ChannelId = request.ChannelId,
                 UserId = request.UserId,
                 CommandName = request.CommandName,
-                Date = Miscellaneous.UnixTimeStampToUtcDateTime(request.UnixTime),
+                Date = Miscellaneous.UnixTimeStampToUtcDateTime(request.Date),
                 ErrorMessage = request.ErrorMessage,
                 ExecutionTimeMs = request.ExecutionTimeMs,
                 GuildId = request.GuildId,
@@ -90,7 +90,7 @@ namespace HuppyService.Service.Services
                 ChannelId = request.ChannelId,
                 UserId = request.UserId,
                 CommandName = request.CommandName,
-                Date = Miscellaneous.UnixTimeStampToUtcDateTime(request.UnixTime),
+                Date = Miscellaneous.UnixTimeStampToUtcDateTime(request.Date),
                 ErrorMessage = request.ErrorMessage,
                 ExecutionTimeMs = request.ExecutionTimeMs,
                 GuildId = request.GuildId,

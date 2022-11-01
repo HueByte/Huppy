@@ -10,68 +10,48 @@ namespace HuppyService.Core.Utilities
 {
     public static class ReflectionMapper
     {
-        public static D? Map<T, D>(T input) 
-            where T : class
-            where D : class, new()
+        public static T Map<T>(object input) where T : class, new()
         {
-            //var type1 = typeof(T);
-            //var type2 = typeof(D);
+            T result = new();
 
-            // create instance of D
-            D result = new();
+            var tProps = result.GetType().GetProperties();
+            var inputProps = input.GetType().GetProperties();
 
-            // get props of D
-            var propsOfD = typeof(D).GetProperties();
-
-            // get props of T
-            var propsOfT = input.GetType().GetProperties();
-
-            // map props to each other via names
-            foreach (var tProp in propsOfT)
+            foreach (var prop in tProps)
             {
-                MappableToAttribute? attributeInfo = tProp.GetCustomAttribute(typeof(MappableToAttribute)) as MappableToAttribute;
-                //string searchName = attributeInfo is not null ? attributeInfo.AlternativeName : tProp.Name;
+                var matchingProp = inputProps.FirstOrDefault(iprop => iprop.Name == prop.Name);
+                if (matchingProp is null)
+                    continue;
+                
+                var inputPropInstance = matchingProp.GetValue(input, null);
 
-                // get instance of D prop 
-                PropertyInfo propInfo;
-                if (attributeInfo != null)
-                    propInfo = propsOfD.First(prop => prop.Name == tProp.Name || prop.Name == attributeInfo.AlternativeName);
-                else
-                    propInfo = propsOfD.First(prop => prop.Name == tProp.Name);
+                Console.WriteLine($"Setting {prop.PropertyType} from {inputPropInstance?.GetType()}");
 
-                //PropertyInfo propInfo = propsOfD.First(prop => prop.Name == searchName);
-                var propInstance = propInfo.GetValue(result, null);
-
-                propInfo.SetValue(result, GetFinalProperty(attributeInfo, propInstance));
+                prop.SetValue(result, GetMappedValue(prop.PropertyType, inputPropInstance));
             }
 
             return result;
         }
 
-        public static object? GetFinalProperty(MappableToAttribute? attributeInfo, object? instance)
+        public static object? GetMappedValue(Type newValue, object inputValue)
         {
-            // get Mappable attribute
-            //MappableToAttribute? attributeInfo = propInfo.GetCustomAttribute(typeof(MappableToAttribute)) as MappableToAttribute;
+            if (inputValue is null) return default;
 
-            // get instance of value
-            //var value = propInfo.GetValue(instance, null);
-            
-            // perform custom mappings
-            if (attributeInfo is not null)
+            switch (inputValue)
             {
-                if (instance is DateTime dateValue && attributeInfo.MappableTo == typeof(ulong))
-                {
-                    return Miscellaneous.DateTimeToUnixTimeStamp(dateValue);
-                }
-                else if (instance is ulong ulongValue && attributeInfo.MappableTo == typeof(DateTime))
-                {
-                    return Miscellaneous.UnixTimeStampToUtcDateTime(ulongValue);
-                }
+                case DateTime:
+                    if (newValue == typeof(ulong))
+                        return Miscellaneous.DateTimeToUnixTimeStamp((DateTime)inputValue);
+                    break;
+                case ulong:
+                    if (newValue == typeof(DateTime))
+                        return Miscellaneous.UnixTimeStampToUtcDateTime((ulong)inputValue);
+                    break;
+                default:
+                    return inputValue;
+            };
 
-                return instance;
-            }
-
-            return instance;
+            return inputValue;
         }
     }
 }
