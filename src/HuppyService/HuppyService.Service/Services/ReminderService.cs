@@ -35,7 +35,7 @@ namespace HuppyService.Service.Services
                 Id = reminder.Id,
                 Message = reminder.Message,
                 UserId = reminder.UserId,
-                UnixTime = Miscellaneous.DateTimeToUnixTimeStamp(reminder.RemindDate)
+                RemindDate = Miscellaneous.DateTimeToUnixTimeStamp(reminder.RemindDate)
             }).ToList());
 
             return result;
@@ -58,14 +58,14 @@ namespace HuppyService.Service.Services
             {
                 Id = reminder.Id,
                 Message = reminder.Message,
-                UnixTime = Miscellaneous.DateTimeToUnixTimeStamp(reminder.RemindDate),
+                RemindDate = Miscellaneous.DateTimeToUnixTimeStamp(reminder.RemindDate),
                 UserId = reminder.UserId
             };
         }
 
         public override async Task<ReminderModel> AddReminder(ReminderModel request, ServerCallContext context)
         {
-            var reminderDate = Miscellaneous.UnixTimeStampToUtcDateTime(request.UnixTime).ToUniversalTime();
+            var reminderDate = Miscellaneous.UnixTimeStampToUtcDateTime(request.RemindDate).ToUniversalTime();
             Reminder reminder = new()
             {
                 Message = request.Message,
@@ -80,7 +80,7 @@ namespace HuppyService.Service.Services
 
             _logger.LogInformation("Added reminder for [{user}] at [{date}] UTC", request.UserId, reminder.RemindDate);
 
-            return new ReminderModel() { Id = reminder.Id, Message = reminder.Message, UnixTime = request.UnixTime, UserId = reminder.UserId };
+            return new ReminderModel() { Id = reminder.Id, Message = reminder.Message, RemindDate = request.RemindDate, UserId = reminder.UserId };
         }
 
         public override async Task<ReminderModelCollection?> GetReminderBatch(ReminderBatchInput request, ServerCallContext context)
@@ -103,7 +103,7 @@ namespace HuppyService.Service.Services
                 Id = reminder.Id,
                 Message = reminder.Message,
                 UserId = reminder.UserId,
-                UnixTime = Miscellaneous.DateTimeToUnixTimeStamp(reminder.RemindDate)
+                RemindDate = Miscellaneous.DateTimeToUnixTimeStamp(reminder.RemindDate)
             }).ToList());
 
             return result;
@@ -122,7 +122,7 @@ namespace HuppyService.Service.Services
                 Id = reminder.Id,
                 Message = reminder.Message,
                 UserId = reminder.UserId,
-                UnixTime = Miscellaneous.DateTimeToUnixTimeStamp(reminder.RemindDate)
+                RemindDate = Miscellaneous.DateTimeToUnixTimeStamp(reminder.RemindDate)
             }));
 
             return result;
@@ -133,7 +133,7 @@ namespace HuppyService.Service.Services
             Reminder reminder = new()
             {
                 Message = request.Message,
-                RemindDate = Miscellaneous.UnixTimeStampToUtcDateTime(request.UnixTime),
+                RemindDate = Miscellaneous.UnixTimeStampToUtcDateTime(request.RemindDate),
                 UserId = request.UserId
             };
 

@@ -8,6 +8,7 @@ using HuppyService.Service.Protos.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using System.Net.Sockets;
+using System.Reflection.Metadata.Ecma335;
 
 namespace HuppyService.Service.Services
 {
@@ -23,32 +24,41 @@ namespace HuppyService.Service.Services
         {
             if (string.IsNullOrEmpty(request.Description)) throw new ArgumentException("Ticket description cannot be null");
 
-            Ticket ticket = new()
-            {
-                Id = Guid.NewGuid().ToString(),
-                Topic = request.Topic,
-                Description = request.Description,
-                CreatedDate = DateTime.UtcNow,
-                TicketAnswer = null,
-                ClosedDate = null,
-                IsClosed = false,
-                UserId = request.UserId,
-            };
+            var ticket = ReflectionMapper.Map<Ticket>(request);
+
+            ticket.Id = Guid.NewGuid().ToString();
+            ticket.CreatedDate = DateTime.UtcNow;
+            ticket.TicketAnswer = null;
+            ticket.IsClosed = false;
+            ticket.ClosedDate = null;
+
+            //Ticket ticket = new()
+            //{
+            //    Id = Guid.NewGuid().ToString(),
+            //    Topic = request.Topic,
+            //    Description = request.Description,
+            //    CreatedDate = DateTime.UtcNow,
+            //    TicketAnswer = null,
+            //    ClosedDate = null,
+            //    IsClosed = false,
+            //    UserId = request.UserId,
+            //};
 
             await _ticketRepository.AddAsync(ticket);
             await _ticketRepository.SaveChangesAsync();
 
-            return new TicketModel()
-            {
-                Id = ticket.Id,
-                UserId = ticket.UserId,
-                Description = ticket.Description,
-                Topic = ticket.Topic,
-                IsClosed = ticket.IsClosed,
-                TicketAnswer = ticket.TicketAnswer,
-                ClosedDate = ticket.ClosedDate is null ? 0 : Miscellaneous.DateTimeToUnixTimeStamp((DateTime)ticket.ClosedDate),
-                CreatedDate = Miscellaneous.DateTimeToUnixTimeStamp(ticket.CreatedDate)
-            };
+            return ReflectionMapper.Map<TicketModel>(ticket);
+            //return new TicketModel()
+            //{
+            //    Id = ticket.Id,
+            //    UserId = ticket.UserId,
+            //    Description = ticket.Description,
+            //    Topic = ticket.Topic,
+            //    IsClosed = ticket.IsClosed,
+            //    TicketAnswer = ticket.TicketAnswer,
+            //    ClosedDate = ticket.ClosedDate is null ? 0 : Miscellaneous.DateTimeToUnixTimeStamp((DateTime)ticket.ClosedDate),
+            //    CreatedDate = Miscellaneous.DateTimeToUnixTimeStamp(ticket.CreatedDate)
+            //};
         }
 
         public override async Task<CommonResponse> CloseTicket(CloseTicketInput request, ServerCallContext context)
@@ -70,7 +80,7 @@ namespace HuppyService.Service.Services
             return new CommonResponse() { IsSuccess = true };
         }
 
-        public override async Task<Protos.Int32> GetCountAsync(UserId request, ServerCallContext context)
+        public override async Task<Protos.Int32> GetCount(UserId request, ServerCallContext context)
         {
             var tickets = await _ticketRepository.GetAllAsync();
 
@@ -88,6 +98,12 @@ namespace HuppyService.Service.Services
                 .Take(request.Take)
                 .ToList();
 
+            // TODO: use mapper
+            //var result = new TicketModelCollection();
+            //var temp = ReflectionMapper.Map<TicketModel>(tickets.ToArray());
+            //result.TicketsModels.AddRange(temp);
+
+
             var result = new TicketModelCollection();
             result.TicketsModels.AddRange(tickets.Select(ticket => new TicketModel
             {
@@ -100,17 +116,37 @@ namespace HuppyService.Service.Services
                 ClosedDate = ticket.ClosedDate is null ? 0 : Miscellaneous.DateTimeToUnixTimeStamp((DateTime)ticket.ClosedDate),
                 CreatedDate = Miscellaneous.DateTimeToUnixTimeStamp(ticket.CreatedDate)
             }));
-            
+
             return result;
         }
 
         public override async Task<TicketModel> GetTicket(GetTicketInput request, ServerCallContext context)
         {
             var ticket = await _ticketRepository.GetAsync(request.TicketId);
-            
+
             if (ticket is null) return null!;
 
-            return new TicketModel
+            return ReflectionMapper.Map<TicketModel>(ticket);
+            //return new TicketModel
+            //{
+            //    Id = ticket.Id,
+            //    UserId = ticket.UserId,
+            //    Description = ticket.Description,
+            //    Topic = ticket.Topic,
+            //    IsClosed = ticket.IsClosed,
+            //    TicketAnswer = ticket.TicketAnswer,
+            //    ClosedDate = ticket.ClosedDate is null ? 0 : Miscellaneous.DateTimeToUnixTimeStamp((DateTime)ticket.ClosedDate),
+            //    CreatedDate = Miscellaneous.DateTimeToUnixTimeStamp(ticket.CreatedDate)
+            //};
+        }
+
+        public override async Task<TicketModelCollection> GetTickets(Protos.Void request, ServerCallContext context)
+        {
+            var ticketsQuery = await _ticketRepository.GetAllAsync();
+            var tickets = await ticketsQuery.ToListAsync();
+
+            var result = new TicketModelCollection();
+            result.TicketsModels.AddRange(tickets.Select(ticket => new TicketModel
             {
                 Id = ticket.Id,
                 UserId = ticket.UserId,
@@ -120,32 +156,84 @@ namespace HuppyService.Service.Services
                 TicketAnswer = ticket.TicketAnswer,
                 ClosedDate = ticket.ClosedDate is null ? 0 : Miscellaneous.DateTimeToUnixTimeStamp((DateTime)ticket.ClosedDate),
                 CreatedDate = Miscellaneous.DateTimeToUnixTimeStamp(ticket.CreatedDate)
-            };
+            }));
+
+            return result;
         }
 
-        public override Task<TicketModelCollection> GetTickets(Protos.Void request, ServerCallContext context)
+        public override async Task<TicketModelCollection> GetUserPaginatedTickets(GetUserPaginatedTicketsInput request, ServerCallContext context)
         {
-            return base.GetTickets(request, context);
+            var tickets = await (await _ticketRepository.GetAllAsync())
+                .Where(ticket => ticket.UserId == request.UserId)
+                .OrderBy(ticket => ticket.IsClosed)
+                .ThenByDescending(ticket => ticket.CreatedDate)
+                .Skip(request.Skip)
+                .Take(request.Take)
+                .ToListAsync();
+
+            var result = new TicketModelCollection();
+            result.TicketsModels.AddRange(tickets.Select(ticket => new TicketModel
+            {
+                Id = ticket.Id,
+                UserId = ticket.UserId,
+                Description = ticket.Description,
+                Topic = ticket.Topic,
+                IsClosed = ticket.IsClosed,
+                TicketAnswer = ticket.TicketAnswer,
+                ClosedDate = ticket.ClosedDate is null ? 0 : Miscellaneous.DateTimeToUnixTimeStamp((DateTime)ticket.ClosedDate),
+                CreatedDate = Miscellaneous.DateTimeToUnixTimeStamp(ticket.CreatedDate)
+            }));
+
+            return result;
         }
 
-        public override Task<TicketModelCollection> GetUserPaginatedTickets(GetUserPaginatedTicketsInput request, ServerCallContext context)
+        public override async Task<TicketModelCollection> GetUserTickets(UserId request, ServerCallContext context)
         {
-            return base.GetUserPaginatedTickets(request, context);
+            var tickets = await (await _ticketRepository.GetAllAsync())
+                .Where(ticket => ticket.UserId == request.Id)
+                .ToListAsync();
+
+            var result = new TicketModelCollection();
+            result.TicketsModels.AddRange(tickets.Select(ticket => new TicketModel
+            {
+                Id = ticket.Id,
+                UserId = ticket.UserId,
+                Description = ticket.Description,
+                Topic = ticket.Topic,
+                IsClosed = ticket.IsClosed,
+                TicketAnswer = ticket.TicketAnswer,
+                ClosedDate = ticket.ClosedDate is null ? 0 : Miscellaneous.DateTimeToUnixTimeStamp((DateTime)ticket.ClosedDate),
+                CreatedDate = Miscellaneous.DateTimeToUnixTimeStamp(ticket.CreatedDate)
+            }));
+
+            return result;
         }
 
-        public override Task<TicketModelCollection> GetUserTickets(UserId request, ServerCallContext context)
+        public override async Task<CommonResponse> RemoveTicket(StringId request, ServerCallContext context)
         {
-            return base.GetUserTickets(request, context);
+            if (string.IsNullOrEmpty(request.Id)) throw new ArgumentException("Ticket cannot be null or empty");
+
+            await _ticketRepository.RemoveAsync(request.Id);
+            await _ticketRepository.SaveChangesAsync();
+
+            return new() { IsSuccess = true };
         }
 
-        public override Task<CommonResponse> RemoveTicketAsync(StringId request, ServerCallContext context)
+        public override async Task<CommonResponse> UpdateTicket(TicketUpdateInput request, ServerCallContext context)
         {
-            return base.RemoveTicketAsync(request, context);
-        }
+            if (string.IsNullOrEmpty(request.TicketId) || string.IsNullOrEmpty(request.Description))
+                throw new ArgumentException("Both ticked ID and ticket description cannot be null or empty");
 
-        public override Task<CommonResponse> UpdateTicketAsync(TicketUpdateInput request, ServerCallContext context)
-        {
-            return base.UpdateTicketAsync(request, context);
+            var ticket = await _ticketRepository.GetAsync(request.TicketId);
+
+            if (ticket is null) throw new Exception("Ticket doesn't exist");
+
+            ticket.Description = request.Description;
+
+            await _ticketRepository.UpdateAsync(ticket);
+            await _ticketRepository.SaveChangesAsync();
+
+            return new() { IsSuccess = true };
         }
     }
 }

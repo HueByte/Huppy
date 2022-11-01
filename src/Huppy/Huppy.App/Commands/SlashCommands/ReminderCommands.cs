@@ -97,7 +97,7 @@ public class ReminderCommands : InteractionModuleBase<ExtendedShardedInteraction
 
         embed.WithTitle("Success")
              .WithDescription($"Reminder with `{reminderId}` ID got removed")
-             .AddField("Date", TimestampTag.FromDateTime(DateTime.SpecifyKind(Miscellaneous.UnixTimeStampToUtcDateTime(reminder.UnixTime), DateTimeKind.Utc)))
+             .AddField("Date", TimestampTag.FromDateTime(DateTime.SpecifyKind(Miscellaneous.UnixTimeStampToUtcDateTime(reminder.RemindDate), DateTimeKind.Utc)))
              .AddField("Message", $"```vb\n{reminder.Message}\n```");
 
         await ModifyOriginalResponseAsync((msg) =>
@@ -168,7 +168,7 @@ public class ReminderCommands : InteractionModuleBase<ExtendedShardedInteraction
 
                     foreach (var reminder in reminders)
                     {
-                        TimestampTag timestamp = TimestampTag.FromDateTime(DateTime.SpecifyKind(Miscellaneous.UnixTimeStampToUtcDateTime(reminder.UnixTime), DateTimeKind.Utc));
+                        TimestampTag timestamp = TimestampTag.FromDateTime(DateTime.SpecifyKind(Miscellaneous.UnixTimeStampToUtcDateTime(reminder.RemindDate), DateTimeKind.Utc));
                         embed.AddField(
                             $"✨ Reminder at {timestamp} | ID: {reminder.Id}",
                             $"```vb\n{reminder.Message}```",

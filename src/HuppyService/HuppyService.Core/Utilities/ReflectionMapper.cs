@@ -1,4 +1,5 @@
 ﻿using HuppyService.Core.Abstraction;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,6 +30,31 @@ namespace HuppyService.Core.Utilities
             }
 
             return result;
+        }
+
+        public static ICollection<T>? Map<T>(object[] input) where T  :class, new()
+        {
+            var result = typeof(List<>).MakeGenericType(typeof(T));
+
+            var tProps = result.GetType().GetProperties();
+            var inputProps = input.GetType().GetProperties().ToDictionary(e => e.Name, e => e);
+
+            foreach (var inputObject in input)
+            {
+                T objectToAdd = new();
+                foreach (var prop in tProps)
+                {
+                    inputProps.TryGetValue(prop.Name, out PropertyInfo? matchingProp);
+                    if (matchingProp is null) continue;
+                    var inputPropInstance = matchingProp.GetValue(inputObject, null);
+
+                    prop.SetValue(objectToAdd, GetMappedValue(prop.PropertyType, inputPropInstance));
+                }
+
+                ((ICollection<T>)result).Add(objectToAdd);
+            }
+
+            return result as ICollection<T>;
         }
 
         public static object? GetMappedValue(Type newValue, object? inputValue)

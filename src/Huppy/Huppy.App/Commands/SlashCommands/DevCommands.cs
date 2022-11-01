@@ -9,6 +9,7 @@ using Huppy.Core.Interfaces.IServices;
 using Huppy.Core.Services.HuppyCacheStorage;
 using Huppy.Core.Services.JobManager;
 using Huppy.Core.Services.Paginator.Entities;
+using Huppy.Core.Utilities;
 using Huppy.Kernel.Constants;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -112,14 +113,14 @@ public class DevCommands : InteractionModuleBase<ExtendedShardedInteractionConte
 
             foreach (var ticket in tickets)
             {
-                ticket.CreatedDate = DateTime.SpecifyKind(ticket.CreatedDate, DateTimeKind.Utc);
-
+                // ticket.CreatedDate = DateTime.SpecifyKind(ticket.CreatedDate, DateTimeKind.Utc);
+                var userName = _client.GetUser(ticket.UserId);
                 StringBuilder sb = new();
                 sb.AppendLine($"> Ticked ID:`{ticket.Id}`");
-                sb.AppendLine($"> Created date: {TimestampTag.FromDateTime(ticket.CreatedDate)}");
+                sb.AppendLine($"> Created date: {TimestampTag.FromDateTime(Miscellaneous.UnixTimeStampToUtcDateTime(ticket.CreatedDate))}");
                 sb.AppendLine($"> Status: {(ticket.IsClosed ? "`Closed`" : "`Open`")}");
                 sb.AppendLine($"> Topic: `{ticket.Topic}`");
-                sb.AppendLine($"> Owner: `{ticket.User.Username} ({ticket.UserId})`");
+                sb.AppendLine($"> Owner: `{userName} ({ticket.UserId})`");
 
                 embed.AddField("📜 Ticket", sb.ToString());
             }

@@ -81,6 +81,11 @@ namespace Huppy.App.Configuration
                 options.Address = huppyCoreUrl;
             });
 
+            _services.AddGrpcClient<TicketProto.TicketProtoClient>((services, options) =>
+            {
+                options.Address = huppyCoreUrl;
+            });
+
             return this;
         }
 

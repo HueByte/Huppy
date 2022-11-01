@@ -35,7 +35,7 @@ message ServerRoomsModel {
 
 message ReminderModel {
     int32 Id = 1;
-    uint64 UnixTime = 2;
+    uint64 RemindDate = 2;
     string Message = 3;
     uint64 UserId = 4;
 }

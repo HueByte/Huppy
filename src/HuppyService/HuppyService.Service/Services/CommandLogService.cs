@@ -57,19 +57,7 @@ namespace HuppyService.Service.Services
 
         public override async Task<CommandLogModel> AddCommand(CommandLogModel request, ServerCallContext context)
         {
-            var q = ReflectionMapper.Map<CommandLog>(request);
-
-            Core.Models.CommandLog commandLog = new()
-            {
-                ChannelId = request.ChannelId,
-                UserId = request.UserId,
-                CommandName = request.CommandName,
-                Date = Miscellaneous.UnixTimeStampToUtcDateTime(request.Date),
-                ErrorMessage = request.ErrorMessage,
-                ExecutionTimeMs = request.ExecutionTimeMs,
-                GuildId = request.GuildId,
-                IsSuccess = request.IsSuccess,
-            };
+            var commandLog = ReflectionMapper.Map<CommandLog>(request);
 
             var result = await _commandLogRepository.AddAsync(commandLog);
             await _commandLogRepository.SaveChangesAsync();

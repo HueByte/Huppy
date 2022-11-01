@@ -8,15 +8,15 @@ import "Protos/shared.proto";
 package TicketProto;
 
 service TicketProto {
-    rpc GetCountAsync(shared.UserId) returns (shared.Int32);
+    rpc GetCount(shared.UserId) returns (shared.Int32);
     rpc GetTickets(shared.Void) returns (TicketModelCollection);
     rpc GetUserTickets(shared.UserId) returns (TicketModelCollection);
     rpc GetPaginatedTickets(GetPaginatedTicketsInput) returns (TicketModelCollection);
     rpc GetUserPaginatedTickets(GetUserPaginatedTicketsInput) returns (TicketModelCollection);
     rpc GetTicket(GetTicketInput) returns (database.models.TicketModel);
     rpc AddTicket(AddTicketInput) returns (database.models.TicketModel);
-    rpc RemoveTicketAsync(shared.StringId) returns (shared.CommonResponse);
-    rpc UpdateTicketAsync(TicketUpdateInput) returns (shared.CommonResponse);
+    rpc RemoveTicket(shared.StringId) returns (shared.CommonResponse);
+    rpc UpdateTicket(TicketUpdateInput) returns (shared.CommonResponse);
     rpc CloseTicket(CloseTicketInput) returns (shared.CommonResponse);
 }
 

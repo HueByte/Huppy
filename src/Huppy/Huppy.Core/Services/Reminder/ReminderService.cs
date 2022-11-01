@@ -69,7 +69,7 @@ public class ReminderService : IReminderService
 
             // add reminder
             ReminderInput reminderInput = new() { User = user, Message = reminder.Message };
-            await _eventService.AddEvent(Miscellaneous.UnixTimeStampToUtcDateTime(reminder.UnixTime), reminder.Id.ToString(), reminderInput, async (input) =>
+            await _eventService.AddEvent(Miscellaneous.UnixTimeStampToUtcDateTime(reminder.RemindDate), reminder.Id.ToString(), reminderInput, async (input) =>
             {
                 if (input is ReminderInput data)
                 {
@@ -99,7 +99,7 @@ public class ReminderService : IReminderService
         ReminderModel reminder = new()
         {
             Message = message,
-            UnixTime = Miscellaneous.DateTimeToUnixTimestamp(date),
+            RemindDate = Miscellaneous.DateTimeToUnixTimestamp(date),
             UserId = user.Id
         };
 
@@ -131,7 +131,7 @@ public class ReminderService : IReminderService
 
         if (result.IsSuccess) throw new Exception($"Failed to remove reminder {reminder.Id}");
 
-        await _eventService.Remove(Miscellaneous.UnixTimeStampToUtcDateTime(reminder.UnixTime), reminder.Id.ToString());
+        await _eventService.Remove(Miscellaneous.UnixTimeStampToUtcDateTime(reminder.RemindDate), reminder.Id.ToString());
     }
 
     public async Task RemoveReminderRangeAsync(string[] ids)

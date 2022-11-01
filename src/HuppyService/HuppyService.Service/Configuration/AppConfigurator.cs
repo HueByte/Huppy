@@ -40,6 +40,7 @@ namespace HuppyService.Service.Configuration
                 _app.MapGrpcService<CommandLogService>();
                 _app.MapGrpcService<ServerService>();
                 _app.MapGrpcService<ReminderService>();
+                _app.MapGrpcService<TicketService>();
             }
         }
     }

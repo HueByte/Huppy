@@ -4,6 +4,7 @@ using Discord.Interactions;
 using Huppy.Core.Attributes;
 using Huppy.Core.Interfaces.IServices;
 using Huppy.Core.Services.Paginator.Entities;
+using Huppy.Core.Utilities;
 using Huppy.Kernel.Constants;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -51,7 +52,7 @@ public class TicketCommands : InteractionModuleBase<ExtendedShardedInteractionCo
             .WithThumbnailUrl(Icons.Huppy1)
             .WithTitle("Ticket created!")
             .AddField("Ticket ID", $"`{ticket.Id}`", true)
-            .AddField("Creation date", TimestampTag.FromDateTime(ticket.CreatedDate), true)
+            .AddField("Creation date", TimestampTag.FromDateTime(Miscellaneous.UnixTimeStampToUtcDateTime(ticket.CreatedDate)), true)
             .AddField("Status", ticket.IsClosed ? "`Closed`" : "`Open`", true)
             .AddField("Topic", ticket.Topic)
             .AddField("Ticket description", ticket.Description)
@@ -92,13 +93,15 @@ public class TicketCommands : InteractionModuleBase<ExtendedShardedInteractionCo
         }
         else
         {
-            ticket.CreatedDate = DateTime.SpecifyKind(ticket.CreatedDate, DateTimeKind.Utc);
+            // ticket.CreatedDate = DateTime.SpecifyKind(ticket.CreatedDate, DateTimeKind.Utc);
+            DateTime? date = Miscellaneous.UnixTimeStampToUtcDateTime(ticket.ClosedDate);
+            string closedDate = date is not null ? TimestampTag.FromDateTime(Miscellaneous.UnixTimeStampToUtcDateTime(ticket.CreatedDate)).ToString() : "Ticket still open";
 
             embed = new EmbedBuilder().WithColor(Color.Magenta)
                 .WithThumbnailUrl(Icons.Huppy1)
                 .WithTitle("Ticket details")
-                .AddField("Creation date", TimestampTag.FromDateTime(ticket.CreatedDate), true)
-                .AddField("Closed date", ticket.ClosedDate is not null ? TimestampTag.FromDateTime(ticket.CreatedDate) : "Ticket still open", true)
+                .AddField("Creation date", TimestampTag.FromDateTime(Miscellaneous.UnixTimeStampToUtcDateTime(ticket.CreatedDate)), true)
+                .AddField("Closed date", closedDate, true)
                 .AddField("Status", ticket.IsClosed ? "`Closed`" : "`Open`", true)
                 .AddField("Topic", ticket.Topic)
                 .AddField("Ticket description", ticket.Description)
@@ -148,11 +151,11 @@ public class TicketCommands : InteractionModuleBase<ExtendedShardedInteractionCo
 
             foreach (var ticket in tickets)
             {
-                ticket.CreatedDate = DateTime.SpecifyKind(ticket.CreatedDate, DateTimeKind.Utc);
+                // ticket.CreatedDate = DateTime.SpecifyKind(ticket.CreatedDate, DateTimeKind.Utc);
 
                 StringBuilder sb = new();
                 sb.AppendLine($"> Ticked ID:`{ticket.Id}`");
-                sb.AppendLine($"> Created date: {TimestampTag.FromDateTime(ticket.CreatedDate)}");
+                sb.AppendLine($"> Created date: {TimestampTag.FromDateTime(Miscellaneous.UnixTimeStampToUtcDateTime(ticket.CreatedDate))}");
                 sb.AppendLine($"> Status: {(ticket.IsClosed ? "`Closed`" : "`Open`")}");
                 sb.AppendLine($"> Topic: `{ticket.Topic}`");
 
