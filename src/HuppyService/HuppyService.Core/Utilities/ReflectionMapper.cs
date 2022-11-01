@@ -15,17 +15,15 @@ namespace HuppyService.Core.Utilities
             T result = new();
 
             var tProps = result.GetType().GetProperties();
-            var inputProps = input.GetType().GetProperties();
+            var inputProps = input.GetType().GetProperties().ToDictionary(e => e.Name, e => e);
 
             foreach (var prop in tProps)
             {
-                var matchingProp = inputProps.FirstOrDefault(iprop => iprop.Name == prop.Name);
-                if (matchingProp is null)
-                    continue;
-                
-                var inputPropInstance = matchingProp.GetValue(input, null);
+                inputProps.TryGetValue(prop.Name, out PropertyInfo? matchingProp);
 
-                Console.WriteLine($"Setting {prop.PropertyType} from {inputPropInstance?.GetType()}");
+                if (matchingProp is null) continue;
+
+                var inputPropInstance = matchingProp.GetValue(input, null);
 
                 prop.SetValue(result, GetMappedValue(prop.PropertyType, inputPropInstance));
             }
@@ -33,7 +31,7 @@ namespace HuppyService.Core.Utilities
             return result;
         }
 
-        public static object? GetMappedValue(Type newValue, object inputValue)
+        public static object? GetMappedValue(Type newValue, object? inputValue)
         {
             if (inputValue is null) return default;
 
