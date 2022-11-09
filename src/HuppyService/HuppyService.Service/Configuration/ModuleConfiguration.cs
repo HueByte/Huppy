@@ -1,6 +1,11 @@
-﻿using HuppyService.Core.Interfaces.IRepositories;
+﻿using AutoMapper;
+using HuppyService.Core.Interfaces.IRepositories;
+using HuppyService.Core.Models;
+using HuppyService.Core.Utilities;
 using HuppyService.Infrastructure;
 using HuppyService.Infrastructure.Repositories;
+using HuppyService.Service.Protos.Models;
+using Microsoft.EntityFrameworkCore.Scaffolding;
 using Microsoft.Extensions.Configuration;
 
 namespace HuppyService.Service.Configuration
@@ -18,6 +23,23 @@ namespace HuppyService.Service.Configuration
         public ModuleConfiguration AddAppConfigurator()
         {
             _services.AddSingleton<AppConfigurator>();
+
+            return this;
+        }
+
+        public ModuleConfiguration ConfigureMappings()
+        {
+            var mapperConfig = new MapperConfiguration(conf =>
+            {
+                conf.AddProfile(new MappingProfile());
+            });
+
+            
+            if(Miscellaneous.IsDebug()) mapperConfig.AssertConfigurationIsValid();
+
+            var mapper = mapperConfig.CreateMapper();
+
+            _services.AddSingleton(mapper);
 
             return this;
         }

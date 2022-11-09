@@ -7,11 +7,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Host.ConfigureServices(services =>
 {
     _ = new ModuleConfiguration(builder.Configuration, services)
-    .AddAppConfigurator()
-    .AddGrpc()
-    .AddHttpClients()
-    .AddDatabase()
-    .AddRepositories();
+        .AddAppConfigurator()
+        .ConfigureMappings()
+        .AddGrpc()
+        .AddHttpClients()
+        .AddDatabase()
+        .AddRepositories();
 });
 
 var app = builder.Build();

@@ -22,5 +22,14 @@ namespace HuppyService.Core.Utilities
             return (ulong)(TimeZoneInfo.ConvertTimeToUtc(date) -
                    new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc)).TotalSeconds;
         }
+
+        public static bool IsDebug()
+        {
+#if DEBUG
+            return true;
+#else
+            return false;
+#endif
+        }
     }
 }

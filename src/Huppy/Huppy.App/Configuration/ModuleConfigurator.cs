@@ -179,8 +179,6 @@ namespace Huppy.App.Configuration
 
             // repositories
             _services.AddScoped<IUserRepository, UserRepository>();
-            _services.AddScoped<IReminderRepository, ReminderRepository>();
-            _services.AddScoped<ITicketRepository, TicketRepository>();
 
             return this;
         }

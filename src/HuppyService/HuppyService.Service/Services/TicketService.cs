@@ -30,7 +30,7 @@ namespace HuppyService.Service.Services
             ticket.CreatedDate = DateTime.UtcNow;
             ticket.TicketAnswer = null;
             ticket.IsClosed = false;
-            ticket.ClosedDate = null;
+            ticket.ClosedDate = default;
 
             //Ticket ticket = new()
             //{
@@ -113,7 +113,7 @@ namespace HuppyService.Service.Services
                 Topic = ticket.Topic,
                 IsClosed = ticket.IsClosed,
                 TicketAnswer = ticket.TicketAnswer,
-                ClosedDate = ticket.ClosedDate is null ? 0 : Miscellaneous.DateTimeToUnixTimeStamp((DateTime)ticket.ClosedDate),
+                ClosedDate = ticket.ClosedDate == default ? 0 : Miscellaneous.DateTimeToUnixTimeStamp((DateTime)ticket.ClosedDate),
                 CreatedDate = Miscellaneous.DateTimeToUnixTimeStamp(ticket.CreatedDate)
             }));
 
@@ -127,17 +127,6 @@ namespace HuppyService.Service.Services
             if (ticket is null) return null!;
 
             return ReflectionMapper.Map<TicketModel>(ticket);
-            //return new TicketModel
-            //{
-            //    Id = ticket.Id,
-            //    UserId = ticket.UserId,
-            //    Description = ticket.Description,
-            //    Topic = ticket.Topic,
-            //    IsClosed = ticket.IsClosed,
-            //    TicketAnswer = ticket.TicketAnswer,
-            //    ClosedDate = ticket.ClosedDate is null ? 0 : Miscellaneous.DateTimeToUnixTimeStamp((DateTime)ticket.ClosedDate),
-            //    CreatedDate = Miscellaneous.DateTimeToUnixTimeStamp(ticket.CreatedDate)
-            //};
         }
 
         public override async Task<TicketModelCollection> GetTickets(Protos.Void request, ServerCallContext context)
@@ -154,7 +143,7 @@ namespace HuppyService.Service.Services
                 Topic = ticket.Topic,
                 IsClosed = ticket.IsClosed,
                 TicketAnswer = ticket.TicketAnswer,
-                ClosedDate = ticket.ClosedDate is null ? 0 : Miscellaneous.DateTimeToUnixTimeStamp((DateTime)ticket.ClosedDate),
+                ClosedDate = ticket.ClosedDate == default ? 0 : Miscellaneous.DateTimeToUnixTimeStamp((DateTime)ticket.ClosedDate),
                 CreatedDate = Miscellaneous.DateTimeToUnixTimeStamp(ticket.CreatedDate)
             }));
 
@@ -180,7 +169,7 @@ namespace HuppyService.Service.Services
                 Topic = ticket.Topic,
                 IsClosed = ticket.IsClosed,
                 TicketAnswer = ticket.TicketAnswer,
-                ClosedDate = ticket.ClosedDate is null ? 0 : Miscellaneous.DateTimeToUnixTimeStamp((DateTime)ticket.ClosedDate),
+                ClosedDate = ticket.ClosedDate == default ? 0 : Miscellaneous.DateTimeToUnixTimeStamp((DateTime)ticket.ClosedDate),
                 CreatedDate = Miscellaneous.DateTimeToUnixTimeStamp(ticket.CreatedDate)
             }));
 
@@ -202,7 +191,7 @@ namespace HuppyService.Service.Services
                 Topic = ticket.Topic,
                 IsClosed = ticket.IsClosed,
                 TicketAnswer = ticket.TicketAnswer,
-                ClosedDate = ticket.ClosedDate is null ? 0 : Miscellaneous.DateTimeToUnixTimeStamp((DateTime)ticket.ClosedDate),
+                ClosedDate = ticket.ClosedDate == default ? 0 : Miscellaneous.DateTimeToUnixTimeStamp((DateTime)ticket.ClosedDate),
                 CreatedDate = Miscellaneous.DateTimeToUnixTimeStamp(ticket.CreatedDate)
             }));
 

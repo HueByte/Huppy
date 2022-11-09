@@ -13,7 +13,7 @@ namespace HuppyService.Core.Models
         public bool IsClosed { get; set; }
         public string? TicketAnswer { get; set; }
         public DateTime CreatedDate { get; set; }
-        public DateTime? ClosedDate { get; set; }
+        public DateTime ClosedDate { get; set; }
 
         //[ForeignKey("UserId")]
         public ulong UserId { get; set; }

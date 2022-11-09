@@ -94,8 +94,8 @@ public class TicketCommands : InteractionModuleBase<ExtendedShardedInteractionCo
         else
         {
             // ticket.CreatedDate = DateTime.SpecifyKind(ticket.CreatedDate, DateTimeKind.Utc);
-            DateTime? date = Miscellaneous.UnixTimeStampToUtcDateTime(ticket.ClosedDate);
-            string closedDate = date is not null ? TimestampTag.FromDateTime(Miscellaneous.UnixTimeStampToUtcDateTime(ticket.CreatedDate)).ToString() : "Ticket still open";
+            DateTime date = Miscellaneous.UnixTimeStampToUtcDateTime(ticket.ClosedDate);
+            string closedDate = date != default ? TimestampTag.FromDateTime(Miscellaneous.UnixTimeStampToUtcDateTime(ticket.CreatedDate)).ToString() : "Ticket still open";
 
             embed = new EmbedBuilder().WithColor(Color.Magenta)
                 .WithThumbnailUrl(Icons.Huppy1)
