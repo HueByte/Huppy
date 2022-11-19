@@ -17,9 +17,10 @@ namespace HuppyService.Core.Utilities
             return dateTime;
         }
 
-        public static ulong DateTimeToUnixTimeStamp(DateTime date)
+        public static ulong DateTimeToUnixTimeStamp(DateTime? date)
         {
-            return (ulong)(TimeZoneInfo.ConvertTimeToUtc(date) -
+            date ??= default;
+            return (ulong)(TimeZoneInfo.ConvertTimeToUtc((DateTime)date) -
                    new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc)).TotalSeconds;
         }
 

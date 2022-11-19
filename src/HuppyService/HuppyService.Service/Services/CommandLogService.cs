@@ -1,4 +1,5 @@
-﻿using Google.Protobuf.WellKnownTypes;
+﻿using AutoMapper;
+using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using HuppyService.Core.Interfaces.IRepositories;
 using HuppyService.Core.Models;
@@ -12,9 +13,11 @@ namespace HuppyService.Service.Services
     public class CommandLogService : CommandLogProto.CommandLogProtoBase
     {
         private readonly ICommandLogRepository _commandLogRepository;
-        public CommandLogService(ICommandLogRepository commandLogRepository)
+        private readonly IMapper _mapper;
+        public CommandLogService(ICommandLogRepository commandLogRepository, IMapper mapper)
         {
             _commandLogRepository = commandLogRepository;
+            _mapper = mapper;
         }
 
         public override async Task<Protos.Int32> GetCount(Protos.Void request, ServerCallContext context)
@@ -57,7 +60,7 @@ namespace HuppyService.Service.Services
 
         public override async Task<CommandLogModel> AddCommand(CommandLogModel request, ServerCallContext context)
         {
-            var commandLog = ReflectionMapper.Map<CommandLog>(request);
+            var commandLog = _mapper.Map<CommandLog>(request);
 
             var result = await _commandLogRepository.AddAsync(commandLog);
             await _commandLogRepository.SaveChangesAsync();
@@ -73,17 +76,7 @@ namespace HuppyService.Service.Services
 
         public override async Task<CommonResponse> RemoveCommand(CommandLogModel request, ServerCallContext context)
         {
-            Core.Models.CommandLog commandLog = new()
-            {
-                ChannelId = request.ChannelId,
-                UserId = request.UserId,
-                CommandName = request.CommandName,
-                Date = Miscellaneous.UnixTimeStampToUtcDateTime(request.Date),
-                ErrorMessage = request.ErrorMessage,
-                ExecutionTimeMs = request.ExecutionTimeMs,
-                GuildId = request.GuildId,
-                IsSuccess = request.IsSuccess,
-            };
+            var commandLog = _mapper.Map<CommandLog>(request);
 
             await _commandLogRepository.RemoveAsync(commandLog);
             await _commandLogRepository.SaveChangesAsync();

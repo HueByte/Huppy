@@ -3,8 +3,7 @@
 - GPT
 - Reminder
 - Server
-- Ticket *
-- Urban *
+- Ticket 
 
 ## Migration consideration
 - ServerInteraction

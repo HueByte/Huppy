@@ -53,6 +53,8 @@ namespace HuppyService.Service.Configuration
                     opt => opt.MapFrom(src => Miscellaneous.DateTimeToUnixTimeStamp(src.CreatedDate)))
                 .ForMember(dest => dest.ClosedDate,
                     opt => opt.MapFrom(src => Miscellaneous.DateTimeToUnixTimeStamp(src.ClosedDate)));
+
+            AllowNullDestinationValues = false;
         }
     }
 }

@@ -263,7 +263,7 @@ public class HuppyHostedService : IHostedService
 #if DEBUG
         return false;
 #else
-            return true;
+        return true;
 #endif
     }
 }

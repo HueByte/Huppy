@@ -1,4 +1,5 @@
-﻿using Google.Protobuf;
+﻿using AutoMapper;
+using Google.Protobuf;
 using Grpc.Core;
 using HuppyService.Core.Interfaces.IRepositories;
 using HuppyService.Core.Models;
@@ -15,22 +16,33 @@ namespace HuppyService.Service.Services
     public class TicketService : TicketProto.TicketProtoBase
     {
         private readonly ITicketRepository _ticketRepository;
-        public TicketService(ITicketRepository ticketRepository)
+        private readonly IMapper _mapper;
+        public TicketService(ITicketRepository ticketRepository, IMapper mapper)
         {
             _ticketRepository = ticketRepository;
+            _mapper = mapper;   
         }
 
         public override async Task<TicketModel> AddTicket(AddTicketInput request, ServerCallContext context)
         {
             if (string.IsNullOrEmpty(request.Description)) throw new ArgumentException("Ticket description cannot be null");
 
-            var ticket = ReflectionMapper.Map<Ticket>(request);
+            //var ticket = _mapper.Map<Ticket>(request);
+            //var ticket = ReflectionMapper.Map<Ticket>(request);
 
-            ticket.Id = Guid.NewGuid().ToString();
-            ticket.CreatedDate = DateTime.UtcNow;
-            ticket.TicketAnswer = null;
-            ticket.IsClosed = false;
-            ticket.ClosedDate = default;
+            Ticket ticket = new()
+            {
+                UserId = request.UserId,
+                Topic = request.Topic,
+                Description = request.Description,
+                Id = Guid.NewGuid().ToString(),
+                CreatedDate = DateTime.UtcNow,
+                TicketAnswer = null,
+                IsClosed = false,
+                ClosedDate = default
+            };
+
+
 
             //Ticket ticket = new()
             //{
@@ -47,7 +59,8 @@ namespace HuppyService.Service.Services
             await _ticketRepository.AddAsync(ticket);
             await _ticketRepository.SaveChangesAsync();
 
-            return ReflectionMapper.Map<TicketModel>(ticket);
+            return _mapper.Map<TicketModel>(ticket);
+            //return ReflectionMapper.Map<TicketModel>(ticket);
             //return new TicketModel()
             //{
             //    Id = ticket.Id,
@@ -105,17 +118,19 @@ namespace HuppyService.Service.Services
 
 
             var result = new TicketModelCollection();
-            result.TicketsModels.AddRange(tickets.Select(ticket => new TicketModel
-            {
-                Id = ticket.Id,
-                UserId = ticket.UserId,
-                Description = ticket.Description,
-                Topic = ticket.Topic,
-                IsClosed = ticket.IsClosed,
-                TicketAnswer = ticket.TicketAnswer,
-                ClosedDate = ticket.ClosedDate == default ? 0 : Miscellaneous.DateTimeToUnixTimeStamp((DateTime)ticket.ClosedDate),
-                CreatedDate = Miscellaneous.DateTimeToUnixTimeStamp(ticket.CreatedDate)
-            }));
+            result.TicketsModels.AddRange(_mapper.Map<TicketModel[]>(tickets));
+
+            //result.TicketsModels.AddRange(tickets.Select(ticket => new TicketModel
+            //{
+            //    Id = ticket.Id,
+            //    UserId = ticket.UserId,
+            //    Description = ticket.Description,
+            //    Topic = ticket.Topic,
+            //    IsClosed = ticket.IsClosed,
+            //    TicketAnswer = ticket.TicketAnswer,
+            //    ClosedDate = ticket.ClosedDate == default ? 0 : Miscellaneous.DateTimeToUnixTimeStamp((DateTime)ticket.ClosedDate),
+            //    CreatedDate = Miscellaneous.DateTimeToUnixTimeStamp(ticket.CreatedDate)
+            //}));
 
             return result;
         }
@@ -126,7 +141,8 @@ namespace HuppyService.Service.Services
 
             if (ticket is null) return null!;
 
-            return ReflectionMapper.Map<TicketModel>(ticket);
+            return _mapper.Map<TicketModel>(ticket);
+            //return ReflectionMapper.Map<TicketModel>(ticket);
         }
 
         public override async Task<TicketModelCollection> GetTickets(Protos.Void request, ServerCallContext context)
@@ -135,17 +151,19 @@ namespace HuppyService.Service.Services
             var tickets = await ticketsQuery.ToListAsync();
 
             var result = new TicketModelCollection();
-            result.TicketsModels.AddRange(tickets.Select(ticket => new TicketModel
-            {
-                Id = ticket.Id,
-                UserId = ticket.UserId,
-                Description = ticket.Description,
-                Topic = ticket.Topic,
-                IsClosed = ticket.IsClosed,
-                TicketAnswer = ticket.TicketAnswer,
-                ClosedDate = ticket.ClosedDate == default ? 0 : Miscellaneous.DateTimeToUnixTimeStamp((DateTime)ticket.ClosedDate),
-                CreatedDate = Miscellaneous.DateTimeToUnixTimeStamp(ticket.CreatedDate)
-            }));
+            result.TicketsModels.AddRange(_mapper.Map<TicketModel[]>(tickets));
+
+            //result.TicketsModels.AddRange(tickets.Select(ticket => new TicketModel
+            //{
+            //    Id = ticket.Id,
+            //    UserId = ticket.UserId,
+            //    Description = ticket.Description,
+            //    Topic = ticket.Topic,
+            //    IsClosed = ticket.IsClosed,
+            //    TicketAnswer = ticket.TicketAnswer,
+            //    ClosedDate = ticket.ClosedDate == default ? 0 : Miscellaneous.DateTimeToUnixTimeStamp((DateTime)ticket.ClosedDate),
+            //    CreatedDate = Miscellaneous.DateTimeToUnixTimeStamp(ticket.CreatedDate)
+            //}));
 
             return result;
         }
@@ -161,17 +179,19 @@ namespace HuppyService.Service.Services
                 .ToListAsync();
 
             var result = new TicketModelCollection();
-            result.TicketsModels.AddRange(tickets.Select(ticket => new TicketModel
-            {
-                Id = ticket.Id,
-                UserId = ticket.UserId,
-                Description = ticket.Description,
-                Topic = ticket.Topic,
-                IsClosed = ticket.IsClosed,
-                TicketAnswer = ticket.TicketAnswer,
-                ClosedDate = ticket.ClosedDate == default ? 0 : Miscellaneous.DateTimeToUnixTimeStamp((DateTime)ticket.ClosedDate),
-                CreatedDate = Miscellaneous.DateTimeToUnixTimeStamp(ticket.CreatedDate)
-            }));
+            result.TicketsModels.AddRange(_mapper.Map<TicketModel[]>(tickets));
+
+            //result.TicketsModels.AddRange(tickets.Select(ticket => new TicketModel
+            //{
+            //    Id = ticket.Id,
+            //    UserId = ticket.UserId,
+            //    Description = ticket.Description,
+            //    Topic = ticket.Topic,
+            //    IsClosed = ticket.IsClosed,
+            //    TicketAnswer = ticket.TicketAnswer,
+            //    ClosedDate = ticket.ClosedDate == default ? 0 : Miscellaneous.DateTimeToUnixTimeStamp((DateTime)ticket.ClosedDate),
+            //    CreatedDate = Miscellaneous.DateTimeToUnixTimeStamp(ticket.CreatedDate)
+            //}));
 
             return result;
         }
@@ -183,17 +203,19 @@ namespace HuppyService.Service.Services
                 .ToListAsync();
 
             var result = new TicketModelCollection();
-            result.TicketsModels.AddRange(tickets.Select(ticket => new TicketModel
-            {
-                Id = ticket.Id,
-                UserId = ticket.UserId,
-                Description = ticket.Description,
-                Topic = ticket.Topic,
-                IsClosed = ticket.IsClosed,
-                TicketAnswer = ticket.TicketAnswer,
-                ClosedDate = ticket.ClosedDate == default ? 0 : Miscellaneous.DateTimeToUnixTimeStamp((DateTime)ticket.ClosedDate),
-                CreatedDate = Miscellaneous.DateTimeToUnixTimeStamp(ticket.CreatedDate)
-            }));
+            result.TicketsModels.AddRange(_mapper.Map<TicketModel[]>(tickets));
+
+            //result.TicketsModels.AddRange(tickets.Select(ticket => new TicketModel
+            //{
+            //    Id = ticket.Id,
+            //    UserId = ticket.UserId,
+            //    Description = ticket.Description,
+            //    Topic = ticket.Topic,
+            //    IsClosed = ticket.IsClosed,
+            //    TicketAnswer = ticket.TicketAnswer,
+            //    ClosedDate = ticket.ClosedDate == default ? 0 : Miscellaneous.DateTimeToUnixTimeStamp((DateTime)ticket.ClosedDate),
+            //    CreatedDate = Miscellaneous.DateTimeToUnixTimeStamp(ticket.CreatedDate)
+            //}));
 
             return result;
         }
