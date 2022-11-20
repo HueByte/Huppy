@@ -16,8 +16,10 @@ jobs:
         uses: actions/setup-dotnet@v2
         with:
           dotnet-version: 6.0.x
-      - name: Restore dependencies
-        run: dotnet restore Huppy/Huppy.sln
+      - name: Restore dependencies Main
+        run: dotnet restore src/Main.sln
+      - name: Restore dependencies Huppy
+        run: dotnet restore src/Huppy/Huppy.sln
       - name: Build
         run: dotnet build src/Main.sln --no-restore
       - name: Build Huppy
