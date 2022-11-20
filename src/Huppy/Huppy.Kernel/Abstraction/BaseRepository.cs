@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Huppy.Kernel.Abstraction;
 
+[Obsolete]
 public class BaseRepository<TKeyType, TEntity, TContext> : IRepository<TKeyType, TEntity>
     where TKeyType : IConvertible
     where TEntity : DbModel<TKeyType>, new()

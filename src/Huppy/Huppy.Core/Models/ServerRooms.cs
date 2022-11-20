@@ -4,6 +4,7 @@ using Huppy.Kernel;
 
 namespace Huppy.Core.Models
 {
+    [Obsolete]
     public class ServerRooms : DbModel<ulong>
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

@@ -1,8 +1,9 @@
-using Huppy.Kernel;
 using System.ComponentModel.DataAnnotations.Schema;
+using Huppy.Kernel;
 
 namespace Huppy.Core.Models
 {
+    [Obsolete]
     public class Reminder : DbModel<int>
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
