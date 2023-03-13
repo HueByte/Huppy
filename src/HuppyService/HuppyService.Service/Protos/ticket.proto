@@ -1,0 +1,57 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "HuppyService.Service.Protos";
+
+import "Protos/database.proto"; 
+import "Protos/shared.proto";
+
+package TicketProto;
+
+service TicketProto {
+    rpc GetCount(shared.UserId) returns (shared.Int32);
+    rpc GetTickets(shared.Void) returns (TicketModelCollection);
+    rpc GetUserTickets(shared.UserId) returns (TicketModelCollection);
+    rpc GetPaginatedTickets(GetPaginatedTicketsInput) returns (TicketModelCollection);
+    rpc GetUserPaginatedTickets(GetUserPaginatedTicketsInput) returns (TicketModelCollection);
+    rpc GetTicket(GetTicketInput) returns (database.models.TicketModel);
+    rpc AddTicket(AddTicketInput) returns (database.models.TicketModel);
+    rpc RemoveTicket(shared.StringId) returns (shared.CommonResponse);
+    rpc UpdateTicket(TicketUpdateInput) returns (shared.CommonResponse);
+    rpc CloseTicket(CloseTicketInput) returns (shared.CommonResponse);
+}
+
+message TicketUpdateInput {
+    string TicketId = 1;
+    string Description = 2;
+}
+
+message CloseTicketInput {
+    string TicketId = 1;
+    string Answer = 2;
+}
+
+message AddTicketInput {
+    uint64 UserId = 1;
+    string Topic = 2;
+    string Description = 3;
+}
+
+message GetTicketInput {
+    string TicketId = 1;
+    uint64 UserId = 2;
+}
+
+message GetUserPaginatedTicketsInput {
+    uint64 UserId = 1;
+    int32 Skip = 2;
+    int32 Take = 3;
+}
+
+message GetPaginatedTicketsInput {
+    int32 Skip = 1;
+    int32 Take = 2;
+} 
+
+message TicketModelCollection {
+    repeated database.models.TicketModel TicketsModels = 1;
+}

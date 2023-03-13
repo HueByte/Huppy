@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+option csharp_namespace = "HuppyService.Service.Protos";
+
+import "Protos/database.proto"; 
+import "Protos/shared.proto";
+
+package CommandLogProto;
+
+service CommandLogProto {
+    rpc GetCount(shared.Void) returns (shared.Int32);
+	rpc GetAverageExecutionTime(shared.Void) returns (AverageTimeResponse);
+    rpc GetAiUsage(shared.Void) returns (AiUsageResponse);
+    rpc AddCommand(database.models.CommandLogModel) returns (database.models.CommandLogModel);
+    rpc RemoveCommand(database.models.CommandLogModel) returns (shared.CommonResponse);
+}
+
+message AverageTimeResponse {
+    double AverageTime = 1;
+}
+
+message AiUsageResponse {
+    map<uint64, int32> AiUsers = 1;
+}

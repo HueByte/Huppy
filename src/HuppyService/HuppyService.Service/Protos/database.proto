@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+option csharp_namespace = "HuppyService.Service.Protos.Models";
+
+package database.models;
+
+message CommandLogModel {
+    int32 Id = 1;
+    string CommandName = 2;
+    uint64 Date = 3;
+    bool IsSuccess = 4;
+    uint64 UserId = 5;
+    int64 ExecutionTimeMs = 6;
+    uint64 ChannelId = 7;
+    string ErrorMessage = 8;
+    uint64 GuildId = 9;
+}
+
+message ServerModel {
+    uint64 Id = 1;
+    string ServerName = 2;
+    bool UseGreet = 3;
+    string GreetMessage = 4;
+    uint64 RoleId = 5;
+    uint64 ServerRoomsId = 6;
+    ServerRoomsModel Rooms = 7;
+}
+
+message ServerRoomsModel {
+    uint64 Id = 1;
+    uint64 OutputRoom = 2;
+    uint64 GreetingRoom = 3;
+    uint64 ServerId = 4;
+}
+
+message ReminderModel {
+    int32 Id = 1;
+    uint64 RemindDate = 2;
+    string Message = 3;
+    uint64 UserId = 4;
+}
+
+message TicketModel {
+    string Id = 1;
+    string Topic = 2;
+    string Description = 3;
+    bool IsClosed = 4;
+    string TicketAnswer = 5;
+    uint64 CreatedDate = 6;
+    uint64 ClosedDate = 7;
+    uint64 UserId = 8;
+}

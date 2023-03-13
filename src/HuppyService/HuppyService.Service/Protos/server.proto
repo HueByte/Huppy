@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+option csharp_namespace = "HuppyService.Service.Protos";
+
+import "Protos/database.proto";
+import "Protos/shared.proto";
+
+package ServerProto;
+
+service ServerProto {
+    rpc Get(shared.ServerId) returns (database.models.ServerModel);
+    rpc GetOrCreate(GetOrCreateServerInput) returns (database.models.ServerModel);
+    rpc Update(database.models.ServerModel) returns(shared.CommonResponse);
+    rpc GetAll(shared.Void) returns (ServerModelCollection);
+}
+
+message ServerModelCollection {
+    repeated database.models.ServerModel ServerModels = 1;
+}
+
+message GetOrCreateServerInput {
+	uint64 Id = 1;
+	string ServerName = 2;
+    uint64 DefaultChannel = 3;
+}

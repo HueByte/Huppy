@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+option csharp_namespace = "HuppyService.Service.Protos";
+
+package shared;
+
+message CommonResponse {
+    bool IsSuccess = 1;
+}
+
+message UserId {
+    uint64 Id = 1;
+}
+
+message ServerId {
+    uint64 Id = 1;
+}
+
+message Int32 {
+    int32 Number = 1;
+}
+
+message StringId {
+    string Id = 1;
+}
+
+message Void { }
